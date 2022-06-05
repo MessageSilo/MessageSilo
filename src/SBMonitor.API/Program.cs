@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Net.Http.Headers;
 using Orleans;
 using Orleans.Hosting;
+using SBMonitor.API.Hubs;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -10,12 +12,19 @@ builder.UseOrleans(builder =>
          {
              manager.AddApplicationPart(typeof(Program).Assembly).WithReferences();
          });
-         builder.UseLocalhostClustering();
-         builder.AddMemoryGrainStorageAsDefault();
-         builder.AddSimpleMessageStreamProvider("SMS");
-         builder.AddMemoryGrainStorage("PubSubStore");
+
          builder.UseDashboard();
          builder.ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Debug).AddConsole());
+
+         builder.UseSignalR(b =>
+             b.Configure((innerSiloBuilder, config) =>
+             {
+                 innerSiloBuilder.UseLocalhostClustering();
+                 innerSiloBuilder.AddMemoryGrainStorageAsDefault();
+                 innerSiloBuilder.AddSimpleMessageStreamProvider("SMS");
+                 innerSiloBuilder.AddMemoryGrainStorage("PubSubStore");
+             })
+             ).RegisterHub<MessageMonitorHub>();
      });
 
 builder.ConfigureWebHostDefaults(webBuilder =>
@@ -33,6 +42,7 @@ builder.ConfigureWebHostDefaults(webBuilder =>
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapDefaultControllerRoute();
+            endpoints.MapHub<MessageMonitorHub>("/MessageMonitorHub");
         });
     });
 });
@@ -43,6 +53,8 @@ builder.ConfigureServices(services =>
     {
         options.SuppressStatusMessages = true;
     });
+
+    services.AddSignalR().AddOrleans();
 });
 
 await builder.RunConsoleAsync();

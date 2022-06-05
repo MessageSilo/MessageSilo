@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
 
@@ -7,6 +7,8 @@ namespace SBMonitor.BlazorApp.Shared
     public partial class ConnectionSettings
     {
         private HttpClient _apiClient;
+
+        private HubConnection _hubConnection;
 
         string Name { get; set; } = "test";
 
@@ -19,6 +21,13 @@ namespace SBMonitor.BlazorApp.Shared
         string TopicName { get; set; } = string.Empty;
 
         string SubscriptionName { get; set; } = string.Empty;
+
+        private void _hubConnection_Received(string obj)
+        {
+            Name = obj;
+
+            StateHasChanged();
+        }
 
         async Task Connect()
         {
@@ -44,6 +53,17 @@ namespace SBMonitor.BlazorApp.Shared
                     });
                     break;
             };
+
+            _hubConnection = new HubConnectionBuilder().WithUrl($"{_apiClient.BaseAddress}MessageMonitorHub").Build();
+
+            _hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+            {
+                var encodedMsg = $"{user}: {message}";
+                Name = encodedMsg;
+                StateHasChanged();
+            });
+
+            await _hubConnection.StartAsync();
         }
     }
 }

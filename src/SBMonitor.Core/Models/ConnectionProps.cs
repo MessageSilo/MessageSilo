@@ -14,5 +14,7 @@ namespace SBMonitor.Core.Models
         public string ConnectionString { get; set; } = string.Empty;
 
         public abstract BusType TypeOfBus { get; }
+
+        public DateTime StartedAt { get; set; }
     }
 }

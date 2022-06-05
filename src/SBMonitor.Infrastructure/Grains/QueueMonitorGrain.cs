@@ -13,7 +13,7 @@ namespace SBMonitor.Infrastructure.Grains
             return _client.CreateProcessor(ConnectionProps.QueueName, _options);
         }
 
-        public QueueMonitorGrain(ILogger<QueueMonitorGrain> logger)
+        public QueueMonitorGrain(ILogger<QueueMonitorGrain> logger) : base()
         {
             _logger = logger;
         }

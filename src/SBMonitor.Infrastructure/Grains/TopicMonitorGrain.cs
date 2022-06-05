@@ -11,7 +11,7 @@ namespace SBMonitor.Infrastructure.Grains
             return _client.CreateProcessor(ConnectionProps.TopicName, ConnectionProps.SubscriptionName, _options);
         }
 
-        public TopicMonitorGrain(ILogger<TopicMonitorGrain> logger)
+        public TopicMonitorGrain(ILogger<TopicMonitorGrain> logger) : base()
         {
             _logger = logger;
         }

@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SBMonitor.Core", "src\SBMon
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SBMonitor.Infrastructure", "src\SBMonitor.Infrastructure\SBMonitor.Infrastructure.csproj", "{9F4D8ABA-8B3B-47F3-964B-27AD13EA6CD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SBMonitor.API", "src\SBMonitor.API\SBMonitor.API.csproj", "{14E20EB5-5802-4C14-9822-DF1E5366F8FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SBMonitor.API", "src\SBMonitor.API\SBMonitor.API.csproj", "{14E20EB5-5802-4C14-9822-DF1E5366F8FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{21B52DD6-02EA-4FAC-BA25-59DC65248640}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
