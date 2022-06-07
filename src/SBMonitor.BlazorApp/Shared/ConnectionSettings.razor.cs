@@ -12,7 +12,7 @@ namespace SBMonitor.BlazorApp.Shared
 
         string Name { get; set; } = "test";
 
-        string ConnectionString { get; set; } = "";
+        string ConnectionString { get; set; } = "Endpoint=sb://sbm-test1.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=rqzi6lkkXatcCxiPNWrP3Zk5Cz8Bc8tmI9vOPtHxDMo=";
 
         BusType TypeOfBus { get; set; } = BusType.Queue;
 
