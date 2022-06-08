@@ -1,7 +1,5 @@
 ﻿@inject IHttpClientFactory _clientFactory
 
-<h3 class="h3">ConnectionSettings</h3>
-
 <form>
     <div class="form-group">
         <label for="connectionTypeOfBus">Type</label>
@@ -16,7 +14,7 @@
     </div>
     <div class="form-group">
         <label for="connectionConnectionString">Connection String</label>
-        <MemoEdit id="connectionConnectionString" class="form-control" AutoSize  @bind-Text="@ConnectionString" />
+        <MemoEdit id="connectionConnectionString" class="form-control" @bind-Text="@ConnectionString" Rows="5" />
     </div>
     @switch (TypeOfBus)
     {
@@ -37,6 +35,4 @@
             </div>
             break;
     }
-
-    <Button class="btn btn-primary" Clicked="Connect">Connect</Button>
 </form>

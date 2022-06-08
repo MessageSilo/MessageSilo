@@ -29,7 +29,7 @@ namespace SBMonitor.BlazorApp.Shared
             StateHasChanged();
         }
 
-        async Task Connect()
+        public async Task Connect()
         {
             _apiClient = _clientFactory.CreateClient("API");
 

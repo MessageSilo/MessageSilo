@@ -1,11 +1,31 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Dashboard</PageTitle>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1>Hello, world!</h1>
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <Button Color="Color.Primary" Clicked="@ShowAddNewConnectionModal" class="btn btn-sm" >
+                <span data-feather="plus-square"></span>
+                New Connection
+            </Button>
+        </div>
+    </div>
 </div>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+<Modal @ref="@newConnectionModal">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Add New Connection</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <ConnectionSettings @ref="@connectionSettings"/>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Primary" Clicked="@(async e => { await connectionSettings.Connect(); await newConnectionModal.Close(CloseReason.UserClosing); })">Connect</Button>
+            <Button Color="Color.Secondary" Clicked="@(e => newConnectionModal.Close(CloseReason.UserClosing))">Close</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
