@@ -5,6 +5,6 @@ namespace SBMonitor.Infrastructure.Grains.Interfaces
 {
     public interface IMonitorGrain<T> : IGrainWithGuidKey where T : ConnectionProps
     {
-        void Connect(T props);
+        Task<T> ConnectAsync(T props);
     }
 }

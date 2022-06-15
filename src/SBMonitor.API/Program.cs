@@ -24,7 +24,7 @@ builder.UseOrleans(builder =>
                  innerSiloBuilder.AddSimpleMessageStreamProvider("SMS");
                  innerSiloBuilder.AddMemoryGrainStorage("PubSubStore");
              })
-             ).RegisterHub<MessageMonitorHub>();
+             ).RegisterHub<MessageMonitor>();
      });
 
 builder.ConfigureWebHostDefaults(webBuilder =>
@@ -42,7 +42,7 @@ builder.ConfigureWebHostDefaults(webBuilder =>
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapDefaultControllerRoute();
-            endpoints.MapHub<MessageMonitorHub>("/MessageMonitorHub");
+            endpoints.MapHub<MessageMonitor>("/MessageMonitor");
         });
     });
 });

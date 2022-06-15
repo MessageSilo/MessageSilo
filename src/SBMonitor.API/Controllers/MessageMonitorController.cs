@@ -19,17 +19,17 @@ namespace SBMonitor.API.Controllers
         }
 
         [HttpPost]
-        public async Task ConnectToQueue([FromBody] QueueConnectionProps connectionProps)
+        public async Task<QueueConnectionProps> ConnectToQueue([FromBody] QueueConnectionProps connectionProps)
         {
-            var grain = _factory.GetGrain<IMonitorGrain<QueueConnectionProps>>(Guid.Empty);
-            grain.Connect(connectionProps);
+            var grain = _factory.GetGrain<IMonitorGrain<QueueConnectionProps>>(connectionProps.Id);
+            return await grain.ConnectAsync(connectionProps);
         }
 
         [HttpPost]
-        public async Task ConnectToTopic([FromBody] TopicConnectionProps connectionProps)
+        public async Task<TopicConnectionProps> ConnectToTopic([FromBody] TopicConnectionProps connectionProps)
         {
-            var grain = _factory.GetGrain<IMonitorGrain<TopicConnectionProps>>(Guid.Empty);
-            grain.Connect(connectionProps);
+            var grain = _factory.GetGrain<IMonitorGrain<TopicConnectionProps>>(connectionProps.Id);
+            return await grain.ConnectAsync(connectionProps);
         }
     }
 }

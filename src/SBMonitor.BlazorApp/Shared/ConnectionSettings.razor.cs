@@ -1,69 +1,54 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
+using System.Net.Http.Json;
 
 namespace SBMonitor.BlazorApp.Shared
 {
     public partial class ConnectionSettings
     {
-        private HttpClient _apiClient;
+        [Parameter]
+        public HttpClient ApiClient { get; set; }
 
-        private HubConnection _hubConnection;
+        public string Name { get; set; } = "test";
 
-        string Name { get; set; } = "test";
+        public string ConnectionString { get; set; } = "Endpoint=sb://sbm-test1.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=rqzi6lkkXatcCxiPNWrP3Zk5Cz8Bc8tmI9vOPtHxDMo=";
 
-        string ConnectionString { get; set; } = "Endpoint=sb://sbm-test1.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=rqzi6lkkXatcCxiPNWrP3Zk5Cz8Bc8tmI9vOPtHxDMo=";
+        public BusType TypeOfBus { get; set; } = BusType.Queue;
 
-        BusType TypeOfBus { get; set; } = BusType.Queue;
+        public string QueueName { get; set; } = "kiscica";
 
-        string QueueName { get; set; } = "kiscica";
+        public string TopicName { get; set; } = string.Empty;
 
-        string TopicName { get; set; } = string.Empty;
+        public string SubscriptionName { get; set; } = string.Empty;
 
-        string SubscriptionName { get; set; } = string.Empty;
-
-        private void _hubConnection_Received(string obj)
+        public async Task<ConnectionProps?> ConnectAsync()
         {
-            Name = obj;
-
-            StateHasChanged();
-        }
-
-        public async Task Connect()
-        {
-            _apiClient = _clientFactory.CreateClient("API");
-
             switch (TypeOfBus)
             {
                 case BusType.Queue:
-                    await _apiClient.PostAsJsonAsync("MessageMonitor/ConnectToQueue", new QueueConnectionProps()
+                    var queueResponse = await ApiClient.PostAsJsonAsync("MessageMonitor/ConnectToQueue", new QueueConnectionProps()
                     {
+                        Id = Guid.NewGuid(),
                         QueueName = QueueName,
                         ConnectionString = ConnectionString,
                         Name = Name
                     });
-                    break;
+                    return await queueResponse.Content.ReadFromJsonAsync<QueueConnectionProps>();
                 case BusType.Topic:
-                    await _apiClient.PostAsJsonAsync("MessageMonitor/ConnectToTopic", new TopicConnectionProps()
+                    var topicResponse = await ApiClient.PostAsJsonAsync("MessageMonitor/ConnectToTopic", new TopicConnectionProps()
                     {
+                        Id = Guid.NewGuid(),
                         TopicName = TopicName,
                         SubscriptionName = SubscriptionName,
                         ConnectionString = ConnectionString,
                         Name = Name
                     });
-                    break;
+                    return await topicResponse.Content.ReadFromJsonAsync<TopicConnectionProps>();
             };
 
-            _hubConnection = new HubConnectionBuilder().WithUrl($"{_apiClient.BaseAddress}MessageMonitorHub").Build();
-
-            _hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
-            {
-                var encodedMsg = $"{user}: {message}";
-                Name = encodedMsg;
-                StateHasChanged();
-            });
-
-            await _hubConnection.StartAsync();
+            return null;
         }
     }
 }

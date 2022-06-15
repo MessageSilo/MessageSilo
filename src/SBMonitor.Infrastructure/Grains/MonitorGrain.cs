@@ -18,18 +18,21 @@ namespace SBMonitor.Infrastructure.Grains
         {
             ReceiveMode = ServiceBusReceiveMode.PeekLock,
             AutoCompleteMessages = false,
+            
         };
 
         protected ILogger<MonitorGrain<T>> _logger;
 
         private HubContext<IMessageMonitor> _hub;
 
+        private long _lastMessageSequenceNumber;
+
         public T ConnectionProps { get; private set; }
 
-        public void Connect(T props)
+        public async Task<T> ConnectAsync(T props)
         {
             if (_processor != null)
-                return;
+                return ConnectionProps;
 
             ConnectionProps = props;
 
@@ -42,9 +45,11 @@ namespace SBMonitor.Infrastructure.Grains
 
             ConnectionProps.StartedAt = DateTime.UtcNow;
 
-            _processor.StartProcessingAsync();
+            await _processor.StartProcessingAsync();
 
             _logger.LogDebug($"{props.Name} connected");
+
+            return ConnectionProps;
         }
 
         private Task Processor_ProcessErrorAsync(ProcessErrorEventArgs arg)
@@ -55,14 +60,16 @@ namespace SBMonitor.Infrastructure.Grains
 
         private async Task Processor_ProcessMessageAsync(ProcessMessageEventArgs arg)
         {
-            if (arg.Message.EnqueuedTime <= ConnectionProps.StartedAt)
+            if (arg.Message.SequenceNumber <= _lastMessageSequenceNumber)
                 return;
 
             string body = arg.Message.Body.ToString();
 
             _logger.LogDebug(body);
 
-            await _hub.Group(Guid.Empty.ToString()).Send("ReceiveMessage", "yeee", "yeeee2");
+            await _hub.Group(ConnectionProps.Id.ToString()).Send("ReceiveMessage", body);
+
+            _lastMessageSequenceNumber = arg.Message.SequenceNumber;
         }
 
         protected abstract ServiceBusProcessor CreateProcessor();
