@@ -17,10 +17,5 @@ namespace SBMonitor.Infrastructure.Grains
         {
             _monitorGrains.Add(grain);
         }
-
-        public IList<IMonitorGrain<ConnectionProps>> List()
-        {
-            return _monitorGrains;
-        }
     }
 }

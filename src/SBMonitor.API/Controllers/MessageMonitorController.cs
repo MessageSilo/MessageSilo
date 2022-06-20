@@ -31,14 +31,5 @@ namespace SBMonitor.API.Controllers
             var grain = _factory.GetGrain<IMonitorGrain<TopicConnectionProps>>(connectionProps.Id);
             return await grain.ConnectAsync(connectionProps);
         }
-
-        [HttpGet]
-        public IReadOnlyList<ConnectionProps> Init()
-        {
-            var cmGrain = _factory.GetGrain<IConnectionManagerGrain>(Guid.Empty);
-            var monitorGrains = cmGrain.List();
-
-            return monitorGrains.Select(p => p.ConnectionProps).ToList();
-        }
     }
 }

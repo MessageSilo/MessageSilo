@@ -31,7 +31,7 @@
             <CloseButton />
         </ModalHeader>
         <ModalBody>
-            <ConnectionSettings @ref="@ConnectionSettings" ApiClient="@_clientFactory.CreateClient("API")" />
+            <ConnectionSettingsForm @ref="@ConnectionSettings" ApiClient="@_clientFactory.CreateClient("API")" />
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Primary" Clicked="@(e => AddNewConnection())">Connect</Button>
