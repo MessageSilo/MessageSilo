@@ -9,7 +9,7 @@ namespace SBMonitor.BlazorApp.Pages
     {
         private Modal NewConnectionModal;
 
-        private ConnectionSettings ConnectionSettings;
+        private ConnectionSettingsForm ConnectionSettings;
 
         private HttpClient ApiClient;
 

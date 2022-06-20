@@ -18,7 +18,6 @@ namespace SBMonitor.Infrastructure.Grains
         {
             ReceiveMode = ServiceBusReceiveMode.PeekLock,
             AutoCompleteMessages = false,
-            
         };
 
         protected ILogger<MonitorGrain<T>> _logger;
@@ -28,6 +27,8 @@ namespace SBMonitor.Infrastructure.Grains
         private long _lastMessageSequenceNumber;
 
         public T ConnectionProps { get; private set; }
+
+        public IList<ServiceBusReceivedMessage> Messages { get; private set; } = new List<ServiceBusReceivedMessage>();
 
         public async Task<T> ConnectAsync(T props)
         {
@@ -68,6 +69,8 @@ namespace SBMonitor.Infrastructure.Grains
             _logger.LogDebug(body);
 
             await _hub.Group(ConnectionProps.Id.ToString()).Send("ReceiveMessage", body);
+
+            Messages.Add(arg.Message);
 
             _lastMessageSequenceNumber = arg.Message.SequenceNumber;
         }

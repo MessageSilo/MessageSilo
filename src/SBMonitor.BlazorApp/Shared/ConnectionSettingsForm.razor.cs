@@ -6,7 +6,7 @@ using System.Net.Http.Json;
 
 namespace SBMonitor.BlazorApp.Shared
 {
-    public partial class ConnectionSettings
+    public partial class ConnectionSettingsForm
     {
         [Parameter]
         public HttpClient ApiClient { get; set; }
