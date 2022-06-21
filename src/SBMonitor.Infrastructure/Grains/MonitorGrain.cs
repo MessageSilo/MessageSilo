@@ -1,6 +1,7 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Orleans;
+using Orleans.Runtime;
 using SBMonitor.Core.Interfaces;
 using SBMonitor.Core.Models;
 using SBMonitor.Infrastructure.Grains.Interfaces;
@@ -20,22 +21,23 @@ namespace SBMonitor.Infrastructure.Grains
             AutoCompleteMessages = false,
         };
 
+
         protected ILogger<MonitorGrain<T>> _logger;
 
         private HubContext<IMessageMonitor> _hub;
 
         private long _lastMessageSequenceNumber;
 
-        public T ConnectionProps { get; private set; }
+        public IPersistentState<T> ConnectionProps { get; protected set; }
 
         public IList<ServiceBusReceivedMessage> Messages { get; private set; } = new List<ServiceBusReceivedMessage>();
 
         public async Task<T> ConnectAsync(T props)
         {
             if (_processor != null)
-                return ConnectionProps;
+                return ConnectionProps.State;
 
-            ConnectionProps = props;
+            ConnectionProps.State = props;
 
             _client = new ServiceBusClient(props.ConnectionString);
 
@@ -44,13 +46,14 @@ namespace SBMonitor.Infrastructure.Grains
             _processor.ProcessMessageAsync += Processor_ProcessMessageAsync;
             _processor.ProcessErrorAsync += Processor_ProcessErrorAsync;
 
-            ConnectionProps.StartedAt = DateTime.UtcNow;
+            ConnectionProps.State.StartedAt = DateTime.UtcNow;
+            await ConnectionProps.WriteStateAsync();
 
             await _processor.StartProcessingAsync();
 
             _logger.LogDebug($"{props.Name} connected");
 
-            return ConnectionProps;
+            return ConnectionProps.State;
         }
 
         private Task Processor_ProcessErrorAsync(ProcessErrorEventArgs arg)
@@ -68,7 +71,7 @@ namespace SBMonitor.Infrastructure.Grains
 
             _logger.LogDebug(body);
 
-            await _hub.Group(ConnectionProps.Id.ToString()).Send("ReceiveMessage", body);
+            await _hub.Group(ConnectionProps.State.Id.ToString()).Send("ReceiveMessage", body);
 
             Messages.Add(arg.Message);
 

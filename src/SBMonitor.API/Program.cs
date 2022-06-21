@@ -20,9 +20,14 @@ builder.UseOrleans(builder =>
              b.Configure((innerSiloBuilder, config) =>
              {
                  innerSiloBuilder.UseLocalhostClustering();
-                 innerSiloBuilder.AddMemoryGrainStorageAsDefault();
                  innerSiloBuilder.AddSimpleMessageStreamProvider("SMS");
-                 innerSiloBuilder.AddMemoryGrainStorage("PubSubStore");
+                 innerSiloBuilder.AddAzureTableGrainStorageAsDefault(
+                     configureOptions: options =>
+                     {
+                         options.TableName = "kiscica";
+                         options.UseJson = true;
+                         options.ConfigureTableServiceClient("DefaultEndpointsProtocol=https;AccountName=dcslhmsa;AccountKey=CBJBhy3sbNnJRN06sQ220SlznTbQt42heAOzo54559acjBLSJXAmNSi5nnrTS+YFNgWyFewN/MYV+AStXpMrqw==;EndpointSuffix=core.windows.net");
+                     });
              })
              ).RegisterHub<MessageMonitor>();
      });
