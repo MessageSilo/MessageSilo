@@ -1,25 +1,28 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Net.Http.Headers;
 using Orleans;
+using Orleans.Configuration;
 using Orleans.Hosting;
 using SBMonitor.API.Hubs;
+using System.Net;
 
 var builder = Host.CreateDefaultBuilder(args);
 
-builder.UseOrleans(builder =>
+builder.UseOrleans((context, sb) =>
      {
-         builder.ConfigureApplicationParts(manager =>
+         sb.ConfigureApplicationParts(manager =>
          {
              manager.AddApplicationPart(typeof(Program).Assembly).WithReferences();
          });
 
-         builder.UseDashboard();
-         builder.ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Debug).AddConsole());
+         sb.UseDashboard();
+         sb.ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Debug).AddConsole());
 
-         builder.UseSignalR(b =>
+         sb.UseSignalR(b =>
              b.Configure((innerSiloBuilder, config) =>
              {
                  innerSiloBuilder.UseLocalhostClustering();
+
                  innerSiloBuilder.AddSimpleMessageStreamProvider("SMS");
                  innerSiloBuilder.AddAzureTableGrainStorageAsDefault(
                      configureOptions: options =>
