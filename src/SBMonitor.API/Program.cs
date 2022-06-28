@@ -24,13 +24,14 @@ builder.UseOrleans((context, sb) =>
                  innerSiloBuilder.UseLocalhostClustering();
 
                  innerSiloBuilder.AddSimpleMessageStreamProvider("SMS");
-                 innerSiloBuilder.AddAzureTableGrainStorageAsDefault(
-                     configureOptions: options =>
-                     {
-                         options.TableName = "kiscica";
-                         options.UseJson = true;
-                         options.ConfigureTableServiceClient("DefaultEndpointsProtocol=https;AccountName=dcslhmsa;AccountKey=CBJBhy3sbNnJRN06sQ220SlznTbQt42heAOzo54559acjBLSJXAmNSi5nnrTS+YFNgWyFewN/MYV+AStXpMrqw==;EndpointSuffix=core.windows.net");
-                     });
+                 innerSiloBuilder.AddMemoryGrainStorageAsDefault();
+                 //innerSiloBuilder.AddAzureTableGrainStorageAsDefault(
+                 //    configureOptions: options =>
+                 //    {
+                 //        options.TableName = "kiscica";
+                 //        options.UseJson = true;
+                 //        options.ConfigureTableServiceClient("DefaultEndpointsProtocol=https;AccountName=dcslhmsa;AccountKey=CBJBhy3sbNnJRN06sQ220SlznTbQt42heAOzo54559acjBLSJXAmNSi5nnrTS+YFNgWyFewN/MYV+AStXpMrqw==;EndpointSuffix=core.windows.net");
+                 //    });
              })
              ).RegisterHub<MessageMonitor>();
      });

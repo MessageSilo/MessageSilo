@@ -23,4 +23,10 @@ builder.Services.AddHttpClient("API", p =>
     p.BaseAddress = new("https://localhost:7175");
 });
 
+builder.Services.AddOidcAuthentication(options =>
+{
+    builder.Configuration.Bind("Auth0", options.ProviderOptions);
+    options.ProviderOptions.ResponseType = "code";
+});
+
 await builder.Build().RunAsync();

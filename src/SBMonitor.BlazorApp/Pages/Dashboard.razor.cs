@@ -5,7 +5,7 @@ using SBMonitor.Core.Models;
 
 namespace SBMonitor.BlazorApp.Pages
 {
-    public partial class Index
+    public partial class Dashboard
     {
         private Modal NewConnectionModal;
 
