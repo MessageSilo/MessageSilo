@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="AntiPattern">
-    <title>SB Monitor</title>
+    <title>Message Silo</title>
 
     <base href="/" />
 
@@ -57,6 +57,10 @@
     <script type="text/javascript">
         window.showIcons = () => {
             feather.replace({ 'aria-hidden': 'true' });
+        }
+
+        window.executeFormat = (f) => {
+                return Function('"use strict";return (' + f + ')')();
         }
     </script>
 </body>

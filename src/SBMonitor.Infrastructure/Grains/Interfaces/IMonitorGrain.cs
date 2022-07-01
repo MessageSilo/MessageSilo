@@ -3,8 +3,18 @@ using SBMonitor.Core.Models;
 
 namespace SBMonitor.Infrastructure.Grains.Interfaces
 {
-    public interface IMonitorGrain<T> : IGrainWithGuidKey where T : ConnectionProps
+    public interface IMonitorGrain : IGrainWithGuidKey
     {
-        Task<T> ConnectAsync(T props);
+        Task<ConnectionProps> ConnectAsync(ConnectionProps props);
+    }
+
+    public interface IQueueMonitorGrain : IMonitorGrain
+    {
+
+    }
+
+    public interface ITopicMonitorGrain : IMonitorGrain
+    {
+
     }
 }

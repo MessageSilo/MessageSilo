@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
+using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
 using SBMonitor.Infrastructure.Grains.Interfaces;
 
@@ -19,16 +20,9 @@ namespace SBMonitor.API.Controllers
         }
 
         [HttpPost]
-        public async Task<QueueConnectionProps> ConnectToQueue([FromBody] QueueConnectionProps connectionProps)
+        public async Task<ConnectionProps> Upsert([FromBody] ConnectionProps connectionProps)
         {
-            var grain = _factory.GetGrain<IMonitorGrain<QueueConnectionProps>>(connectionProps.Id);
-            return await grain.ConnectAsync(connectionProps);
-        }
-
-        [HttpPost]
-        public async Task<TopicConnectionProps> ConnectToTopic([FromBody] TopicConnectionProps connectionProps)
-        {
-            var grain = _factory.GetGrain<IMonitorGrain<TopicConnectionProps>>(connectionProps.Id);
+            var grain = _factory.GetGrain<IQueueMonitorGrain>(connectionProps.Id);
             return await grain.ConnectAsync(connectionProps);
         }
     }

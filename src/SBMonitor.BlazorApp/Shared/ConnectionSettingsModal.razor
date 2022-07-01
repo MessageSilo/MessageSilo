@@ -1,0 +1,50 @@
+﻿<Modal @ref="@ConnectionModal">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Connection Settings</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <form>
+                <div class="form-group">
+                    <label for="connectionTypeOfBus">Type</label>
+                    <Select Disabled="Disabled" TValue="BusType" id="connectionTypeOfBus" class="form-control" @bind-SelectedValue="TypeOfBus">
+                        <SelectItem Value="BusType.Queue">Queue</SelectItem>
+                        <SelectItem Value="BusType.Topic">Topic</SelectItem>
+                    </Select>
+                </div>
+                <div class="form-group">
+                    <label for="connectionName">Name</label>
+                    <TextEdit id="connectionName" class="form-control" @bind-Text="@Name" />
+                </div>
+                <div class="form-group">
+                    <label for="connectionConnectionString">Connection String</label>
+                    <MemoEdit Disabled="Disabled" id="connectionConnectionString" class="form-control" @bind-Text="@ConnectionString" Rows="5" />
+                </div>
+                @switch (TypeOfBus)
+                {
+                    case BusType.Queue:
+                        <div class="form-group">
+                            <label for="connectionQueueName">Queue Name</label>
+                            <TextEdit Disabled="Disabled" id="connectionQueueName" class="form-control" @bind-Text="@QueueName" />
+                        </div>
+                        break;
+                    case BusType.Topic:
+                        <div class="form-group">
+                            <label for="connectionTopicName">Topic Name</label>
+                            <TextEdit Disabled="Disabled" id="connectionTopicName" class="form-control" @bind-Text="@TopicName" />
+                        </div>
+                        <div class="form-group">
+                            <label for="connectionSubscriptionName">Subscription Name</label>
+                            <TextEdit Disabled="Disabled" id="connectionSubscriptionName" class="form-control" @bind-Text="@SubscriptionName" />
+                        </div>
+                        break;
+                }
+            </form>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Primary" Clicked="@(e => Save())">Save</Button>
+            <Button Color="Color.Secondary" Clicked="@(e => ConnectionModal.Close(CloseReason.UserClosing))">Close</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>

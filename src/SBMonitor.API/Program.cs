@@ -15,8 +15,8 @@ builder.UseOrleans((context, sb) =>
              manager.AddApplicationPart(typeof(Program).Assembly).WithReferences();
          });
 
-         sb.UseDashboard();
-         sb.ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Debug).AddConsole());
+         //sb.UseDashboard();
+         sb.ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Information).AddConsole());
 
          sb.UseSignalR(b =>
              b.Configure((innerSiloBuilder, config) =>
@@ -24,14 +24,13 @@ builder.UseOrleans((context, sb) =>
                  innerSiloBuilder.UseLocalhostClustering();
 
                  innerSiloBuilder.AddSimpleMessageStreamProvider("SMS");
-                 innerSiloBuilder.AddMemoryGrainStorageAsDefault();
-                 //innerSiloBuilder.AddAzureTableGrainStorageAsDefault(
-                 //    configureOptions: options =>
-                 //    {
-                 //        options.TableName = "kiscica";
-                 //        options.UseJson = true;
-                 //        options.ConfigureTableServiceClient("DefaultEndpointsProtocol=https;AccountName=dcslhmsa;AccountKey=CBJBhy3sbNnJRN06sQ220SlznTbQt42heAOzo54559acjBLSJXAmNSi5nnrTS+YFNgWyFewN/MYV+AStXpMrqw==;EndpointSuffix=core.windows.net");
-                 //    });
+                 innerSiloBuilder.AddAzureTableGrainStorageAsDefault(
+                     configureOptions: options =>
+                     {
+                         options.TableName = "MessageSiloState";
+                         options.UseJson = true;
+                         options.ConfigureTableServiceClient(context.Configuration["ConnectionStrings:MessageSiloState"]);
+                     });
              })
              ).RegisterHub<MessageMonitor>();
      });

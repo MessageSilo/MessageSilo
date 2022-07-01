@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazorise;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
@@ -12,6 +13,9 @@ namespace SBMonitor.BlazorApp.Shared
 
         [Parameter]
         public HttpClient ApiClient { get; set; }
+
+        [Parameter]
+        public Modal ConnectionModal { get; set; }
 
         private string MessageDetails { get; set; }
 

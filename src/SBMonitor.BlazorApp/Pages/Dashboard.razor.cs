@@ -7,9 +7,7 @@ namespace SBMonitor.BlazorApp.Pages
 {
     public partial class Dashboard
     {
-        private Modal NewConnectionModal;
-
-        private ConnectionSettingsForm ConnectionSettings;
+        private ConnectionSettingsModal ConnectionSettingsModal;
 
         private HttpClient ApiClient;
 
@@ -17,18 +15,28 @@ namespace SBMonitor.BlazorApp.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            var asd = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             ApiClient = _clientFactory.CreateClient("API");
             await base.OnInitializedAsync();
         }
 
-        private async Task AddNewConnection()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            var newConnection = await ConnectionSettings.ConnectAsync();
+            if (firstRender)
+                ConnectionSettingsModal.ConnectionChanged += ConnectionSettingsModal_ConnectionChanged;
 
-            if (newConnection != null)
-                Items.Add(newConnection);
+            await base.OnAfterRenderAsync(firstRender);
+        }
 
-            await NewConnectionModal.Close(CloseReason.UserClosing);
+        private void ConnectionSettingsModal_ConnectionChanged(object? sender, EventArgs e)
+        {
+            var ea = e as ConnectionChangedEventArgs;
+
+            if (ea != null)
+            {
+                Items.Add(ea.ConnectionProps);
+                InvokeAsync(StateHasChanged);
+            }
         }
     }
 }

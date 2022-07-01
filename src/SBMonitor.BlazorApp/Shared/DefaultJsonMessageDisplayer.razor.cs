@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using SBMonitor.Core.Extensions;
 using System.Text.Json;
 
 namespace SBMonitor.BlazorApp.Shared
@@ -24,6 +25,9 @@ namespace SBMonitor.BlazorApp.Shared
                 json = json.Replace(@"  ", "&emsp;");
 
                 FormattedMessage = json;
+
+                //var yourObject = JsonSerializer.Deserialize<JsonElement>(InputMessage);
+                //var asd = yourObject.GetJsonElement("name");
             }
 
             await base.OnParametersSetAsync();

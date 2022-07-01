@@ -1,6 +1,7 @@
 ﻿@inject IHttpClientFactory _clientFactory
 @page "/dashboard"
-@attribute [Authorize]
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -8,7 +9,7 @@
     <h1 class="h2">Dashboard</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group me-2">
-            <Button Color="Color.Primary" Clicked="@(e => NewConnectionModal.Show())" class="btn btn-sm">
+            <Button Color="Color.Primary" Clicked="@(e => ConnectionSettingsModal.Show())" class="btn btn-sm">
                 <span data-feather="plus-square"></span>
                 New Connection
             </Button>
@@ -25,29 +26,4 @@
     </div>
 </div>
 
-<Modal @ref="@NewConnectionModal">
-    <ModalContent Centered>
-        <ModalHeader>
-            <ModalTitle>Add New Connection</ModalTitle>
-            <CloseButton />
-        </ModalHeader>
-        <ModalBody>
-            <ConnectionSettingsForm @ref="@ConnectionSettings" ApiClient="@_clientFactory.CreateClient("API")" />
-        </ModalBody>
-        <ModalFooter>
-            <Button Color="Color.Primary" Clicked="@(e => AddNewConnection())">Connect</Button>
-            <Button Color="Color.Secondary" Clicked="@(e => NewConnectionModal.Close(CloseReason.UserClosing))">Close</Button>
-        </ModalFooter>
-    </ModalContent>
-</Modal>
-
-@*<Modal @ref="@NewConnectionModal">
-    <ModalContent>
-        <ModalHeader>
-            <ModalTitle>Add New Connection</ModalTitle>
-        </ModalHeader>
-        <ModalBody>
-            asd
-        </ModalBody>
-    </ModalContent>
-</Modal>*@
+<ConnectionSettingsModal @ref="@ConnectionSettingsModal" ApiClient="ApiClient"></ConnectionSettingsModal>

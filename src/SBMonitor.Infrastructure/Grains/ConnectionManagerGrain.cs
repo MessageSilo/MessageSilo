@@ -11,9 +11,9 @@ namespace SBMonitor.Infrastructure.Grains
 {
     public class ConnectionManagerGrain : Grain, IConnectionManagerGrain
     {
-        private IList<IMonitorGrain<ConnectionProps>> _monitorGrains { get; set; } = new List<IMonitorGrain<ConnectionProps>>();
+        private IList<IMonitorGrain> _monitorGrains { get; set; } = new List<IMonitorGrain>();
 
-        public void Add(IMonitorGrain<ConnectionProps> grain)
+        public void Add(IMonitorGrain grain)
         {
             _monitorGrains.Add(grain);
         }

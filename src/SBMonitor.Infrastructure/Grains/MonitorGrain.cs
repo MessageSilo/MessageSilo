@@ -9,7 +9,7 @@ using SignalR.Orleans.Core;
 
 namespace SBMonitor.Infrastructure.Grains
 {
-    public abstract class MonitorGrain<T> : Grain, IMonitorGrain<T> where T : ConnectionProps
+    public abstract class MonitorGrain : Grain, IMonitorGrain
     {
         protected ServiceBusClient _client;
 
@@ -22,17 +22,15 @@ namespace SBMonitor.Infrastructure.Grains
         };
 
 
-        protected ILogger<MonitorGrain<T>> _logger;
+        protected ILogger<MonitorGrain> _logger;
 
         private HubContext<IMessageMonitor> _hub;
 
         private long _lastMessageSequenceNumber;
 
-        public IPersistentState<T> ConnectionProps { get; protected set; }
+        public IPersistentState<ConnectionProps> ConnectionProps { get; protected set; }
 
-        public IList<ServiceBusReceivedMessage> Messages { get; private set; } = new List<ServiceBusReceivedMessage>();
-
-        public async Task<T> ConnectAsync(T props)
+        public async Task<ConnectionProps> ConnectAsync(ConnectionProps props)
         {
             if (_processor != null)
                 return ConnectionProps.State;
@@ -70,10 +68,7 @@ namespace SBMonitor.Infrastructure.Grains
             string body = arg.Message.Body.ToString();
 
             _logger.LogDebug(body);
-
-            await _hub.Group(ConnectionProps.State.Id.ToString()).Send("ReceiveMessage", body);
-
-            Messages.Add(arg.Message);
+            await _hub.Group(this.GetPrimaryKeyString()).Send("ReceiveMessage", body);
 
             _lastMessageSequenceNumber = arg.Message.SequenceNumber;
         }

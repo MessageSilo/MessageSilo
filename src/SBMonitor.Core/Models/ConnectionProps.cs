@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SBMonitor.Core.Models
 {
-    public abstract class ConnectionProps
+    public class ConnectionProps
     {
         public Guid Id { get; set; }
 
@@ -15,8 +15,30 @@ namespace SBMonitor.Core.Models
 
         public string ConnectionString { get; set; } = string.Empty;
 
-        public abstract BusType TypeOfBus { get; }
+        public BusType TypeOfBus { get; set; } = BusType.Queue;
 
         public DateTime StartedAt { get; set; }
+
+        public string QueueName { get; set; } = string.Empty;
+
+        public string TopicName { get; set; } = string.Empty;
+
+        public string SubscriptionName { get; set; } = string.Empty;
+
+        public ConnectionProps(string queueName)
+        {
+            QueueName = queueName;
+            TypeOfBus = BusType.Queue;
+        }
+
+        public ConnectionProps(string topicName, string subscriptionName)
+        {
+            TopicName = topicName;
+            SubscriptionName = subscriptionName;
+            TypeOfBus = BusType.Topic;
+        }
+
+        public ConnectionProps()
+        { }
     }
 }
