@@ -5,6 +5,7 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using SBMonitor.API.Hubs;
 using System.Net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -37,8 +38,20 @@ builder.UseOrleans((context, sb) =>
 
 builder.ConfigureWebHostDefaults(webBuilder =>
 {
-    webBuilder.ConfigureServices(services =>
+    webBuilder.ConfigureServices((context, services) =>
     {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
+        {
+            c.Authority = $"{context.Configuration["Auth0:Domain"]}";
+            c.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            {
+                ValidAudience = context.Configuration["Auth0:Audience"],
+                ValidIssuer = $"{context.Configuration["Auth0:Domain"]}"
+            };
+        });
+
+        services.AddHttpContextAccessor();
         services.AddControllers();
     });
     webBuilder.Configure(app =>
@@ -46,6 +59,7 @@ builder.ConfigureWebHostDefaults(webBuilder =>
         app.UseCors(builder => builder.SetIsOriginAllowed(isOriginAllowed: _ => true).WithExposedHeaders(HeaderNames.ContentDisposition).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
         app.UseHttpsRedirection();
         app.UseRouting();
+        app.UseAuthentication();
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {

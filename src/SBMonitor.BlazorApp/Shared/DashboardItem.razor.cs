@@ -15,7 +15,7 @@ namespace SBMonitor.BlazorApp.Shared
         public HttpClient ApiClient { get; set; }
 
         [Parameter]
-        public Modal ConnectionModal { get; set; }
+        public ConnectionSettingsModal ConnectionSettingsModal { get; set; }
 
         private string MessageDetails { get; set; }
 

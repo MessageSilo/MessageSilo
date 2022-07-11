@@ -1,8 +1,10 @@
 ﻿using Blazorise;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.SignalR.Client;
 using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace SBMonitor.BlazorApp.Shared
@@ -66,6 +68,9 @@ namespace SBMonitor.BlazorApp.Shared
 
             if (cp != null)
                 OnConnectionChanged(new ConnectionChangedEventArgs(cp));
+
+
+            await ConnectionModal.Close(CloseReason.UserClosing);
         }
 
         public async Task Show(ConnectionProps? props = null)

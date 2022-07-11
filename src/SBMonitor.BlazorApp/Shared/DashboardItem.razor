@@ -12,7 +12,7 @@
                         <span data-feather="settings"></span>
                     </DropdownToggle>
                     <DropdownMenu>
-                        <DropdownItem Clicked="@(e => ConnectionModal.Show())">Edit</DropdownItem>
+                        <DropdownItem Clicked="@(e => ConnectionSettingsModal.Show(Connection))">Edit</DropdownItem>
                         <DropdownDivider />
                         <DropdownItem TextColor="TextColor.Danger">Delete</DropdownItem>
                     </DropdownMenu>

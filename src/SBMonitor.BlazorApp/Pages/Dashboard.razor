@@ -1,7 +1,6 @@
-﻿@inject IHttpClientFactory _clientFactory
+﻿@inject HttpClient ApiClient
 @page "/dashboard"
-
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize]
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -21,7 +20,7 @@
     <div class="col">
         @foreach (var item in Items)
         {
-            <DashboardItem Connection="item" ApiClient="ApiClient"></DashboardItem>
+            <DashboardItem Connection="item" ApiClient="ApiClient" ConnectionSettingsModal="ConnectionSettingsModal"></DashboardItem>
         }
     </div>
 </div>

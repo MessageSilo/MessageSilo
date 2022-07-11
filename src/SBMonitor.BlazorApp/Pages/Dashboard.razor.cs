@@ -1,7 +1,9 @@
 ﻿using Blazorise;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.SignalR.Client;
 using SBMonitor.BlazorApp.Shared;
 using SBMonitor.Core.Models;
+using System.Net.Http.Json;
 
 namespace SBMonitor.BlazorApp.Pages
 {
@@ -9,21 +11,21 @@ namespace SBMonitor.BlazorApp.Pages
     {
         private ConnectionSettingsModal ConnectionSettingsModal;
 
-        private HttpClient ApiClient;
-
         private List<ConnectionProps> Items = new List<ConnectionProps>();
 
         protected override async Task OnInitializedAsync()
         {
-            var asd = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            ApiClient = _clientFactory.CreateClient("API");
             await base.OnInitializedAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
+            {
                 ConnectionSettingsModal.ConnectionChanged += ConnectionSettingsModal_ConnectionChanged;
+
+                Items = new List<ConnectionProps>();
+            }
 
             await base.OnAfterRenderAsync(firstRender);
         }
