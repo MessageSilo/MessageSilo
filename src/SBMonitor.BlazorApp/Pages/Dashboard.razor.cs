@@ -13,8 +13,14 @@ namespace SBMonitor.BlazorApp.Pages
 
         private List<ConnectionProps> Items = new List<ConnectionProps>();
 
+        public void RefreshState()
+        {
+            InvokeAsync(StateHasChanged);
+        }
+
         protected override async Task OnInitializedAsync()
         {
+            Items = await ApiClient.GetFromJsonAsync<List<ConnectionProps>>("MessageMonitor/Connections");
             await base.OnInitializedAsync();
         }
 
@@ -23,8 +29,6 @@ namespace SBMonitor.BlazorApp.Pages
             if (firstRender)
             {
                 ConnectionSettingsModal.ConnectionChanged += ConnectionSettingsModal_ConnectionChanged;
-
-                Items = new List<ConnectionProps>();
             }
 
             await base.OnAfterRenderAsync(firstRender);
@@ -34,11 +38,24 @@ namespace SBMonitor.BlazorApp.Pages
         {
             var ea = e as ConnectionChangedEventArgs;
 
-            if (ea != null)
-            {
+            if (ea == null)
+                return;
+
+            if (!Items.Any(p => p.Id == ea.ConnectionProps.Id))
                 Items.Add(ea.ConnectionProps);
-                InvokeAsync(StateHasChanged);
-            }
+
+            RefreshState();
+        }
+
+        private async Task DeleteItem(Guid id)
+        {
+            var response = await ApiClient.DeleteAsync($"MessageMonitor/Delete?id={id}");
+
+            response.EnsureSuccessStatusCode();
+
+            Items.Remove(Items.First(p => p.Id == id));
+
+            RefreshState();
         }
     }
 }

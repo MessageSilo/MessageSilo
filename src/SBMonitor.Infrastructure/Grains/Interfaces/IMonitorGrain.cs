@@ -5,7 +5,7 @@ namespace SBMonitor.Infrastructure.Grains.Interfaces
 {
     public interface IMonitorGrain : IGrainWithGuidKey
     {
-        Task<ConnectionProps> ConnectAsync(ConnectionProps props);
+        Task ConnectAsync(ConnectionProps props);
     }
 
     public interface IQueueMonitorGrain : IMonitorGrain

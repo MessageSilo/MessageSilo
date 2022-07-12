@@ -8,6 +8,6 @@ namespace SBMonitor.Core.Models
 {
     public class User
     {
-        public IList<Guid> MonitorGrainIds { get; set; } = new List<Guid>();
+        public IList<ConnectionProps> Connections { get; set; } = new List<ConnectionProps>();
     }
 }

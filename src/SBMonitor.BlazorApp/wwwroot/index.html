@@ -40,7 +40,11 @@
 </head>
 
 <body>
-    <div id="app">Loading...</div>
+    <div id="app">
+        <div class="d-flex justify-content-center">
+            <div class="spinner-grow" role="status" />
+        </div>
+    </div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
@@ -60,7 +64,7 @@
         }
 
         window.executeFormat = (f) => {
-                return Function('"use strict";return (' + f + ')')();
+            return Function('"use strict";return (' + f + ')')();
         }
     </script>
 </body>

@@ -5,8 +5,10 @@ namespace SBMonitor.Infrastructure.Grains.Interfaces
 {
     public interface IUserGrain : IGrainWithStringKey
     {
-        Task AddMonitorGrain(Guid id);
+        Task AddConnection(ConnectionProps conn);
 
-        Task RemoveMonitorGrain(Guid id);
+        Task RemoveConnection(Guid id);
+
+        Task<IList<ConnectionProps>> Connections();
     }
 }

@@ -14,6 +14,7 @@ namespace SBMonitor.BlazorApp.Shared
         [Parameter]
         public HttpClient ApiClient { get; set; }
 
+        public Guid Id { get; internal set; }
         public string Name { get; internal set; }
 
         public string ConnectionString { get; internal set; }
@@ -40,41 +41,40 @@ namespace SBMonitor.BlazorApp.Shared
 
         public async Task Save()
         {
-            ConnectionProps? props = null;
+            ConnectionProps conn = null;
 
             switch (TypeOfBus)
             {
                 case BusType.Queue:
-                    props = new ConnectionProps(QueueName)
+                    conn = new ConnectionProps(QueueName)
                     {
-                        Id = Guid.NewGuid(),
+                        Id = Id,
                         ConnectionString = ConnectionString,
                         Name = Name
                     };
                     break;
                 case BusType.Topic:
-                    props = new ConnectionProps(TopicName, SubscriptionName)
+                    conn = new ConnectionProps(TopicName, SubscriptionName)
                     {
-                        Id = Guid.NewGuid(),
+                        Id = Id,
                         ConnectionString = ConnectionString,
                         Name = Name
                     };
                     break;
             };
 
-            var response = await ApiClient.PostAsJsonAsync("MessageMonitor/Upsert", props);
+            var response = await ApiClient.PostAsJsonAsync("MessageMonitor/Upsert", conn);
 
-            var cp = await response.Content.ReadFromJsonAsync<ConnectionProps>();
+            response.EnsureSuccessStatusCode();
 
-            if (cp != null)
-                OnConnectionChanged(new ConnectionChangedEventArgs(cp));
-
+            OnConnectionChanged(new ConnectionChangedEventArgs(conn));
 
             await ConnectionModal.Close(CloseReason.UserClosing);
         }
 
         public async Task Show(ConnectionProps? props = null)
         {
+            Id = props?.Id ?? Guid.NewGuid();
             Name = props?.Name ?? "test";//string.Empty;
             ConnectionString = props?.ConnectionString ?? "Endpoint=sb://sbm-test1.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=rqzi6lkkXatcCxiPNWrP3Zk5Cz8Bc8tmI9vOPtHxDMo=";//string.Empty;
             TypeOfBus = props?.TypeOfBus ?? BusType.Queue;

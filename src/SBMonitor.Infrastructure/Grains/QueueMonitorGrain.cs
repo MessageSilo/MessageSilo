@@ -11,13 +11,12 @@ namespace SBMonitor.Infrastructure.Grains
     {
         protected override ServiceBusProcessor CreateProcessor()
         {
-            return _client.CreateProcessor(ConnectionProps.State.QueueName, _options);
+            return client.CreateProcessor(connectionProps.QueueName, options);
         }
 
-        public QueueMonitorGrain(ILogger<QueueMonitorGrain> logger, [PersistentState("queueMonitorGrainState")] IPersistentState<ConnectionProps> connectionProps) : base()
+        public QueueMonitorGrain(ILogger<QueueMonitorGrain> logger) : base()
         {
             _logger = logger;
-            ConnectionProps = connectionProps;
         }
     }
 }

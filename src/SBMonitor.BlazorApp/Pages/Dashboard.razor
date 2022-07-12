@@ -20,7 +20,7 @@
     <div class="col">
         @foreach (var item in Items)
         {
-            <DashboardItem Connection="item" ApiClient="ApiClient" ConnectionSettingsModal="ConnectionSettingsModal"></DashboardItem>
+            <DashboardItem Connection="item" ApiClient="ApiClient" ConnectionSettingsModal="ConnectionSettingsModal" DeleteItemAction="@(e =>DeleteItem(item.Id))"></DashboardItem>
         }
     </div>
 </div>

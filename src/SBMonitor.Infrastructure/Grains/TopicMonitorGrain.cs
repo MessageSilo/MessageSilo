@@ -10,13 +10,12 @@ namespace SBMonitor.Infrastructure.Grains
     {
         protected override ServiceBusProcessor CreateProcessor()
         {
-            return _client.CreateProcessor(ConnectionProps.State.TopicName, ConnectionProps.State.SubscriptionName, _options);
+            return client.CreateProcessor(connectionProps.TopicName, connectionProps.SubscriptionName, options);
         }
 
-        public TopicMonitorGrain(ILogger<TopicMonitorGrain> logger, [PersistentState("topicMonitorGrainState")] IPersistentState<ConnectionProps> connectionProps) : base()
+        public TopicMonitorGrain(ILogger<TopicMonitorGrain> logger) : base()
         {
             _logger = logger;
-            ConnectionProps = connectionProps;
         }
     }
 }

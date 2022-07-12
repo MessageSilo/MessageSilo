@@ -14,7 +14,7 @@
                     <DropdownMenu>
                         <DropdownItem Clicked="@(e => ConnectionSettingsModal.Show(Connection))">Edit</DropdownItem>
                         <DropdownDivider />
-                        <DropdownItem TextColor="TextColor.Danger">Delete</DropdownItem>
+                        <DropdownItem Clicked="@(e => Delete())" TextColor="TextColor.Danger">Delete</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
             </div>

@@ -11,11 +11,11 @@ namespace SBMonitor.Infrastructure.Grains
 {
     public abstract class MonitorGrain : Grain, IMonitorGrain
     {
-        protected ServiceBusClient _client;
+        protected ServiceBusClient client;
 
-        protected ServiceBusProcessor _processor;
+        protected ServiceBusProcessor processor;
 
-        protected readonly ServiceBusProcessorOptions _options = new()
+        protected readonly ServiceBusProcessorOptions options = new()
         {
             ReceiveMode = ServiceBusReceiveMode.PeekLock,
             AutoCompleteMessages = false,
@@ -28,30 +28,25 @@ namespace SBMonitor.Infrastructure.Grains
 
         private long _lastMessageSequenceNumber;
 
-        public IPersistentState<ConnectionProps> ConnectionProps { get; protected set; }
+        protected ConnectionProps connectionProps;
 
-        public async Task<ConnectionProps> ConnectAsync(ConnectionProps props)
+        public async Task ConnectAsync(ConnectionProps props)
         {
-            if (_processor != null)
-                return ConnectionProps.State;
+            if (processor != null)
+                return;
 
-            ConnectionProps.State = props;
+            connectionProps = props;
 
-            _client = new ServiceBusClient(props.ConnectionString);
+            client = new ServiceBusClient(props.ConnectionString);
 
-            _processor = CreateProcessor();
+            processor = CreateProcessor();
 
-            _processor.ProcessMessageAsync += Processor_ProcessMessageAsync;
-            _processor.ProcessErrorAsync += Processor_ProcessErrorAsync;
+            processor.ProcessMessageAsync += Processor_ProcessMessageAsync;
+            processor.ProcessErrorAsync += Processor_ProcessErrorAsync;
 
-            ConnectionProps.State.StartedAt = DateTime.UtcNow;
-            await ConnectionProps.WriteStateAsync();
-
-            await _processor.StartProcessingAsync();
+            await processor.StartProcessingAsync();
 
             _logger.LogDebug($"{props.Name} connected");
-
-            return ConnectionProps.State;
         }
 
         private Task Processor_ProcessErrorAsync(ProcessErrorEventArgs arg)
@@ -75,10 +70,17 @@ namespace SBMonitor.Infrastructure.Grains
 
         protected abstract ServiceBusProcessor CreateProcessor();
 
-        public override Task OnActivateAsync()
+        public override async Task OnActivateAsync()
         {
             _hub = GrainFactory.GetHub<IMessageMonitor>();
-            return Task.CompletedTask;
+            await base.OnActivateAsync();
+        }
+
+        public override async Task OnDeactivateAsync()
+        {
+            await processor.DisposeAsync();
+            await client.DisposeAsync();
+            await base.OnDeactivateAsync();
         }
     }
 }

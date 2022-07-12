@@ -29,16 +29,26 @@ namespace SBMonitor.Infrastructure.Grains
             return Task.CompletedTask;
         }
 
-        public async Task AddMonitorGrain(Guid id)
+        public async Task AddConnection(ConnectionProps conn)
         {
-            User.State.MonitorGrainIds.Add(id);
+            if (User.State.Connections.Any(p => p.Id == conn.Id))
+                return;
+
+            User.State.Connections.Add(conn);
             await User.WriteStateAsync();
         }
 
-        public async Task RemoveMonitorGrain(Guid id)
+        public async Task RemoveConnection(Guid id)
         {
-            User.State.MonitorGrainIds.Remove(id);
+            var removable = User.State.Connections.First(p => p.Id == id);
+            User.State.Connections.Remove(removable);
             await User.WriteStateAsync();
+        }
+
+        public async Task<IList<ConnectionProps>> Connections()
+        {
+            await User.ReadStateAsync();
+            return User.State.Connections;
         }
     }
 }

@@ -17,8 +17,6 @@ namespace SBMonitor.Core.Models
 
         public BusType TypeOfBus { get; set; } = BusType.Queue;
 
-        public DateTime? StartedAt { get; set; } = null;
-
         public string QueueName { get; set; } = string.Empty;
 
         public string TopicName { get; set; } = string.Empty;

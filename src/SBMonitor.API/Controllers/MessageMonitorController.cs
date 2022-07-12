@@ -3,50 +3,51 @@ using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
+using SBMonitor.Infrastructure.Grains;
 using SBMonitor.Infrastructure.Grains.Interfaces;
 using System.Security.Claims;
+using SBMonitor.Infrastructure.Extensions;
 
 namespace SBMonitor.API.Controllers
 {
-    [ApiController]
-    [Route("[controller]/[action]")]
-    [Authorize]
-    public class MessageMonitorController : ControllerBase
+    public class MessageMonitorController : MessageSiloControllerBase
     {
-        private readonly ILogger<MessageMonitorController> _logger;
-        private readonly IGrainFactory _factory;
-        private readonly IHttpContextAccessor httpContextAccessor;
-
-        public MessageMonitorController(ILogger<MessageMonitorController> logger, IGrainFactory factory, IHttpContextAccessor httpContextAccessor)
+        public MessageMonitorController(ILogger<MessageMonitorController> logger, IGrainFactory grainFactory, IHttpContextAccessor httpContextAccessor)
+            : base(logger, grainFactory, httpContextAccessor)
         {
-            _logger = logger;
-            _factory = factory;
-            this.httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost]
-        public async Task<ConnectionProps> Upsert([FromBody] ConnectionProps connectionProps)
+        public async Task Upsert([FromBody] ConnectionProps conn)
         {
-            var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var monitor = grainFactory.MonitorGrain(conn.TypeOfBus, conn.Id);
+            await monitor.ConnectAsync(conn);
 
-            IMonitorGrain monitor;
-            
-            switch (connectionProps.TypeOfBus)
+            var user = grainFactory.GetGrain<IUserGrain>(loggedInUserId);
+            await user.AddConnection(conn);
+        }
+
+        [HttpDelete]
+        public async Task Delete([FromQuery] Guid id)
+        {
+            var user = grainFactory.GetGrain<IUserGrain>(loggedInUserId);
+
+            await user.RemoveConnection(id);
+        }
+
+        [HttpGet]
+        public async Task<IList<ConnectionProps>> Connections()
+        {
+            var user = grainFactory.GetGrain<IUserGrain>(loggedInUserId);
+
+            var result = new List<ConnectionProps>();
+
+            foreach (var conn in await user.Connections())
             {
-                case BusType.Queue:
-                    monitor = _factory.GetGrain<IQueueMonitorGrain>(connectionProps.Id);
-                    break;
-                case BusType.Topic:
-                default:
-                    monitor = _factory.GetGrain<ITopicMonitorGrain>(connectionProps.Id);
-                    break;
+                var monitor = grainFactory.MonitorGrain(conn.TypeOfBus, conn.Id);
+                await monitor.ConnectAsync(conn);
+                result.Add(conn);
             }
-
-            var result = await monitor.ConnectAsync(connectionProps);
-
-            var user = _factory.GetGrain<IUserGrain>(userId);
-
-            await user.AddMonitorGrain(connectionProps.Id);
 
             return result;
         }

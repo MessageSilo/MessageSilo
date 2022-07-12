@@ -1,6 +1,7 @@
 ﻿using Blazorise;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using SBMonitor.BlazorApp.Pages;
 using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
 
@@ -16,6 +17,9 @@ namespace SBMonitor.BlazorApp.Shared
 
         [Parameter]
         public ConnectionSettingsModal ConnectionSettingsModal { get; set; }
+
+        [Parameter]
+        public Func<Guid, Task> DeleteItemAction { get; set; }
 
         private string MessageDetails { get; set; }
 
@@ -39,6 +43,11 @@ namespace SBMonitor.BlazorApp.Shared
             await HubConnection.StartAsync();
 
             await HubConnection.SendAsync("JoinGroup", Connection.Id);
+        }
+
+        public async Task Delete()
+        {
+            await DeleteItemAction(Connection.Id);
         }
     }
 }
