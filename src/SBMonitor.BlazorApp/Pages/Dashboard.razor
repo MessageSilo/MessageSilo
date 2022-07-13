@@ -17,12 +17,14 @@
 </div>
 
 <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-    <div class="col">
-        @foreach (var item in Items)
-        {
-            <DashboardItem Connection="item" ApiClient="ApiClient" ConnectionSettingsModal="ConnectionSettingsModal" DeleteItemAction="@(e =>DeleteItem(item.Id))"></DashboardItem>
-        }
-    </div>
+
+    @foreach (var item in Items)
+    {
+        <div class="col">
+            <DashboardItem Connection="item" ApiClient="ApiClient" ConnectionSettingsModal="ConnectionSettingsModal" OnDeleteItem="@(e =>DeleteItem(item.Id))"></DashboardItem>
+        </div>
+    }
+
 </div>
 
 <ConnectionSettingsModal @ref="@ConnectionSettingsModal" ApiClient="ApiClient"></ConnectionSettingsModal>

@@ -63,9 +63,11 @@ namespace SBMonitor.Infrastructure.Grains
             string body = arg.Message.Body.ToString();
 
             _logger.LogDebug(body);
-            await _hub.Group(this.GetPrimaryKeyString()).Send("ReceiveMessage", body);
+            await _hub.Group(this.GetPrimaryKey().ToString()).Send("ReceiveMessage", body);
 
             _lastMessageSequenceNumber = arg.Message.SequenceNumber;
+
+            await arg.AbandonMessageAsync(arg.Message);
         }
 
         protected abstract ServiceBusProcessor CreateProcessor();

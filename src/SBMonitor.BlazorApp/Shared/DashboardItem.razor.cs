@@ -19,7 +19,7 @@ namespace SBMonitor.BlazorApp.Shared
         public ConnectionSettingsModal ConnectionSettingsModal { get; set; }
 
         [Parameter]
-        public Func<Guid, Task> DeleteItemAction { get; set; }
+        public Func<Guid, Task> OnDeleteItem { get; set; }
 
         private string MessageDetails { get; set; }
 
@@ -47,7 +47,7 @@ namespace SBMonitor.BlazorApp.Shared
 
         public async Task Delete()
         {
-            await DeleteItemAction(Connection.Id);
+            await OnDeleteItem(Connection.Id);
         }
     }
 }
