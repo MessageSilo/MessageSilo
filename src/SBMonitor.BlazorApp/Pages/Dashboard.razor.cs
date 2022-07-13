@@ -41,7 +41,9 @@ namespace SBMonitor.BlazorApp.Pages
             if (ea == null)
                 return;
 
-            if (!Items.Any(p => p.Id == ea.ConnectionProps.Id))
+            var existingConn = Items.FirstOrDefault(p => p.Id == ea.ConnectionProps.Id);
+
+            if (existingConn == null)
                 Items.Add(ea.ConnectionProps);
 
             RefreshState();

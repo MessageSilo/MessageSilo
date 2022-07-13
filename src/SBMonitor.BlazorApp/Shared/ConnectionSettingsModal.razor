@@ -1,6 +1,4 @@
-﻿@inject AuthenticationStateProvider GetAuthenticationStateAsync
-
-<Modal @ref="@ConnectionModal">
+﻿<Modal @ref="@ConnectionModal">
     <ModalContent Centered>
         <ModalHeader>
             <ModalTitle>Connection Settings</ModalTitle>
@@ -8,6 +6,11 @@
         </ModalHeader>
         <ModalBody>
             <form>
+                <div class="form-group">
+                    <label for="connectionTypeOfBus">Platform</label>
+                    <TextEdit Disabled="true" id="platform" class="form-control" Text="Azure Service Bus">
+                    </TextEdit>
+                </div>
                 <div class="form-group">
                     <label for="connectionTypeOfBus">Type</label>
                     <Select Disabled="Disabled" TValue="BusType" id="connectionTypeOfBus" class="form-control" @bind-SelectedValue="TypeOfBus">

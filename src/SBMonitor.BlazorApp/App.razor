@@ -1,4 +1,4 @@
-﻿@inject NavigationManager _navigationManager
+﻿@inject NavigationManager navigationManager
 
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
@@ -9,7 +9,7 @@
                 </Authorizing>
                 <NotAuthorized>
                     @{
-                        _navigationManager.NavigateTo("/authentication/login");
+                        navigationManager.NavigateTo("/authentication/login");
                     }
                 </NotAuthorized>
             </AuthorizeRouteView>

@@ -4,18 +4,37 @@
 @inject NavigationManager Navigation
 @inject SignOutSessionStateManager SignOutManager
 
-<AuthorizeView>
-    <Authorized>
-        Hello, @context.User.Identity.Name!
-        <a href="#" @onclick="BeginSignOut">Log out</a>
-    </Authorized>
-    <NotAuthorized>
-        <a href="authentication/login">Log in</a>
-    </NotAuthorized>
-</AuthorizeView>
+<div class="navbar-nav">
+    <div class="nav-item text-nowrap">
+        <AuthorizeView>
+            <Authorized>
+                <Dropdown>
+                    <DropdownToggle Color="Color.Secondary">
+                        <span data-feather="user"></span>
+                        @context?.User?.Identity?.Name
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        <DropdownItem Clicked="@BeginSignOut">
+                            <span data-feather="log-out"></span>
+                            Log out
+                        </DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
+            </Authorized>
+            <NotAuthorized>
+                <Button Color="Color.Secondary" Clicked="@(e => Navigation.NavigateTo("authentication/login"))" class="btn btn-sm">
+                    <span data-feather="log-in"></span>
+                    Log in
+                </Button>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+    <div class="nav-item text-nowrap">
+    </div>
+</div>
 
-@code{
-    private async Task BeginSignOut(MouseEventArgs args)
+@code {
+    private async Task BeginSignOut()
     {
         await SignOutManager.SetSignOutState();
         Navigation.NavigateTo("authentication/logout");

@@ -1,6 +1,4 @@
-﻿@inject IJSRuntime JS
-
-<div class="card mb-4 rounded-3 shadow-sm">
+﻿<div class="card mb-4 rounded-3 shadow-sm">
     <div class="card-header py-3">
         <div class="row">
             <div class="col-md-10">
@@ -12,8 +10,8 @@
                         <span data-feather="settings"></span>
                     </DropdownToggle>
                     <DropdownMenu>
-                        <DropdownItem Clicked="@(e => ConnectionSettingsModal.Show(Connection))">Edit</DropdownItem>
-                        <DropdownDivider />
+                        @*<DropdownItem Clicked="@(e => ConnectionSettingsModal.Show(Connection))">Edit</DropdownItem>*@
+                        @*<DropdownDivider />*@
                         <DropdownItem Clicked="@(e => Delete())" TextColor="TextColor.Danger">Delete</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
@@ -27,11 +25,3 @@
         <Button class="w-100 btn btn-lg btn-primary">Previous Messages</Button>
     </div>
 </div>
-
-@code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await JS.InvokeVoidAsync("showIcons");
-        await base.OnAfterRenderAsync(firstRender);
-    }
-}

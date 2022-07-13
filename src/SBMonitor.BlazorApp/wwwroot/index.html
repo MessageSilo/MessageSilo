@@ -66,6 +66,15 @@
         window.executeFormat = (f) => {
             return Function('"use strict";return (' + f + ')')();
         }
+
+        window.domObserver = new MutationObserver((mutations, observer) => {
+            window.showIcons();
+        });
+
+        window.domObserver.observe(document, {
+            subtree: true,
+            attributes: true
+        });
     </script>
 </body>
 
