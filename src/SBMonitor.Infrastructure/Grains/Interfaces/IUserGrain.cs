@@ -5,7 +5,7 @@ namespace SBMonitor.Infrastructure.Grains.Interfaces
 {
     public interface IUserGrain : IGrainWithStringKey
     {
-        Task AddConnection(ConnectionProps conn);
+        Task AddOrUpdateConnection(ConnectionProps conn);
 
         Task RemoveConnection(Guid id);
 

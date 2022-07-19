@@ -45,6 +45,20 @@
                         </div>
                         break;
                 }
+                <div class="form-group">
+                    <label for="pinnedPathes">Pinned Pathes</label>
+                    <ListGroup class="form-control">
+                        <Repeater Items="@PinnedPathes">
+                            <ListGroupItem>
+                                <TextEdit @bind-Text="@context.Path" />
+                            </ListGroupItem>
+                        </Repeater>
+                    </ListGroup>
+                    <Button Color="Color.Primary" Clicked="@(e => AddPath())">
+                        <span data-feather="plus-square"></span>
+                        New Path
+                    </Button>
+                </div>
             </form>
         </ModalBody>
         <ModalFooter>

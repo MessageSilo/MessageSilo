@@ -25,9 +25,6 @@ namespace SBMonitor.BlazorApp.Shared
                 json = json.Replace(@"  ", "&emsp;");
 
                 FormattedMessage = json;
-
-                //var yourObject = JsonSerializer.Deserialize<JsonElement>(InputMessage);
-                //var asd = yourObject.GetJsonElement("name");
             }
 
             await base.OnParametersSetAsync();

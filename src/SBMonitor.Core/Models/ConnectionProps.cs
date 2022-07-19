@@ -23,6 +23,8 @@ namespace SBMonitor.Core.Models
 
         public string SubscriptionName { get; set; } = string.Empty;
 
+        public IList<PinnedPath> PinnedPathes { get; set; } = new List<PinnedPath>();
+
         public ConnectionProps(string queueName)
         {
             QueueName = queueName;

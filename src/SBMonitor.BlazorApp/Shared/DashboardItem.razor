@@ -6,12 +6,12 @@
             </div>
             <div class="col-md-4 float-right">
                 <Dropdown>
-                    <DropdownToggle Color="Color.Info">
+                    <DropdownToggle Color="Color.Primary">
                         Actions
                     </DropdownToggle>
                     <DropdownMenu>
-                        @*<DropdownItem Clicked="@(e => ConnectionSettingsModal.Show(Connection))">Edit</DropdownItem>*@
-                        @*<DropdownDivider />*@
+                        <DropdownItem Clicked="@(e => ConnectionSettingsModal.Show(Connection))">Edit</DropdownItem>
+                        <DropdownDivider />
                         <DropdownItem Clicked="@(e => Delete())" TextColor="TextColor.Danger">Delete</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
@@ -19,8 +19,16 @@
         </div>
     </div>
     <div class="card-body">
+        <Switch TValue="bool" @bind-Checked="IsAdvancedView"></Switch>
         <p class="mt-3 mb-4">
-            <DefaultJsonMessageDisplayer InputMessage="@MessageDetails" />
+            @if (IsAdvancedView)
+            {
+                <PinnerMessageDisplayer InputMessage="@MessageDetails" PinnedPathes="@Connection.PinnedPathes" />
+            }
+            else
+            {
+                <DefaultJsonMessageDisplayer InputMessage="@MessageDetails" />
+            }
         </p>
     </div>
 </div>

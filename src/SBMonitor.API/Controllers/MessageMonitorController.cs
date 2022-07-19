@@ -24,7 +24,7 @@ namespace SBMonitor.API.Controllers
             await monitor.ConnectAsync(conn);
 
             var user = grainFactory.GetGrain<IUserGrain>(loggedInUserId);
-            await user.AddConnection(conn);
+            await user.AddOrUpdateConnection(conn);
         }
 
         [HttpDelete]

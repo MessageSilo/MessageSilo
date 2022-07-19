@@ -25,6 +25,8 @@ namespace SBMonitor.BlazorApp.Shared
 
         private HubConnection HubConnection;
 
+        private bool IsAdvancedView { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();

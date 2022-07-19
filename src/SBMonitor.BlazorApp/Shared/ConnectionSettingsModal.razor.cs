@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.SignalR.Client;
 using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
+using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -27,6 +28,8 @@ namespace SBMonitor.BlazorApp.Shared
 
         public string SubscriptionName { get; internal set; }
 
+        public ObservableCollection<PinnedPath> PinnedPathes { get; internal set; }
+
         public bool Disabled { get; internal set; }
 
         private Modal ConnectionModal;
@@ -43,6 +46,8 @@ namespace SBMonitor.BlazorApp.Shared
         {
             ConnectionProps conn = null;
 
+            PinnedPathes = new(PinnedPathes.Where(p => !string.IsNullOrEmpty(p.Path) && !string.IsNullOrWhiteSpace(p.Path)));
+
             switch (TypeOfBus)
             {
                 case BusType.Queue:
@@ -50,7 +55,8 @@ namespace SBMonitor.BlazorApp.Shared
                     {
                         Id = Id,
                         ConnectionString = ConnectionString,
-                        Name = Name
+                        Name = Name,
+                        PinnedPathes = PinnedPathes
                     };
                     break;
                 case BusType.Topic:
@@ -58,7 +64,8 @@ namespace SBMonitor.BlazorApp.Shared
                     {
                         Id = Id,
                         ConnectionString = ConnectionString,
-                        Name = Name
+                        Name = Name,
+                        PinnedPathes = PinnedPathes
                     };
                     break;
             };
@@ -72,6 +79,11 @@ namespace SBMonitor.BlazorApp.Shared
             await ConnectionModal.Close(CloseReason.UserClosing);
         }
 
+        public void AddPath()
+        {
+            PinnedPathes.Add(new());
+        }
+
         public async Task Show(ConnectionProps? props = null)
         {
             Id = props?.Id ?? Guid.NewGuid();
@@ -81,6 +93,7 @@ namespace SBMonitor.BlazorApp.Shared
             QueueName = props?.QueueName ?? "kiscica";//string.Empty;
             TopicName = props?.TopicName ?? string.Empty;
             SubscriptionName = props?.SubscriptionName ?? string.Empty;
+            PinnedPathes = new ObservableCollection<PinnedPath>(props == null ? Enumerable.Empty<PinnedPath>() : props.PinnedPathes);
 
             Disabled = props != null;
 

@@ -29,12 +29,15 @@ namespace SBMonitor.Infrastructure.Grains
             return Task.CompletedTask;
         }
 
-        public async Task AddConnection(ConnectionProps conn)
+        public async Task AddOrUpdateConnection(ConnectionProps conn)
         {
-            if (User.State.Connections.Any(p => p.Id == conn.Id))
-                return;
+            var existingConnection = User.State.Connections.FirstOrDefault(p => p.Id == conn.Id);
 
-            User.State.Connections.Add(conn);
+            if (existingConnection == null)
+                User.State.Connections.Add(conn);
+            else
+                existingConnection = conn;
+
             await User.WriteStateAsync();
         }
 
