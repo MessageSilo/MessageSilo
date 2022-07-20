@@ -6,8 +6,8 @@ on:
     - main
 
 env:
-  UNIQUE_APP_NAME: message-silo-api-prod
-  AZURE_RESOURCE_GROUP_NAME: message-silo-rg-prod
+  UNIQUE_APP_NAME: messagesiloapiprd
+  AZURE_RESOURCE_GROUP_NAME: messagesilorgprd
   AZURE_RESOURCE_GROUP_LOCATION: westeurope
 
 jobs:
