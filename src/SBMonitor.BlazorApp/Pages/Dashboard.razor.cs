@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.SignalR.Client;
 using SBMonitor.BlazorApp.Shared;
 using SBMonitor.Core.Models;
+using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 
 namespace SBMonitor.BlazorApp.Pages
@@ -11,7 +12,9 @@ namespace SBMonitor.BlazorApp.Pages
     {
         private ConnectionSettingsModal ConnectionSettingsModal;
 
-        private List<ConnectionProps> Items = new List<ConnectionProps>();
+        private ObservableCollection<ConnectionProps> Items = new ObservableCollection<ConnectionProps>();
+
+        private int rows = 2;
 
         public void RefreshState()
         {
@@ -20,7 +23,7 @@ namespace SBMonitor.BlazorApp.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            Items = await ApiClient.GetFromJsonAsync<List<ConnectionProps>>("MessageMonitor/Connections");
+            Items = await ApiClient.GetFromJsonAsync<ObservableCollection<ConnectionProps>>("MessageMonitor/Connections");
             await base.OnInitializedAsync();
         }
 
@@ -45,8 +48,8 @@ namespace SBMonitor.BlazorApp.Pages
 
             if (existingConn == null)
                 Items.Add(ea.ConnectionProps);
-
-            RefreshState();
+            else
+                existingConn.Update(ea.ConnectionProps);
         }
 
         private async Task DeleteItem(Guid id)
@@ -56,8 +59,11 @@ namespace SBMonitor.BlazorApp.Pages
             response.EnsureSuccessStatusCode();
 
             Items.Remove(Items.First(p => p.Id == id));
+        }
 
-            RefreshState();
+        private async Task SetRows(int rows)
+        {
+            this.rows = rows;
         }
     }
 }

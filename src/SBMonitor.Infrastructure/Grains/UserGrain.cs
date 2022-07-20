@@ -36,7 +36,7 @@ namespace SBMonitor.Infrastructure.Grains
             if (existingConnection == null)
                 User.State.Connections.Add(conn);
             else
-                existingConnection = conn;
+                existingConnection.Update(conn);
 
             await User.WriteStateAsync();
         }

@@ -40,5 +40,11 @@ namespace SBMonitor.Core.Models
 
         public ConnectionProps()
         { }
+
+        public void Update(ConnectionProps conn)
+        {
+            this.Name = conn.Name;
+            this.PinnedPathes = conn.PinnedPathes;
+        }
     }
 }

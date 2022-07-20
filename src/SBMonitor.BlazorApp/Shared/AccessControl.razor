@@ -16,7 +16,7 @@
                     <DropdownMenu>
                         <DropdownItem Clicked="@BeginSignOut">
                             <span data-feather="log-out"></span>
-                            Log out
+                            Sign Out
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
@@ -24,7 +24,7 @@
             <NotAuthorized>
                 <Button Color="Color.Secondary" Clicked="@(e => Navigation.NavigateTo("authentication/login"))" class="btn btn-sm">
                     <span data-feather="log-in"></span>
-                    Log in
+                    Sign In
                 </Button>
             </NotAuthorized>
         </AuthorizeView>

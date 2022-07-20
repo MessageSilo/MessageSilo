@@ -8,8 +8,14 @@
             <form>
                 <div class="form-group">
                     <label for="connectionTypeOfBus">Platform</label>
-                    <TextEdit Disabled="true" id="platform" class="form-control" Text="Azure Service Bus">
-                    </TextEdit>
+                    <Addons>
+                        <Addon AddonType="AddonType.Start">
+                            <img src="/images/azureservicebus_logo.png" height="35"/>
+                        </Addon>
+                        <Addon AddonType="AddonType.Body">
+                            <TextEdit Disabled="true" id="platform" class="form-control" Text="Azure Service Bus" />
+                        </Addon>
+                    </Addons>
                 </div>
                 <div class="form-group">
                     <label for="connectionTypeOfBus">Type</label>

@@ -140,3 +140,11 @@
         content: "An error has occurred."
     }
 
+.dashboard-item-card {
+    min-height: 350px;
+    max-height: 350px;
+}
+
+    .dashboard-item-card .card-body {
+        overflow:auto;
+    }
