@@ -11,76 +11,61 @@ namespace SBMonitor.Infrastructure.Grains
 {
     public abstract class MonitorGrain : Grain, IMonitorGrain
     {
-        protected ServiceBusClient client;
+        private HubContext<IMessageMonitor> hub;
 
-        protected ServiceBusProcessor processor;
-
-        protected readonly ServiceBusProcessorOptions options = new()
-        {
-            ReceiveMode = ServiceBusReceiveMode.PeekLock,
-            AutoCompleteMessages = false,
-        };
-
-
-        protected ILogger<MonitorGrain> _logger;
-
-        private HubContext<IMessageMonitor> _hub;
-
-        private long _lastMessageSequenceNumber;
+        private IDisposable timer;
 
         protected ConnectionProps connectionProps;
 
-        public async Task ConnectAsync(ConnectionProps props)
+        protected ServiceBusClient client;
+
+        protected ServiceBusReceiver receiver;
+
+        protected ILogger<MonitorGrain> logger;
+
+        public Task ConnectAsync(ConnectionProps props)
         {
-            if (processor != null)
-                return;
+            if (receiver != null)
+                return Task.CompletedTask;
 
             connectionProps = props;
 
             client = new ServiceBusClient(props.ConnectionString);
 
-            processor = CreateProcessor();
+            receiver = CreateReceiver();
 
-            processor.ProcessMessageAsync += Processor_ProcessMessageAsync;
-            processor.ProcessErrorAsync += Processor_ProcessErrorAsync;
+            receiver.
 
-            await processor.StartProcessingAsync();
+            timer = RegisterTimer(processMessageAsync, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
 
-            _logger.LogDebug($"{props.Name} connected");
-        }
-
-        private Task Processor_ProcessErrorAsync(ProcessErrorEventArgs arg)
-        {
-            _logger.LogError(arg.Exception.Message);
             return Task.CompletedTask;
         }
 
-        private async Task Processor_ProcessMessageAsync(ProcessMessageEventArgs arg)
+        private async Task processMessageAsync(object state)
         {
-            if (arg.Message.SequenceNumber <= _lastMessageSequenceNumber)
+            var msg = await receiver.PeekMessageAsync();
+
+            if (msg == null)
                 return;
 
-            string body = arg.Message.Body.ToString();
+            string body = msg.Body.ToString();
 
-            _logger.LogDebug(body);
-            await _hub.Group(this.GetPrimaryKey().ToString()).Send("ReceiveMessage", body);
-
-            _lastMessageSequenceNumber = arg.Message.SequenceNumber;
-
-            await arg.AbandonMessageAsync(arg.Message);
+            logger.LogDebug(body);
+            await hub.Group(this.GetPrimaryKey().ToString()).Send("ReceiveMessage", body);
         }
 
-        protected abstract ServiceBusProcessor CreateProcessor();
+        protected abstract ServiceBusReceiver CreateReceiver();
 
         public override async Task OnActivateAsync()
         {
-            _hub = GrainFactory.GetHub<IMessageMonitor>();
+            hub = GrainFactory.GetHub<IMessageMonitor>();
             await base.OnActivateAsync();
         }
 
         public override async Task OnDeactivateAsync()
         {
-            await processor.DisposeAsync();
+            timer.Dispose();
+            await receiver.DisposeAsync();
             await client.DisposeAsync();
             await base.OnDeactivateAsync();
         }

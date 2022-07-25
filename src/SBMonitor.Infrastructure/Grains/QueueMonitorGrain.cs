@@ -9,14 +9,14 @@ namespace SBMonitor.Infrastructure.Grains
 {
     public class QueueMonitorGrain : MonitorGrain, IQueueMonitorGrain
     {
-        protected override ServiceBusProcessor CreateProcessor()
+        protected override ServiceBusReceiver CreateReceiver()
         {
-            return client.CreateProcessor(connectionProps.QueueName, options);
+            return client.CreateReceiver(connectionProps.QueueName);
         }
 
         public QueueMonitorGrain(ILogger<QueueMonitorGrain> logger) : base()
         {
-            _logger = logger;
+            base.logger = logger;
         }
     }
 }

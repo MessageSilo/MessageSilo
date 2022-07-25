@@ -8,14 +8,14 @@ namespace SBMonitor.Infrastructure.Grains
 {
     public class TopicMonitorGrain : MonitorGrain, ITopicMonitorGrain
     {
-        protected override ServiceBusProcessor CreateProcessor()
+        protected override ServiceBusReceiver CreateReceiver()
         {
-            return client.CreateProcessor(connectionProps.TopicName, connectionProps.SubscriptionName, options);
+            return client.CreateReceiver(connectionProps.TopicName, connectionProps.SubscriptionName);
         }
 
         public TopicMonitorGrain(ILogger<TopicMonitorGrain> logger) : base()
         {
-            _logger = logger;
+            base.logger = logger;
         }
     }
 }
