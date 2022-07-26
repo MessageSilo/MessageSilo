@@ -34,8 +34,6 @@ namespace SBMonitor.Infrastructure.Grains
 
             receiver = CreateReceiver();
 
-            receiver.
-
             timer = RegisterTimer(processMessageAsync, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
 
             return Task.CompletedTask;

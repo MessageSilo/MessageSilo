@@ -27,6 +27,8 @@ namespace SBMonitor.BlazorApp.Shared
 
         private bool IsAdvancedView { get; set; }
 
+        private bool Pulseing { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -36,10 +38,14 @@ namespace SBMonitor.BlazorApp.Shared
             .AddJsonProtocol()
             .Build();
 
-            HubConnection.On<string>("ReceiveMessage", (message) =>
+            HubConnection.On<string>("ReceiveMessage", async (message) =>
             {
+                Pulseing = true;
                 MessageDetails = message;
-                InvokeAsync(StateHasChanged);
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(1000);
+                Pulseing = false;
+                await InvokeAsync(StateHasChanged);
             });
 
             await HubConnection.StartAsync();
