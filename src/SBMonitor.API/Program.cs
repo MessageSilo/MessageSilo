@@ -16,7 +16,7 @@ builder.UseOrleans((context, sb) =>
              manager.AddApplicationPart(typeof(Program).Assembly).WithReferences();
          });
 
-         //sb.UseDashboard();
+         sb.UseDashboard();
          sb.ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Information).AddConsole());
 
          sb.UseSignalR(b =>

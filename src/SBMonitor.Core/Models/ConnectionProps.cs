@@ -15,7 +15,7 @@ namespace SBMonitor.Core.Models
 
         public string ConnectionString { get; set; } = string.Empty;
 
-        public BusType TypeOfBus { get; set; } = BusType.Queue;
+        public BusType TypeOfBus { get; set; } = BusType.Azure_Queue;
 
         public string QueueName { get; set; } = string.Empty;
 
@@ -28,14 +28,14 @@ namespace SBMonitor.Core.Models
         public ConnectionProps(string queueName)
         {
             QueueName = queueName;
-            TypeOfBus = BusType.Queue;
+            TypeOfBus = BusType.Azure_Queue;
         }
 
         public ConnectionProps(string topicName, string subscriptionName)
         {
             TopicName = topicName;
             SubscriptionName = subscriptionName;
-            TypeOfBus = BusType.Topic;
+            TypeOfBus = BusType.Azure_Topic;
         }
 
         public ConnectionProps()

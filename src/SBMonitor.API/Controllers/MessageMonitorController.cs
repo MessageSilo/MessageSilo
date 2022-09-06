@@ -20,7 +20,7 @@ namespace SBMonitor.API.Controllers
         [HttpPost]
         public async Task Upsert([FromBody] ConnectionProps conn)
         {
-            var monitor = grainFactory.MonitorGrain(conn.TypeOfBus, conn.Id);
+            var monitor = grainFactory.CreateMonitorGrain(conn.TypeOfBus, conn.Id);
             await monitor.ConnectAsync(conn);
 
             var user = grainFactory.GetGrain<IUserGrain>(loggedInUserId);
@@ -44,7 +44,7 @@ namespace SBMonitor.API.Controllers
 
             foreach (var conn in await user.Connections())
             {
-                var monitor = grainFactory.MonitorGrain(conn.TypeOfBus, conn.Id);
+                var monitor = grainFactory.CreateMonitorGrain(conn.TypeOfBus, conn.Id);
                 await monitor.ConnectAsync(conn);
                 result.Add(conn);
             }

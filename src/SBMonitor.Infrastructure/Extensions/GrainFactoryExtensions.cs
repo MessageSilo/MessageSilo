@@ -11,15 +11,15 @@ namespace SBMonitor.Infrastructure.Extensions
 {
     public static class GrainFactoryExtensions
     {
-        public static IMonitorGrain MonitorGrain(this IGrainFactory grainFactory, BusType typeOfBus, Guid id)
+        public static IMonitorGrain CreateMonitorGrain(this IGrainFactory grainFactory, BusType typeOfBus, Guid id)
         {
             switch (typeOfBus)
             {
-                case BusType.Queue:
-                    return grainFactory.GetGrain<IQueueMonitorGrain>(id);
-                case BusType.Topic:
+                case BusType.Azure_Queue:
+                    return grainFactory.GetGrain<IAzureQueueMonitorGrain>(id);
+                case BusType.Azure_Topic:
                 default:
-                    return grainFactory.GetGrain<ITopicMonitorGrain>(id);
+                    return grainFactory.GetGrain<IAzureTopicMonitorGrain>(id);
             }
         }
     }

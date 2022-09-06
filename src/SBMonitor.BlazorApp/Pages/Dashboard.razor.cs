@@ -50,6 +50,8 @@ namespace SBMonitor.BlazorApp.Pages
                 Items.Add(ea.ConnectionProps);
             else
                 existingConn.Update(ea.ConnectionProps);
+
+            RefreshState();
         }
 
         private async Task DeleteItem(Guid id)

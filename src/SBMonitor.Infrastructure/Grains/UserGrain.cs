@@ -38,7 +38,7 @@ namespace SBMonitor.Infrastructure.Grains
             else
                 existingConnection.Update(conn);
 
-            await User.WriteStateAsync();
+            //await User.WriteStateAsync();
         }
 
         public async Task RemoveConnection(Guid id)

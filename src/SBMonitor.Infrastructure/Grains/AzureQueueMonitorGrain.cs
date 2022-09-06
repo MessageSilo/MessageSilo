@@ -7,14 +7,14 @@ using SBMonitor.Infrastructure.Grains.Interfaces;
 
 namespace SBMonitor.Infrastructure.Grains
 {
-    public class QueueMonitorGrain : MonitorGrain, IQueueMonitorGrain
+    public class AzureQueueMonitorGrain : MonitorGrain, IAzureQueueMonitorGrain
     {
         protected override ServiceBusReceiver CreateReceiver()
         {
             return client.CreateReceiver(connectionProps.QueueName);
         }
 
-        public QueueMonitorGrain(ILogger<QueueMonitorGrain> logger) : base()
+        public AzureQueueMonitorGrain(ILogger<AzureQueueMonitorGrain> logger) : base()
         {
             base.logger = logger;
         }

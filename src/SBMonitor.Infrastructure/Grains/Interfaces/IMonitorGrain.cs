@@ -8,12 +8,12 @@ namespace SBMonitor.Infrastructure.Grains.Interfaces
         Task ConnectAsync(ConnectionProps props);
     }
 
-    public interface IQueueMonitorGrain : IMonitorGrain
+    public interface IAzureQueueMonitorGrain : IMonitorGrain
     {
 
     }
 
-    public interface ITopicMonitorGrain : IMonitorGrain
+    public interface IAzureTopicMonitorGrain : IMonitorGrain
     {
 
     }

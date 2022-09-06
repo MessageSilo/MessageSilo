@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.SignalR.Client;
 using SBMonitor.Core.Enums;
+using SBMonitor.Core.Interfaces;
 using SBMonitor.Core.Models;
+using SBMonitor.Core.Platforms;
 using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -15,8 +17,22 @@ namespace SBMonitor.BlazorApp.Shared
         [Parameter]
         public HttpClient ApiClient { get; set; }
 
+        public IEnumerable<IPlatform> Platforms => new List<IPlatform>() { new Azure(), new AWS() };
+
         public Guid Id { get; internal set; }
         public string Name { get; internal set; }
+
+        private IPlatform selectedValue;
+
+        public IPlatform SelectedPlatform
+        {
+            get { return selectedValue; }
+            internal set
+            {
+                selectedValue = value;
+                StateHasChanged();
+            }
+        }
 
         public string ConnectionString { get; internal set; }
 
@@ -32,7 +48,7 @@ namespace SBMonitor.BlazorApp.Shared
 
         public bool Disabled { get; internal set; }
 
-        private Modal ConnectionModal;
+        private Modal? ConnectionModal;
 
         public event EventHandler ConnectionChanged;
 
@@ -44,13 +60,13 @@ namespace SBMonitor.BlazorApp.Shared
 
         public async Task Save()
         {
-            ConnectionProps conn = null;
+            ConnectionProps? conn = null;
 
             PinnedPathes = new(PinnedPathes.Where(p => !string.IsNullOrEmpty(p.Path) && !string.IsNullOrWhiteSpace(p.Path)));
 
             switch (TypeOfBus)
             {
-                case BusType.Queue:
+                case BusType.Azure_Queue:
                     conn = new ConnectionProps(QueueName)
                     {
                         Id = Id,
@@ -59,7 +75,7 @@ namespace SBMonitor.BlazorApp.Shared
                         PinnedPathes = PinnedPathes
                     };
                     break;
-                case BusType.Topic:
+                case BusType.Azure_Topic:
                     conn = new ConnectionProps(TopicName, SubscriptionName)
                     {
                         Id = Id,
@@ -88,8 +104,9 @@ namespace SBMonitor.BlazorApp.Shared
         {
             Id = props?.Id ?? Guid.NewGuid();
             Name = props?.Name ?? "test";//string.Empty;
+            SelectedPlatform = Platforms.First();
             ConnectionString = props?.ConnectionString ?? "Endpoint=sb://sbm-test1.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=rqzi6lkkXatcCxiPNWrP3Zk5Cz8Bc8tmI9vOPtHxDMo=";//string.Empty;
-            TypeOfBus = props?.TypeOfBus ?? BusType.Queue;
+            TypeOfBus = props?.TypeOfBus ?? BusType.Azure_Queue;
             QueueName = props?.QueueName ?? "kiscica";//string.Empty;
             TopicName = props?.TopicName ?? string.Empty;
             SubscriptionName = props?.SubscriptionName ?? string.Empty;
