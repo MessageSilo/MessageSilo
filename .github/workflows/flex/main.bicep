@@ -4,7 +4,7 @@ param location string = resourceGroup().location
 module storageModule 'storage.bicep' = {
   name: 'orleansStorageModule'
   params: {
-    name: '${appName}storage'
+    name: '${appName}jee'
     location: location
   }
 }
