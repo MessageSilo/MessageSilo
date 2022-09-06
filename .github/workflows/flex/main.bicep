@@ -5,7 +5,7 @@ module storageModule 'storage.bicep' = {
   name: 'orleansStorageModule'
   params: {
     name: '${appName}jee'
-    location: location
+    location: 'uksouth'
   }
 }
 
