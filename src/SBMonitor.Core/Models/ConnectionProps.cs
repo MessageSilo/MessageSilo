@@ -15,7 +15,7 @@ namespace SBMonitor.Core.Models
 
         public string ConnectionString { get; set; } = string.Empty;
 
-        public BusType TypeOfBus { get; set; } = BusType.Azure_Queue;
+        public MessagePlatformType TypeOfBus { get; set; } = MessagePlatformType.Azure_Queue;
 
         public string QueueName { get; set; } = string.Empty;
 
@@ -23,19 +23,17 @@ namespace SBMonitor.Core.Models
 
         public string SubscriptionName { get; set; } = string.Empty;
 
-        public IList<PinnedPath> PinnedPathes { get; set; } = new List<PinnedPath>();
-
         public ConnectionProps(string queueName)
         {
             QueueName = queueName;
-            TypeOfBus = BusType.Azure_Queue;
+            TypeOfBus = MessagePlatformType.Azure_Queue;
         }
 
         public ConnectionProps(string topicName, string subscriptionName)
         {
             TopicName = topicName;
             SubscriptionName = subscriptionName;
-            TypeOfBus = BusType.Azure_Topic;
+            TypeOfBus = MessagePlatformType.Azure_Topic;
         }
 
         public ConnectionProps()
@@ -44,7 +42,6 @@ namespace SBMonitor.Core.Models
         public void Update(ConnectionProps conn)
         {
             this.Name = conn.Name;
-            this.PinnedPathes = conn.PinnedPathes;
         }
     }
 }

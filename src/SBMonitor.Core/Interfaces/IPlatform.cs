@@ -13,6 +13,6 @@ namespace SBMonitor.Core.Interfaces
 
         string DisplayName { get; }
 
-        List<BusType> BusTypes { get; }
+        List<MessagePlatformType> Types { get; }
     }
 }

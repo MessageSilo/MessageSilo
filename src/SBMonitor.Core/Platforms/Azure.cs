@@ -14,6 +14,6 @@ namespace SBMonitor.Core.Platforms
 
         public string DisplayName => "Azure Service Bus";
 
-        public List<BusType> BusTypes => new List<BusType>() { BusType.Azure_Queue, BusType.Azure_Topic };
+        public List<MessagePlatformType> Types => new List<MessagePlatformType>() { MessagePlatformType.Azure_Queue, MessagePlatformType.Azure_Topic };
     }
 }

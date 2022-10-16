@@ -14,6 +14,6 @@ namespace SBMonitor.Core.Platforms
 
         public string DisplayName => "Amazon Simple Queue Service";
 
-        public List<BusType> BusTypes => new List<BusType>() { BusType.AWS_SQS };
+        public List<MessagePlatformType> Types => new List<MessagePlatformType>() { MessagePlatformType.AWS_SQS };
     }
 }
