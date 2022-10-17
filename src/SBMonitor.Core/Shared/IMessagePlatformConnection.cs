@@ -16,8 +16,8 @@ namespace SBMonitor.Core.Shared
 
         MessagePlatformType Type { get; }
 
-        void StartProcessingDeadLetterMessages();
+        void InitDeadLetterCorrector();
 
-        event EventHandler DeadLetterMessageReceived;
+        Task<IEnumerable<string>> GetDeadLetterMessagesAsync();
     }
 }

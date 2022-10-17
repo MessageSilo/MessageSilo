@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
+using Microsoft.Azure.Amqp.Framing;
 using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
 using System;
@@ -13,7 +14,9 @@ namespace SBMonitor.Core.Shared
     {
         private ServiceBusClient client;
 
-        private ServiceBusProcessor deadLetterProcessor;
+        private ServiceBusReceiver deadLetterReceiver;
+
+        private const int MAX_NUMBER_OF_MESSAGES = 100;
 
         public string QueueName { get; }
 
@@ -34,21 +37,26 @@ namespace SBMonitor.Core.Shared
             Type = MessagePlatformType.Azure_Topic;
         }
 
-        public override void StartProcessingDeadLetterMessages()
+        public override void InitDeadLetterCorrector()
         {
             client = new ServiceBusClient(ConnectionString);
 
             switch (Type)
             {
                 case MessagePlatformType.Azure_Queue:
-                    deadLetterProcessor = client.CreateProcessor(QueueName, new ServiceBusProcessorOptions() { SubQueue = SubQueue.DeadLetter });
+                    deadLetterReceiver = client.CreateReceiver(QueueName, new ServiceBusReceiverOptions() { SubQueue = SubQueue.DeadLetter });
                     break;
                 case MessagePlatformType.Azure_Topic:
-                    deadLetterProcessor = client.CreateProcessor(TopicName, SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = SubQueue.DeadLetter });
+                    deadLetterReceiver = client.CreateReceiver(TopicName, SubscriptionName, new ServiceBusReceiverOptions() { SubQueue = SubQueue.DeadLetter });
                     break;
             }
+        }
 
-            deadLetterProcessor.ProcessMessageAsync += onDeadLetterMessageReceived;
+        public override async Task<IEnumerable<string>> GetDeadLetterMessagesAsync()
+        {
+            var msgs = await deadLetterReceiver.PeekMessagesAsync(MAX_NUMBER_OF_MESSAGES);
+
+            return msgs.Select(p => p.Body.ToString());
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using Orleans;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.Azure.Amqp.Framing;
+using Microsoft.Extensions.Logging;
+using Orleans;
 using Orleans.Runtime;
 using SBMonitor.Core.DeadLetterCorrector;
 using SBMonitor.Core.Shared;
@@ -27,18 +30,19 @@ namespace SBMonitor.Infrastructure.DeadLetterCorrector
         {
             this.correctorFuncBody = correctorFuncBody;
             this.messagePlatformConnection = messagePlatformConnection;
-            this.messagePlatformConnection.DeadLetterMessageReceived += deadLetterMessageReceived;
-            this.messagePlatformConnection.StartProcessingDeadLetterMessages();
+            this.messagePlatformConnection.InitDeadLetterCorrector();
+            RegisterTimer(processMessagesAsync, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
             return Task.CompletedTask;
         }
 
-        private void deadLetterMessageReceived(object? sender, EventArgs e)
+        private async Task processMessagesAsync(object state)
         {
-            var eventArgs = e as MessageReceivedEventArgs;
+            var msgs = await messagePlatformConnection.GetDeadLetterMessagesAsync();
 
-            var correctedMessage = messageCorrector.Correct(eventArgs.MessageBody, correctorFuncBody);
-
-
+            foreach (var msg in msgs)
+            {
+                var correctedMsg = messageCorrector.Correct(msg, correctorFuncBody);
+            }
         }
     }
 }
