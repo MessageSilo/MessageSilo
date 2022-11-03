@@ -24,14 +24,16 @@ namespace SBMonitor.Core.Shared
 
         public string SubscriptionName { get; }
 
-        public AzureServiceBusConnection(string queueName)
+        public AzureServiceBusConnection(string connectionString, string queueName)
         {
+            ConnectionString = connectionString;
             QueueName = queueName;
             Type = MessagePlatformType.Azure_Queue;
         }
 
-        public AzureServiceBusConnection(string topicName, string subscriptionName)
+        public AzureServiceBusConnection(string connectionString, string topicName, string subscriptionName)
         {
+            ConnectionString = connectionString;
             TopicName = topicName;
             SubscriptionName = subscriptionName;
             Type = MessagePlatformType.Azure_Topic;
@@ -52,11 +54,11 @@ namespace SBMonitor.Core.Shared
             }
         }
 
-        public override async Task<IEnumerable<string>> GetDeadLetterMessagesAsync()
+        public override async Task<IEnumerable<Message>> GetDeadLetterMessagesAsync()
         {
             var msgs = await deadLetterReceiver.PeekMessagesAsync(MAX_NUMBER_OF_MESSAGES);
 
-            return msgs.Select(p => p.Body.ToString());
+            return msgs.Select(p => new Message(p.MessageId, p.EnqueuedTime, p.Body.ToString()));
         }
     }
 }

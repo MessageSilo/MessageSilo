@@ -1,4 +1,5 @@
 ﻿using Orleans;
+using SBMonitor.Core.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace SBMonitor.Infrastructure.User
 {
     public interface IUserGrain : IGrainWithStringKey
     {
-        Task AddDeadLetterCorrector(string settingString);
+        Task AddDeadLetterCorrector(ConnectionSettingsDTO setting);
 
         Task InitDeadLetterCorrectors();
     }

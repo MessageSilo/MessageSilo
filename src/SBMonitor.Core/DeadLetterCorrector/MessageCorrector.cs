@@ -1,21 +1,20 @@
-﻿using Microsoft.ClearScript.V8;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Jint;
 
 namespace SBMonitor.Core.DeadLetterCorrector
 {
     public class MessageCorrector : IMessageCorrector
     {
+        private readonly Engine engine = new Engine();
+
         public string Correct(string message, string currectorFuncBody)
         {
-            using var engine = new V8ScriptEngine();
+            engine
+                .Execute($"correct = {currectorFuncBody}")
+                .Execute("serializer = (m) => { return JSON.stringify(correct(m)); }");
 
-            engine.ExecuteCommand($"correct = {currectorFuncBody}");
+            var result = engine.Evaluate($"serializer({message})");
 
-            return engine.Script.correct(message);
+            return result.AsString();
         }
     }
 }

@@ -20,11 +20,11 @@ namespace SBMonitor.Infrastructure.User
 
         protected IGrainFactory grainFactory;
 
-        protected IPersistentState<List<string>> deadLetterCorrectorSettings { get; set; }
+        protected IPersistentState<List<ConnectionSettingsDTO>> deadLetterCorrectorSettings { get; set; }
 
         public UserGrain(
             ILogger<UserGrain> logger,
-            [PersistentState("DeadLetterCorrectorSettings")] IPersistentState<List<string>> deadLetterCorrectorSettings,
+            [PersistentState("DeadLetterCorrectorSettings")] IPersistentState<List<ConnectionSettingsDTO>> deadLetterCorrectorSettings,
             IGrainFactory grainFactory) : base()
         {
             this.logger = logger;
@@ -32,28 +32,26 @@ namespace SBMonitor.Infrastructure.User
             this.grainFactory = grainFactory;
         }
 
-        public async Task AddDeadLetterCorrector(string settingString)
+        public async Task AddDeadLetterCorrector(ConnectionSettingsDTO setting)
         {
-            deadLetterCorrectorSettings.State.Add(settingString);
+            deadLetterCorrectorSettings.State.Add(setting);
             await deadLetterCorrectorSettings.WriteStateAsync();
             return;
         }
 
         public Task InitDeadLetterCorrectors()
         {
-            foreach (var settingString in deadLetterCorrectorSettings.State)
+            foreach (var setting in deadLetterCorrectorSettings.State)
             {
-                var setting = JsonConvert.DeserializeObject<dynamic>(settingString);
+                var deadLetterCorrector = grainFactory.GetGrain<IDeadLetterCorrectorGrain>($"{this.GetPrimaryKeyString()}_{setting.Name}");
 
-                var deadLetterCorrector = grainFactory.GetGrain<IDeadLetterCorrectorGrain>($"a@b.com_{setting.name}");
-
-                switch (setting.type)
+                switch (setting.Type)
                 {
                     case MessagePlatformType.Azure_Queue:
-                        deadLetterCorrector.Init(new AzureServiceBusConnection(setting.queueName), setting.correctorFuncBody);
+                        deadLetterCorrector.Init(new AzureServiceBusConnection(setting.ConnectionString, setting.QueueName), setting.CorrectorFuncBody);
                         break;
                     case MessagePlatformType.Azure_Topic:
-                        deadLetterCorrector.Init(new AzureServiceBusConnection(setting.topicName, setting.subscriptionName), setting.correctorFuncBody);
+                        deadLetterCorrector.Init(new AzureServiceBusConnection(setting.ConnectionString, setting.TopicName, setting.SubscriptionName), setting.CorrectorFuncBody);
                         break;
                 }
             }

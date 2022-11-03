@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
 using SBMonitor.Core.DeadLetterCorrector;
+using SBMonitor.Core.Models;
 using SBMonitor.Core.Shared;
 using System;
 using System.Collections.Generic;
@@ -19,11 +20,16 @@ namespace SBMonitor.Infrastructure.DeadLetterCorrector
 
         private IMessagePlatformConnection messagePlatformConnection;
 
+        private IPersistentState<List<CorrectedMessage>> correctedMessages;
+
+        private SlidingBuffer<CorrectedMessage> buffer = new SlidingBuffer<CorrectedMessage>(1000);
+
         private string correctorFuncBody;
 
-        public DeadLetterCorrectorGrain(IMessageCorrector messageCorrector)
+        public DeadLetterCorrectorGrain(IMessageCorrector messageCorrector, [PersistentState("correctedMessages")] IPersistentState<List<CorrectedMessage>> correctedMessages)
         {
             this.messageCorrector = messageCorrector;
+            this.correctedMessages = correctedMessages;
         }
 
         public Task Init(IMessagePlatformConnection messagePlatformConnection, string correctorFuncBody)
@@ -39,10 +45,40 @@ namespace SBMonitor.Infrastructure.DeadLetterCorrector
         {
             var msgs = await messagePlatformConnection.GetDeadLetterMessagesAsync();
 
+            if (msgs.Count() == 0)
+                return;
+
             foreach (var msg in msgs)
             {
-                var correctedMsg = messageCorrector.Correct(msg, correctorFuncBody);
+                if (correctedMessages.State.Any(p => p.Id == msg.Id))
+                    continue;
+
+                string? correctedMessageBody = null;
+
+                try
+                {
+                    correctedMessageBody = messageCorrector.Correct(msg.Body, correctorFuncBody);
+                }
+                catch(Exception ex)
+                {
+                    ex.ToString();
+                }
+
+                buffer.Add(new CorrectedMessage(msg)
+                {
+                    BodyAfterCorrection = correctedMessageBody!,
+                    IsCorrected = correctedMessageBody != null,
+                    IsResent = false,
+                });
             }
+
+            correctedMessages.State = buffer.ToList();
+            await correctedMessages.WriteStateAsync();
+        }
+
+        public Task<List<CorrectedMessage>> GetCorrectedMessages()
+        {
+            return Task.FromResult(correctedMessages.State.ToList());
         }
     }
 }

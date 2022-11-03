@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using SBMonitor.Core.Enums;
 using SBMonitor.Core.Models;
-using SBMonitor.Infrastructure.Grains;
-using SBMonitor.Infrastructure.Grains.Interfaces;
 using System.Security.Claims;
 
 namespace SBMonitor.API.Controllers

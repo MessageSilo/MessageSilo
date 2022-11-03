@@ -18,6 +18,6 @@ namespace SBMonitor.Core.Shared
 
         void InitDeadLetterCorrector();
 
-        Task<IEnumerable<string>> GetDeadLetterMessagesAsync();
+        Task<IEnumerable<Message>> GetDeadLetterMessagesAsync();
     }
 }
