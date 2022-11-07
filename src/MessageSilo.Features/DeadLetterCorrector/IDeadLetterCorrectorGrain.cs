@@ -1,4 +1,4 @@
-﻿using MessageSilo.Features.Shared.Models;
+﻿using MessageSilo.Shared.Models;
 using Orleans;
 
 namespace MessageSilo.Features.DeadLetterCorrector

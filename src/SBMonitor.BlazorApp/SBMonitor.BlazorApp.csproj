@@ -7,6 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\Dashboard.razor.cs" />
+    <Compile Remove="Shared\ConnectionSettingsModal.razor.cs" />
+    <Compile Remove="Shared\DashboardItem.razor.cs" />
+    <Compile Remove="Shared\DefaultJsonMessageDisplayer.razor.cs" />
+    <Compile Remove="Shared\PinnerMessageDisplayer.razor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Pages\Dashboard.razor" />
+    <Content Remove="Shared\ConnectionSettingsModal.razor" />
+    <Content Remove="Shared\DashboardItem.razor" />
+    <Content Remove="Shared\DefaultJsonMessageDisplayer.razor" />
+    <Content Remove="Shared\PinnerMessageDisplayer.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Blazorise.Bootstrap5" Version="1.0.4" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.4" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.8" />
@@ -19,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SBMonitor.Core\SBMonitor.Core.csproj" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

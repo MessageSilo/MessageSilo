@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace MessageSilo.Features.Shared.Enums
+namespace MessageSilo.Shared.Enums
 {
     public enum MessagePlatformType
     {

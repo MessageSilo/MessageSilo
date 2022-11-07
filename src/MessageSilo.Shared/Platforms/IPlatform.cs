@@ -1,6 +1,6 @@
-﻿using MessageSilo.Features.Shared.Enums;
+﻿using MessageSilo.Shared.Enums;
 
-namespace MessageSilo.Features.Shared.Models
+namespace MessageSilo.Shared.Platforms
 {
     public interface IPlatform
     {

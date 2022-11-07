@@ -4,11 +4,8 @@ namespace MessageSilo.API.Controllers
 {
     public class DeadLetterCorrectorController : MessageSiloControllerBase
     {
-        private readonly IClusterClient client;
-
-        public DeadLetterCorrectorController(ILogger logger, IGrainFactory grainFactory, IHttpContextAccessor httpContextAccessor, IClusterClient client) : base(logger, grainFactory, httpContextAccessor)
+        public DeadLetterCorrectorController(ILogger<DeadLetterCorrectorController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor) : base(logger, client, httpContextAccessor)
         {
-            this.client = client;
         }
     }
 }

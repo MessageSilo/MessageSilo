@@ -10,18 +10,18 @@ namespace MessageSilo.API.Controllers
     [Authorize]
     public abstract class MessageSiloControllerBase : ControllerBase
     {
-        protected readonly ILogger logger;
+        protected readonly ILogger<MessageSiloControllerBase> logger;
 
-        protected readonly IGrainFactory grainFactory;
+        protected readonly IClusterClient client;
 
         protected readonly IHttpContextAccessor httpContextAccessor;
 
         protected readonly string loggedInUserId;
 
-        public MessageSiloControllerBase(ILogger logger, IGrainFactory grainFactory, IHttpContextAccessor httpContextAccessor)
+        public MessageSiloControllerBase(ILogger<MessageSiloControllerBase> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor)
         {
             this.logger = logger;
-            this.grainFactory = grainFactory;
+            this.client = client;
             this.httpContextAccessor = httpContextAccessor;
 
             loggedInUserId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value!;

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace MessageSilo.Features.Shared.Models
+namespace MessageSilo.Shared.Models
 {
     public class SlidingBuffer<T> : IEnumerable<T>
     {

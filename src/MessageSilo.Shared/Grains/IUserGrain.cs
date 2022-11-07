@@ -1,7 +1,7 @@
-﻿using MessageSilo.Features.Shared.Models;
+﻿using MessageSilo.Shared.Models;
 using Orleans;
 
-namespace MessageSilo.Features.User
+namespace MessageSilo.Shared.Grains
 {
     public interface IUserGrain : IGrainWithStringKey
     {

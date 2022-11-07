@@ -1,7 +1,7 @@
 using MessageSilo.Features.DeadLetterCorrector;
-using MessageSilo.Features.Shared.Enums;
-using MessageSilo.Features.Shared.Models;
-using MessageSilo.Features.User;
+using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Models;
+using MessageSilo.Shared.Grains;
 using Orleans;
 using Orleans.Hosting;
 
@@ -9,6 +9,7 @@ var builder = Host.CreateDefaultBuilder(args)
         .UseOrleans(siloBuilder => siloBuilder
         .ConfigureApplicationParts(manager =>
         {
+            manager.AddApplicationPart(typeof(IUserGrain).Assembly);
             manager.AddApplicationPart(typeof(IDeadLetterCorrectorGrain).Assembly);
         })
         .UseLocalhostClustering()

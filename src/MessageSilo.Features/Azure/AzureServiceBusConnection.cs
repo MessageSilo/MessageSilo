@@ -1,6 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
-using MessageSilo.Features.Shared.Enums;
-using MessageSilo.Features.Shared.Models;
+using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Models;
 
 namespace MessageSilo.Features.Azure
 {

@@ -1,4 +1,4 @@
-﻿namespace MessageSilo.Features.Shared.Models
+﻿namespace MessageSilo.Shared.Models
 {
     public class Message
     {

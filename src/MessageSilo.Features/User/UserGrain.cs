@@ -1,7 +1,8 @@
 ﻿using MessageSilo.Features.Azure;
 using MessageSilo.Features.DeadLetterCorrector;
-using MessageSilo.Features.Shared.Enums;
-using MessageSilo.Features.Shared.Models;
+using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Models;
+using MessageSilo.Shared.Grains;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;

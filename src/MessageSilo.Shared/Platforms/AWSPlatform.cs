@@ -1,7 +1,6 @@
-﻿using MessageSilo.Features.Shared.Enums;
-using MessageSilo.Features.Shared.Models;
+﻿using MessageSilo.Shared.Enums;
 
-namespace MessageSilo.Features.AWS
+namespace MessageSilo.Shared.Platforms
 {
     public class AWSPlatform : IPlatform
     {

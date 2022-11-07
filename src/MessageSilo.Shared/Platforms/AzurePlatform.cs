@@ -1,7 +1,6 @@
-﻿using MessageSilo.Features.Shared.Enums;
-using MessageSilo.Features.Shared.Models;
+﻿using MessageSilo.Shared.Enums;
 
-namespace MessageSilo.Features.Azure
+namespace MessageSilo.Shared.Platforms
 {
     public class AzurePlatform : IPlatform
     {

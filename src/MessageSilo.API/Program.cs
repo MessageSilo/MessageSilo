@@ -1,4 +1,7 @@
 using MessageSilo.API;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Orleans;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,12 +14,27 @@ builder.Services.AddSingleton<IClusterClient>(
 builder.Services.AddSingleton<IGrainFactory>(
             sp => sp.GetService<ClusterClientHostedService>()!.Client);
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
+        {
+            c.Authority = $"{builder.Configuration["Auth0:Domain"]}";
+            c.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidAudience = builder.Configuration["Auth0:Audience"],
+                ValidIssuer = $"{builder.Configuration["Auth0:Domain"]}"
+            };
+        });
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-app.MapControllers();
-
+app.UseCors(builder => builder.SetIsOriginAllowed(isOriginAllowed: _ => true).WithExposedHeaders(HeaderNames.ContentDisposition).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();
