@@ -13,11 +13,6 @@
     <PackageReference Include="OrleansDashboard" Version="3.6.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SBMonitor.Core\SBMonitor.Core.csproj" />
-    <ProjectReference Include="..\SBMonitor.Infrastructure\SBMonitor.Infrastructure.csproj" />
-  </ItemGroup>
-
   <Target Name="ZipPublishOutput" AfterTargets="Publish">
     <Delete Files="$(ProjectDir)\..\silo.zip" />
     <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(ProjectDir)\..\silo.zip" />

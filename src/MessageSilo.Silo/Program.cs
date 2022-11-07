@@ -1,15 +1,15 @@
+using MessageSilo.Features.DeadLetterCorrector;
+using MessageSilo.Features.Shared.Enums;
+using MessageSilo.Features.Shared.Models;
+using MessageSilo.Features.User;
 using Orleans;
 using Orleans.Hosting;
-using SBMonitor.Core.DeadLetterCorrector;
-using SBMonitor.Core.Enums;
-using SBMonitor.Core.Shared;
-using SBMonitor.Infrastructure.User;
 
 var builder = Host.CreateDefaultBuilder(args)
         .UseOrleans(siloBuilder => siloBuilder
         .ConfigureApplicationParts(manager =>
         {
-            manager.AddApplicationPart(typeof(SBMonitor.Infrastructure.DeadLetterCorrector.IDeadLetterCorrectorGrain).Assembly);
+            manager.AddApplicationPart(typeof(IDeadLetterCorrectorGrain).Assembly);
         })
         .UseLocalhostClustering()
         .AddMemoryGrainStorageAsDefault());

@@ -1,0 +1,21 @@
+﻿using MessageSilo.Features.Shared.Enums;
+
+namespace MessageSilo.Features.Shared.Models
+{
+    public class ConnectionSettingsDTO
+    {
+        public string Name { get; set; }
+
+        public string ConnectionString { get; set; }
+
+        public MessagePlatformType Type { get; set; }
+
+        public string QueueName { get; set; }
+
+        public string TopicName { get; set; }
+
+        public string SubscriptionName { get; set; }
+
+        public string CorrectorFuncBody { get; set; }
+    }
+}
