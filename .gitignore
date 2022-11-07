@@ -259,4 +259,7 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-/src/SBMonitor.API/appsettings.local.json
+
+**/appsettings.local.json
+**/MessageSilo.TesterApp/*
+
