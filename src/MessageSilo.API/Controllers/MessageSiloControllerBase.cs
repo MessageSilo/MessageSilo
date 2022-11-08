@@ -5,8 +5,6 @@ using System.Security.Claims;
 
 namespace MessageSilo.API.Controllers
 {
-    [ApiController]
-    [Route("[controller]/[action]")]
     [Authorize]
     public abstract class MessageSiloControllerBase : ControllerBase
     {

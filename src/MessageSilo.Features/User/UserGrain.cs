@@ -29,7 +29,15 @@ namespace MessageSilo.Features.User
 
         public async Task AddDeadLetterCorrector(ConnectionSettingsDTO setting)
         {
-            deadLetterCorrectorSettings.State.Add(setting);
+            var existing = deadLetterCorrectorSettings.State.FirstOrDefault(p => p.Name == setting.Name);
+
+            if (existing is not null)
+            {
+                //TODO: update
+            }
+            else
+                deadLetterCorrectorSettings.State.Add(setting);
+
             await deadLetterCorrectorSettings.WriteStateAsync();
             return;
         }
@@ -52,6 +60,11 @@ namespace MessageSilo.Features.User
             }
 
             return Task.CompletedTask;
+        }
+
+        public Task<List<ConnectionSettingsDTO>> GetDeadLetterCorrectors()
+        {
+            return Task.FromResult(deadLetterCorrectorSettings.State);
         }
     }
 }

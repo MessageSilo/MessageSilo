@@ -13,12 +13,12 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddHttpClient("ServerAPI", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7175");
+    client.BaseAddress = new Uri("https://localhost:7132");
 }).AddHttpMessageHandler(sp =>
 {
     var handler = sp.GetService<AuthorizationMessageHandler>()
     .ConfigureHandler(
-         authorizedUrls: new[] { "https://localhost:7175" }
+         authorizedUrls: new[] { "https://localhost:7132" }
      );
     return handler;
 });
