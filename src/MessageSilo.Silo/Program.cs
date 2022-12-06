@@ -4,6 +4,7 @@ using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Grains;
 using Orleans;
 using Orleans.Hosting;
+using MessageSilo.Shared.DataAccess;
 
 var builder = Host.CreateDefaultBuilder(args)
         .UseOrleans(siloBuilder => siloBuilder
@@ -18,6 +19,7 @@ var builder = Host.CreateDefaultBuilder(args)
 builder.ConfigureServices(services =>
 {
     services.AddScoped<IMessageCorrector, MessageCorrector>();
+    services.AddSingleton<IMessageRepository<CorrectedMessage>, MessageRepository<CorrectedMessage>>();
 });
 
 var app = builder.Build();
@@ -33,7 +35,7 @@ await testUserGrain.AddDeadLetterCorrector(new ConnectionSettingsDTO()
     Id = Guid.Parse("c8e2bc0e-8c39-4df2-9003-2558279fcf3d"),
     Name = "test1",
     QueueName = "test_queue",
-    ConnectionString = "Endpoint=sb://messagesilo-poc.servicebus.windows.net/;SharedAccessKeyName=qr;SharedAccessKey=4clFdunVfT+UEl5cDlOtjvFD15WD0uRHherkuqMAzAA=;EntityPath=test_queue",
+    ConnectionString = "Endpoint=sb://message-silo-poc.servicebus.windows.net/;SharedAccessKeyName=q;SharedAccessKey=tKoqoEntAxtVQI04AXQerh3Z8hl1NDC04sL8J+e4MK4=;EntityPath=test_queue",
     Type = MessagePlatformType.Azure_Queue,
     CorrectorFuncBody = "(x) => { return {...x, 'newProp':'yeee'}; }"
 });

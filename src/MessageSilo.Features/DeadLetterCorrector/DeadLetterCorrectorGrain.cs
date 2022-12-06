@@ -27,9 +27,14 @@ namespace MessageSilo.Features.DeadLetterCorrector
             this.setting = setting;
             this.messageCorrector = messageCorrector;
             this.messages = messages;
+        }
 
-            if (setting.State is not null)
+        public override Task OnActivateAsync()
+        {
+            if (this.setting.RecordExists)
                 reInit();
+
+            return base.OnActivateAsync();
         }
 
         public async Task Update(ConnectionSettingsDTO s)
@@ -77,7 +82,7 @@ namespace MessageSilo.Features.DeadLetterCorrector
                     ex.ToString();
                 }
 
-                messages.Add(messagePlatformConnection.Id.ToString(), new CorrectedMessage(msg)
+                messages.Add(setting.State.Id.ToString(), new CorrectedMessage(msg)
                 {
                     BodyAfterCorrection = correctedMessageBody!,
                     IsCorrected = correctedMessageBody != null,

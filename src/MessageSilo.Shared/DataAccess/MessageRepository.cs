@@ -3,6 +3,7 @@ using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
@@ -35,7 +36,7 @@ namespace MessageSilo.Shared.DataAccess
             write(write =>
             {
                 var point = PointData.Measurement(connectionId)
-                    .Field("message", message)
+                    .Field("message", JsonConvert.SerializeObject(message))
                     .Timestamp(message.EnqueuedTime, WritePrecision.Ns);
 
                 write.WritePoint(point, bucket, ORGANIZATION);

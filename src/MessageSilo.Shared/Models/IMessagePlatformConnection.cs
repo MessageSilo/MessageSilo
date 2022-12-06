@@ -4,8 +4,6 @@ namespace MessageSilo.Shared.Models
 {
     public interface IMessagePlatformConnection
     {
-        Guid Id { get; }
-
         string Name { get; }
 
         string ConnectionString { get; }
