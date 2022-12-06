@@ -4,6 +4,8 @@ namespace MessageSilo.Shared.Models
 {
     public abstract class MessagePlatformConnection : IMessagePlatformConnection
     {
+        public Guid Id { get; private set; } = Guid.NewGuid();
+
         public string Name { get; protected set; }
 
         public string ConnectionString { get; protected set; }

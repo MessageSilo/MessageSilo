@@ -11,9 +11,8 @@ namespace MessageSilo.Features.User
 {
     public class UserGrain : Grain, IUserGrain
     {
-        protected ILogger<UserGrain> logger;
-
-        protected IGrainFactory grainFactory;
+        private readonly ILogger<UserGrain> logger;
+        private readonly IGrainFactory grainFactory;
 
         protected IPersistentState<List<ConnectionSettingsDTO>> deadLetterCorrectorSettings { get; set; }
 
@@ -29,7 +28,7 @@ namespace MessageSilo.Features.User
 
         public async Task AddDeadLetterCorrector(ConnectionSettingsDTO setting)
         {
-            var existing = deadLetterCorrectorSettings.State.FirstOrDefault(p => p.Name == setting.Name);
+            var existing = deadLetterCorrectorSettings.State.FirstOrDefault(p => p.Id == setting.Id);
 
             if (existing is not null)
             {
@@ -39,6 +38,10 @@ namespace MessageSilo.Features.User
                 deadLetterCorrectorSettings.State.Add(setting);
 
             await deadLetterCorrectorSettings.WriteStateAsync();
+
+            var deadLetterCorrector = grainFactory.GetGrain<IDeadLetterCorrectorGrain>(setting.Id);
+            await deadLetterCorrector.Update(setting);
+
             return;
         }
 
@@ -46,17 +49,7 @@ namespace MessageSilo.Features.User
         {
             foreach (var setting in deadLetterCorrectorSettings.State)
             {
-                var deadLetterCorrector = grainFactory.GetGrain<IDeadLetterCorrectorGrain>($"{this.GetPrimaryKeyString()}_{setting.Name}");
-
-                switch (setting.Type)
-                {
-                    case MessagePlatformType.Azure_Queue:
-                        deadLetterCorrector.Init(new AzureServiceBusConnection(setting.ConnectionString, setting.QueueName), setting.CorrectorFuncBody);
-                        break;
-                    case MessagePlatformType.Azure_Topic:
-                        deadLetterCorrector.Init(new AzureServiceBusConnection(setting.ConnectionString, setting.TopicName, setting.SubscriptionName), setting.CorrectorFuncBody);
-                        break;
-                }
+                var deadLetterCorrector = grainFactory.GetGrain<IDeadLetterCorrectorGrain>(setting.Id);
             }
 
             return Task.CompletedTask;

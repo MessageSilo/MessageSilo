@@ -1,6 +1,8 @@
 ﻿using Blazorise;
+using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Platforms;
 using Microsoft.AspNetCore.Components;
+using System.Runtime.CompilerServices;
 
 namespace MessageSilo.BlazorApp.Shared
 {
@@ -9,7 +11,9 @@ namespace MessageSilo.BlazorApp.Shared
         [Parameter]
         public HttpClient ApiClient { get; set; }
 
-        private Modal? ConnectionModal;
+        public Modal? ConnectionModal;
+
+        public ConnectionSettingsDTO ConnectionSettings { get; set; } = new ConnectionSettingsDTO();
 
         public IEnumerable<IPlatform> Platforms => new List<IPlatform>() { new AzurePlatform(), new AWSPlatform() };
 
@@ -23,6 +27,11 @@ namespace MessageSilo.BlazorApp.Shared
                 selectedValue = value;
                 StateHasChanged();
             }
+        }
+
+        public async Task Show()
+        {
+            await ConnectionModal!.Show();
         }
     }
 }

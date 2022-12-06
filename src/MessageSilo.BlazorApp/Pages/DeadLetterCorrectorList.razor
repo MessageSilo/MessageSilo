@@ -8,7 +8,7 @@
     <h1 class="h2">Dead Letter Correctors</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group me-2">
-            <Button Color="Color.Primary" class="btn btn-sm">
+            <Button Color="Color.Primary" Clicked="@(e => ConnectionSettingsModal!.Show())" class="btn btn-sm">
                 <span data-feather="plus-square"></span>
                 New Connection
             </Button>
@@ -16,7 +16,7 @@
     </div>
 </div>
 
-<ConnectionSettingsModal ApiClient="ApiClient"></ConnectionSettingsModal>
+<ConnectionSettingsModal @ref="ConnectionSettingsModal" ApiClient="ApiClient"></ConnectionSettingsModal>
 
 <ul>
 @foreach (var item in Connections)

@@ -3,10 +3,8 @@ using Orleans;
 
 namespace MessageSilo.Features.DeadLetterCorrector
 {
-    public interface IDeadLetterCorrectorGrain : IGrainWithStringKey
+    public interface IDeadLetterCorrectorGrain : IGrainWithGuidKey
     {
-        Task Init(IMessagePlatformConnection messagePlatformConnection, string correctorFuncBody);
-
-        Task<List<CorrectedMessage>> GetCorrectedMessages();
+        Task Update(ConnectionSettingsDTO s);
     }
 }

@@ -1,4 +1,6 @@
 using MessageSilo.API;
+using MessageSilo.Features.DeadLetterCorrector;
+using MessageSilo.Shared.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
@@ -13,6 +15,7 @@ builder.Services.AddSingleton<IClusterClient>(
             sp => sp.GetService<ClusterClientHostedService>()!.Client);
 builder.Services.AddSingleton<IGrainFactory>(
             sp => sp.GetService<ClusterClientHostedService>()!.Client);
+builder.Services.AddSingleton<IMessageRepository<CorrectedMessage>, MessageRepository<CorrectedMessage>>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>

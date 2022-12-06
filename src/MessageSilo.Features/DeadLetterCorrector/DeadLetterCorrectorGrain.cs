@@ -1,34 +1,60 @@
-﻿using MessageSilo.Shared.Models;
+﻿using MessageSilo.Features.Azure;
+using MessageSilo.Features.User;
+using MessageSilo.Shared.DataAccess;
+using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Models;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
+using System;
+using System.Drawing.Imaging;
 
 namespace MessageSilo.Features.DeadLetterCorrector
 {
     public class DeadLetterCorrectorGrain : Grain, IDeadLetterCorrectorGrain
     {
-        private IMessageCorrector messageCorrector;
+        private readonly IMessageCorrector messageCorrector;
+        private readonly IMessageRepository<CorrectedMessage> messages;
+        private readonly ILogger<UserGrain> logger;
 
         private IMessagePlatformConnection messagePlatformConnection;
+        private IPersistentState<ConnectionSettingsDTO> setting { get; set; }
 
-        private IPersistentState<List<CorrectedMessage>> correctedMessages;
+        private IDisposable timer;
 
-        private SlidingBuffer<CorrectedMessage> buffer = new SlidingBuffer<CorrectedMessage>(1000);
-
-        private string correctorFuncBody;
-
-        public DeadLetterCorrectorGrain(IMessageCorrector messageCorrector, [PersistentState("correctedMessages")] IPersistentState<List<CorrectedMessage>> correctedMessages)
+        public DeadLetterCorrectorGrain([PersistentState("Setting")] IPersistentState<ConnectionSettingsDTO> setting, IMessageCorrector messageCorrector, IMessageRepository<CorrectedMessage> messages)
         {
+            this.setting = setting;
             this.messageCorrector = messageCorrector;
-            this.correctedMessages = correctedMessages;
+            this.messages = messages;
+
+            if (setting.State is not null)
+                reInit();
         }
 
-        public Task Init(IMessagePlatformConnection messagePlatformConnection, string correctorFuncBody)
+        public async Task Update(ConnectionSettingsDTO s)
         {
-            this.correctorFuncBody = correctorFuncBody;
-            this.messagePlatformConnection = messagePlatformConnection;
-            this.messagePlatformConnection.InitDeadLetterCorrector();
-            RegisterTimer(processMessagesAsync, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
-            return Task.CompletedTask;
+            setting.State = s;
+            await setting.WriteStateAsync();
+            reInit();
+        }
+
+        private void reInit()
+        {
+            switch (setting.State.Type)
+            {
+                case MessagePlatformType.Azure_Queue:
+                    messagePlatformConnection = new AzureServiceBusConnection(setting.State.ConnectionString, setting.State.QueueName);
+                    break;
+                case MessagePlatformType.Azure_Topic:
+                    messagePlatformConnection = new AzureServiceBusConnection(setting.State.ConnectionString, setting.State.TopicName, setting.State.SubscriptionName);
+                    break;
+            }
+
+            messagePlatformConnection!.InitDeadLetterCorrector();
+
+            if (timer is null)
+                timer = RegisterTimer(processMessagesAsync, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
         }
 
         private async Task processMessagesAsync(object state)
@@ -40,35 +66,24 @@ namespace MessageSilo.Features.DeadLetterCorrector
 
             foreach (var msg in msgs)
             {
-                if (correctedMessages.State.Any(p => p.Id == msg.Id))
-                    continue;
-
                 string? correctedMessageBody = null;
 
                 try
                 {
-                    correctedMessageBody = messageCorrector.Correct(msg.Body, correctorFuncBody);
+                    correctedMessageBody = messageCorrector.Correct(msg.Body, setting.State.CorrectorFuncBody);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ex.ToString();
                 }
 
-                buffer.Add(new CorrectedMessage(msg)
+                messages.Add(messagePlatformConnection.Id.ToString(), new CorrectedMessage(msg)
                 {
                     BodyAfterCorrection = correctedMessageBody!,
                     IsCorrected = correctedMessageBody != null,
                     IsResent = false,
                 });
             }
-
-            correctedMessages.State = buffer.ToList();
-            await correctedMessages.WriteStateAsync();
-        }
-
-        public Task<List<CorrectedMessage>> GetCorrectedMessages()
-        {
-            return Task.FromResult(correctedMessages.State.ToList());
         }
     }
 }
