@@ -10,5 +10,7 @@ namespace MessageSilo.Shared.DataAccess
     public interface IMessageRepository<T> where T : Message
     {
         void Add(string connectionId, T message);
+
+        Task<IEnumerable<T>> Query(string connectionId, DateTimeOffset from, DateTimeOffset to);
     }
 }

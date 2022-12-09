@@ -8,6 +8,11 @@
 
         public string Body { get; set; }
 
+        public Message()
+        {
+
+        }
+
         public Message(string id, DateTimeOffset enqueuedTime, string body)
         {
             Id = id;

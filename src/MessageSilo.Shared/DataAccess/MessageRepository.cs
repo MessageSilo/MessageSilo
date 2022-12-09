@@ -1,5 +1,6 @@
 ﻿using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
+using InfluxDB.Client.Core.Flux.Domain;
 using InfluxDB.Client.Writes;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Configuration;
@@ -52,13 +53,11 @@ namespace MessageSilo.Shared.DataAccess
                 var tables = await query.QueryAsync(flux, ORGANIZATION);
 
                 return tables.SelectMany(table =>
-                    table.Records.Select(record =>
-                        (record.GetValueByKey("message") as T)!
-                        )
+                    table.Records.Select(r => r.GetValue().ToString()!)
                     );
             });
 
-            return result;
+            return result.Select(p => JsonConvert.DeserializeObject<T>(p)!);
         }
 
         private void write(Action<WriteApi> action)
@@ -68,7 +67,7 @@ namespace MessageSilo.Shared.DataAccess
             action(write);
         }
 
-        private async Task<IEnumerable<T>> queryAsync(Func<QueryApi, Task<IEnumerable<T>>> action)
+        private async Task<IEnumerable<string>> queryAsync(Func<QueryApi, Task<IEnumerable<string>>> action)
         {
             using var client = new InfluxDBClient(url, token);
             var query = client.GetQueryApi();

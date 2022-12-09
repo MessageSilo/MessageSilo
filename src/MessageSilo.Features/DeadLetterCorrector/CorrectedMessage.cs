@@ -10,6 +10,11 @@ namespace MessageSilo.Features.DeadLetterCorrector
 
         public bool IsResent { get; set; }
 
+        public CorrectedMessage() : base()
+        {
+
+        }
+
         public CorrectedMessage(Message msg) : base(msg.Id, msg.EnqueuedTime, msg.Body)
         {
 

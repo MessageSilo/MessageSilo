@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace MessageSilo.API.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public abstract class MessageSiloControllerBase : ControllerBase
     {
         protected readonly ILogger<MessageSiloControllerBase> logger;

@@ -1,0 +1,21 @@
+﻿<Table>
+    <TableHeader>
+        <TableRow>
+            <TableHeaderCell>#</TableHeaderCell>
+            <TableHeaderCell>Name</TableHeaderCell>
+            <TableHeaderCell>Platform</TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        @foreach (var item in Connections)
+        {
+            <TableRow>
+                <TableRowCell>
+                    <a href="/dead-letter-correctors/@(item.Id)">@item.Id</a>
+                </TableRowCell>
+                <TableRowCell>@item.Name</TableRowCell>
+                <TableRowCell>@item.Type</TableRowCell>
+            </TableRow>
+        }
+    </TableBody>
+</Table>

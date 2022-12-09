@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "MessageSilo.BlazorApp": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
+      "applicationUrl": "https://localhost:7243;http://localhost:5081",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "MessageSiloAPIURL": "https://localhost:7132"
+      }
+    }
+  }
+}
