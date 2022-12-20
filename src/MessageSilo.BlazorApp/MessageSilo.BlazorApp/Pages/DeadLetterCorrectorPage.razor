@@ -1,4 +1,5 @@
-﻿@using MessageSilo.BlazorApp.Components.DeadLetterCorrector
+﻿@using MessageSilo.BlazorApp.Components
+@using MessageSilo.BlazorApp.Components.DeadLetterCorrector
 @using MessageSilo.Shared.Enums
 @page "/dead-letter-correctors/{id}"
 
@@ -6,67 +7,122 @@
 
 @if (ConnectionSettings != null)
 {
-    <Heading Size="HeadingSize.Is2">Details</Heading>
+    <Row>
+        <Column>
+            <Heading Size="HeadingSize.Is2">Details</Heading>
+        </Column>
+    </Row>
+    <Row>
+        <Column>
+            <Table>
+                <TableBody>
+                    <TableRow>
+                        <TableRowHeader>#</TableRowHeader>
+                        <TableRowCell>@ConnectionSettings.Id</TableRowCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableRowHeader>Name</TableRowHeader>
+                        <TableRowCell>@ConnectionSettings.Name</TableRowCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableRowHeader>Type</TableRowHeader>
+                        <TableRowCell>@ConnectionSettings.Type</TableRowCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableRowHeader>Connection String</TableRowHeader>
+                        <TableRowCell>@ConnectionSettings.ConnectionString</TableRowCell>
+                    </TableRow>
+                    @switch (ConnectionSettings.Type)
+                    {
+                        case MessagePlatformType.Azure_Queue:
+                            {
+                                <TableRow>
+                                    <TableRowHeader>Queue Name</TableRowHeader>
+                                    <TableRowCell>@ConnectionSettings.QueueName</TableRowCell>
+                                </TableRow>
+                            }
+                            break;
+                        case MessagePlatformType.Azure_Topic:
+                            {
+                                <TableRow>
+                                    <TableRowHeader>Topic Name</TableRowHeader>
+                                    <TableRowCell>@ConnectionSettings.TopicName</TableRowCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowHeader>Subscription Name</TableRowHeader>
+                                    <TableRowCell>@ConnectionSettings.SubscriptionName</TableRowCell>
+                                </TableRow>
+                            }
+                            break;
+                    }
+                </TableBody>
+            </Table>
+        </Column>
+    </Row>
 
-    <Table>
-        <TableBody>
-            <TableRow>
-                <TableRowHeader>#</TableRowHeader>
-                <TableRowCell>@ConnectionSettings.Id</TableRowCell>
-            </TableRow>
-            <TableRow>
-                <TableRowHeader>Name</TableRowHeader>
-                <TableRowCell>@ConnectionSettings.Name</TableRowCell>
-            </TableRow>
-            <TableRow>
-                <TableRowHeader>Type</TableRowHeader>
-                <TableRowCell>@ConnectionSettings.Type</TableRowCell>
-            </TableRow>
-            <TableRow>
-                <TableRowHeader>Connection String</TableRowHeader>
-                <TableRowCell>@ConnectionSettings.ConnectionString</TableRowCell>
-            </TableRow>
-            @switch (ConnectionSettings.Type)
-            {
-                case MessagePlatformType.Azure_Queue:
-                    {
-                        <TableRow>
-                            <TableRowHeader>Queue Name</TableRowHeader>
-                            <TableRowCell>@ConnectionSettings.QueueName</TableRowCell>
-                        </TableRow>
-                    }
-                    break;
-                case MessagePlatformType.Azure_Topic:
-                    {
-                        <TableRow>
-                            <TableRowHeader>Topic Name</TableRowHeader>
-                            <TableRowCell>@ConnectionSettings.TopicName</TableRowCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableRowHeader>Subscription Name</TableRowHeader>
-                            <TableRowCell>@ConnectionSettings.SubscriptionName</TableRowCell>
-                        </TableRow>
-                    }
-                    break;
-            }
-        </TableBody>
-    </Table>
+    <Row>
+        <Column>
+            <Heading Size="HeadingSize.Is2">Corrector Function</Heading>
+        </Column>
+    </Row>
+
+    <Row>
+        <Column>
+            <MemoEdit Text="@ConnectionSettings.CorrectorFuncBody" Rows="5" AutoSize Disabled />
+        </Column>
+    </Row>
 }
 
 @if (CorrectedMessages != null)
 {
-    <Heading Size="HeadingSize.Is2">Messages</Heading>
+    <Row>
+        <Column>
+            <Heading Size="HeadingSize.Is2">Messages</Heading>
+        </Column>
+    </Row>
 
-    <Table>
-        <TableBody>
-            @foreach (var item in CorrectedMessages)
-            {
-                <TableRow>
-                    <TableRowCell>@item.Id</TableRowCell>
-                </TableRow>
-            }
-        </TableBody>
-    </Table>
+    <Row>
+        <Column>
+            <Label>From</Label>
+            <DatePicker TValue="DateTimeOffset" InputMode="DateInputMode.DateTime" SelectionMode="DateInputSelectionMode.Single" @bind-Date=@From />
+        </Column>
+        <Column>
+            <Label>To</Label>
+            <DatePicker TValue="DateTimeOffset" InputMode="DateInputMode.DateTime" SelectionMode="DateInputSelectionMode.Single" @bind-Date=@To />
+        </Column>
+        <Column>
+            <Button Color="Color.Primary" Clicked="@(() => FilterMessages())">Filter</Button>
+        </Column>
+    </Row>
+
+    <Row>
+        <Column>
+            <Accordion>
+                @foreach (var item in CorrectedMessages)
+                {
+                    <Collapse Visible="@item.IsVisible">
+                        <CollapseHeader>
+                            <Heading Size="HeadingSize.Is6">
+                                <Button Block Clicked="@(()=> item.IsVisible = !item.IsVisible)">@item.CorrectedMessage.EnqueuedTime.ToString("s") - @item.CorrectedMessage.Id</Button>
+                            </Heading>
+                        </CollapseHeader>
+                        <CollapseBody>
+                            <Row>
+                                <Column ColumnSize="ColumnSize.IsHalf.OnDesktop">
+                                    <Label>Before</Label>
+                                    <MessageDisplayer OriginalMessage="@item.CorrectedMessage.Body" />
+                                </Column>
+                                <Column ColumnSize="ColumnSize.IsHalf.OnDesktop">
+                                    <Label>After</Label>
+                                    <MessageDisplayer OriginalMessage="@item.CorrectedMessage.BodyAfterCorrection" />
+                                </Column>
+                            </Row>
+                        </CollapseBody>
+                    </Collapse>
+                }
+            </Accordion>
+        </Column>
+    </Row>
 }
 
 

@@ -1,5 +1,7 @@
 ﻿using MessageSilo.BlazorApp.Components.DeadLetterCorrector;
+using MessageSilo.BlazorApp.Components.TodoApp;
 using MessageSilo.BlazorApp.Services;
+using MessageSilo.BlazorApp.ViewModels;
 using MessageSilo.Features.DeadLetterCorrector;
 using MessageSilo.Shared.Models;
 using Microsoft.AspNetCore.Components;
@@ -17,12 +19,24 @@ namespace MessageSilo.BlazorApp.Pages
 
         public ConnectionSettingsDTO ConnectionSettings { get; set; }
 
-        public List<CorrectedMessage> CorrectedMessages { get; set; }
+        public List<CorrectedMessageViewModel> CorrectedMessages { get; set; }
+
+        public DateTimeOffset From { get; set; } = DateTimeOffset.Now.AddHours(-1);
+
+        public DateTimeOffset To { get; set; } = DateTimeOffset.Now;
 
         protected override async Task OnInitializedAsync()
         {
             ConnectionSettings = await MessageSiloAPI.GetDeadLetterCorrector(Guid.Parse(Id));
-            CorrectedMessages = await MessageSiloAPI.GetCorrectedMessages(Guid.Parse(Id));
+            await FilterMessages();
+        }
+
+        public async Task FilterMessages()
+        {
+            CorrectedMessages = (await MessageSiloAPI.GetCorrectedMessages(Guid.Parse(Id), From, To)).Select(p => new CorrectedMessageViewModel()
+            {
+                CorrectedMessage = p
+            }).ToList();
         }
     }
 }

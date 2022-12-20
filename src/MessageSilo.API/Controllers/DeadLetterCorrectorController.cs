@@ -39,9 +39,10 @@ namespace MessageSilo.API.Controllers
         }
 
         [HttpGet("DeadLetterCorrector/{id}/Messages")]
-        public async Task<IEnumerable<CorrectedMessage>> Messages(Guid id)
+        public async Task<IEnumerable<CorrectedMessage>> Messages(Guid id, [FromQuery] DateTimeOffset from, [FromQuery] DateTimeOffset to)
         {
-            return await messages.Query(id.ToString(), DateTimeOffset.UtcNow.AddHours(-3000), DateTimeOffset.UtcNow);
+            Request.Query.ToString();
+            return await messages.Query(id.ToString(), from, to);
         }
     }
 }
