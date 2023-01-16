@@ -1,6 +1,7 @@
 ﻿@using MessageSilo.BlazorApp.Components
 @using MessageSilo.BlazorApp.Components.DeadLetterCorrector
 @using MessageSilo.Shared.Enums
+@using MessageSilo.Shared.Platforms;
 @page "/dead-letter-correctors/{id}"
 
 <Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Dead Letter Corrector</Heading>
@@ -14,61 +15,118 @@
     </Row>
     <Row>
         <Column>
-            <Table>
-                <TableBody>
-                    <TableRow>
-                        <TableRowHeader>#</TableRowHeader>
-                        <TableRowCell>@ConnectionSettings.Id</TableRowCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableRowHeader>Name</TableRowHeader>
-                        <TableRowCell>@ConnectionSettings.Name</TableRowCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableRowHeader>Type</TableRowHeader>
-                        <TableRowCell>@ConnectionSettings.Type</TableRowCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableRowHeader>Connection String</TableRowHeader>
-                        <TableRowCell>@ConnectionSettings.ConnectionString</TableRowCell>
-                    </TableRow>
-                    @switch (ConnectionSettings.Type)
-                    {
-                        case MessagePlatformType.Azure_Queue:
+            <Validations Mode="ValidationMode.Auto" Model="@ConnectionSettings">
+                <Validation>
+                    <Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is2">Id</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is10">
+                            <Strong>@ConnectionSettings.Id</Strong>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+                <Validation>
+                    <Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is2">Name</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is10">
+                            <TextEdit Placeholder="My corrector" @bind-Text="@ConnectionSettings.Name">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+                <Field Horizontal>
+                    <FieldLabel ColumnSize="ColumnSize.Is2">Platfrom</FieldLabel>
+                    <FieldBody ColumnSize="ColumnSize.Is10">
+                        <Select TValue="string" @bind-SelectedValue="@ConnectionSettings.PlatformId">
+                            @foreach (var p in Platforms.Where(p => p.Id == "azure"))
                             {
-                                <TableRow>
-                                    <TableRowHeader>Queue Name</TableRowHeader>
-                                    <TableRowCell>@ConnectionSettings.QueueName</TableRowCell>
-                                </TableRow>
+                                <SelectItem Value="@p.Id">@p.DisplayName</SelectItem>
                             }
-                            break;
-                        case MessagePlatformType.Azure_Topic:
-                            {
-                                <TableRow>
-                                    <TableRowHeader>Topic Name</TableRowHeader>
-                                    <TableRowCell>@ConnectionSettings.TopicName</TableRowCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableRowHeader>Subscription Name</TableRowHeader>
-                                    <TableRowCell>@ConnectionSettings.SubscriptionName</TableRowCell>
-                                </TableRow>
-                            }
-                            break;
-                    }
-                </TableBody>
-            </Table>
-        </Column>
-    </Row>
-
-    <Row>
-        <Column>
-            <Heading Size="HeadingSize.Is2">Corrector Function</Heading>
-        </Column>
-    </Row>
-
-    <Row>
-        <Column>
-            <MemoEdit Text="@ConnectionSettings.CorrectorFuncBody" Rows="5" AutoSize Disabled />
+                        </Select>
+                    </FieldBody>
+                </Field>
+                <Validation>
+                    <Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is2">Type</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is10">
+                            <Select TValue="MessagePlatformType" @bind-SelectedValue="@ConnectionSettings.Type">
+                                @foreach (var t in Platforms.Where(p => p.Id == "azure").SelectMany(x => x.Types))
+                                {
+                                    <SelectItem Value="@t">@t.ToString()</SelectItem>
+                                }
+                            </Select>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+                @switch (ConnectionSettings.Type)
+                {
+                    case MessagePlatformType.Azure_Queue:
+                        {
+                            <Validation>
+                                <Field Horizontal>
+                                    <FieldLabel ColumnSize="ColumnSize.Is2">Queue Name</FieldLabel>
+                                    <FieldBody ColumnSize="ColumnSize.Is10">
+                                        <TextEdit Placeholder="My queue" @bind-Text="@ConnectionSettings.QueueName">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                    </FieldBody>
+                                </Field>
+                            </Validation>
+                        }
+                        break;
+                    case MessagePlatformType.Azure_Topic:
+                        {
+                            <Validation>
+                                <Field Horizontal>
+                                    <FieldLabel ColumnSize="ColumnSize.Is2">Topic Name</FieldLabel>
+                                    <FieldBody ColumnSize="ColumnSize.Is10">
+                                        <TextEdit Placeholder="My topic" @bind-Text="@ConnectionSettings.TopicName">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                    </FieldBody>
+                                </Field>
+                            </Validation>
+                            <Validation>
+                                <Field Horizontal>
+                                    <FieldLabel ColumnSize="ColumnSize.Is2">Subscription Name</FieldLabel>
+                                    <FieldBody ColumnSize="ColumnSize.Is10">
+                                        <TextEdit Placeholder="My subscription" @bind-Text="@ConnectionSettings.SubscriptionName">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                    </FieldBody>
+                                </Field>
+                            </Validation>
+                        }
+                        break;
+                }
+                <Validation>
+                    <Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is2">Connection String</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is10">
+                            <TextEdit Placeholder="Endpoint=sb://..." @bind-Text="@ConnectionSettings.ConnectionString">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+                <Field Horizontal>
+                    <FieldLabel ColumnSize="ColumnSize.Is2">Corrector Function</FieldLabel>
+                    <FieldBody ColumnSize="ColumnSize.Is10">
+                        <MemoEdit Text="@ConnectionSettings.CorrectorFuncBody" Rows="5" AutoSize />
+                    </FieldBody>
+                </Field>
+                <Button Color="Color.Primary" Float="Float.End" Clicked="@(() => Save())">Save</Button>
+            </Validations>
         </Column>
     </Row>
 }
@@ -91,7 +149,7 @@
             <DatePicker TValue="DateTimeOffset" InputMode="DateInputMode.DateTime" SelectionMode="DateInputSelectionMode.Single" @bind-Date=@To />
         </Column>
         <Column>
-            <Button Color="Color.Primary" Clicked="@(() => FilterMessages())">Filter</Button>
+            <Button Color="Color.Primary" Float="Float.End" Clicked="@(() => FilterMessages())">Filter</Button>
         </Column>
     </Row>
 

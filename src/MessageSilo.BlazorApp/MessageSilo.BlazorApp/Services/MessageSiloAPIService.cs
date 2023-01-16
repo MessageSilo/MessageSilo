@@ -29,6 +29,11 @@ namespace MessageSilo.BlazorApp.Services
             return result!;
         }
 
+        public async Task UpsertDeadLetterCorrector(ConnectionSettingsDTO dto)
+        {
+            var result = await httpClient.PutAsJsonAsync<ConnectionSettingsDTO>($"api/v1/DeadLetterCorrector", dto);
+        }
+
         public async Task<List<CorrectedMessage>> GetCorrectedMessages(Guid dcId, DateTimeOffset from, DateTimeOffset to)
         {
             var result = await httpClient.GetFromJsonAsync<IEnumerable<CorrectedMessage>>($"api/v1/DeadLetterCorrector/{dcId}/Messages?from={from.ToString("yyyy-MM-dd HH:mm")}&to={to.ToString("yyyy-MM-dd HH:mm")}");

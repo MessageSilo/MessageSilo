@@ -32,7 +32,7 @@ namespace MessageSilo.Features.User
 
             if (existing is not null)
             {
-                //TODO: update
+                existing.Name = setting.Name;
             }
             else
                 deadLetterCorrectorSettings.State.Add(setting);
