@@ -6,6 +6,7 @@ using MessageSilo.Shared.Grains;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
+using System;
 
 namespace MessageSilo.Features.User
 {
@@ -58,6 +59,16 @@ namespace MessageSilo.Features.User
         public Task<List<ConnectionSettingsDTO>> GetDeadLetterCorrectors()
         {
             return Task.FromResult(deadLetterCorrectorSettings.State);
+        }
+
+        public async Task DeleteDeadLetterCorrector(Guid id)
+        {
+            var deadLetterCorrector = grainFactory.GetGrain<IDeadLetterCorrectorGrain>(id);
+            await deadLetterCorrector.Delete();
+
+            var existing = deadLetterCorrectorSettings.State.First(p => p.Id == id);
+            deadLetterCorrectorSettings.State.Remove(existing);
+            await deadLetterCorrectorSettings.WriteStateAsync();
         }
     }
 }

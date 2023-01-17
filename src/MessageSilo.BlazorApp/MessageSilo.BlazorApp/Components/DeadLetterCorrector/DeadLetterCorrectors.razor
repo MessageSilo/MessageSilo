@@ -4,6 +4,7 @@
             <TableHeaderCell>#</TableHeaderCell>
             <TableHeaderCell>Name</TableHeaderCell>
             <TableHeaderCell>Platform</TableHeaderCell>
+            <TableHeaderCell>Actions</TableHeaderCell>
         </TableRow>
     </TableHeader>
     <TableBody>
@@ -15,6 +16,9 @@
                 </TableRowCell>
                 <TableRowCell>@item.Name</TableRowCell>
                 <TableRowCell>@item.Type</TableRowCell>
+                <TableRowCell>
+                    <Button Color="Color.Danger" Float="Float.End" Clicked="@(() => Delete(item.Id))">Delete</Button>
+                </TableRowCell>
             </TableRow>
         }
     </TableBody>

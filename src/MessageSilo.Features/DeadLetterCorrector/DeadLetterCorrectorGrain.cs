@@ -44,6 +44,13 @@ namespace MessageSilo.Features.DeadLetterCorrector
             reInit();
         }
 
+        public async Task Delete()
+        {
+            timer.Dispose();
+            await messagePlatformConnection.DisposeAsync();
+            await this.setting.ClearStateAsync();
+        }
+
         private void reInit()
         {
             switch (setting.State.Type)

@@ -10,5 +10,7 @@ namespace MessageSilo.Shared.Grains
         Task InitDeadLetterCorrectors();
 
         Task<List<ConnectionSettingsDTO>> GetDeadLetterCorrectors();
+
+        Task DeleteDeadLetterCorrector(Guid id);
     }
 }

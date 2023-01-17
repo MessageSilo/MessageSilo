@@ -40,5 +40,10 @@ namespace MessageSilo.BlazorApp.Services
 
             return result!.ToList();
         }
+
+        public async Task DeleteDeadLetterCorrector(Guid id)
+        {
+            var result = await httpClient.DeleteAsync($"api/v1/DeadLetterCorrector/{id}");
+        }
     }
 }

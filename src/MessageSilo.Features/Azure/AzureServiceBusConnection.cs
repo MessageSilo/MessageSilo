@@ -54,5 +54,11 @@ namespace MessageSilo.Features.Azure
 
             return msgs.Select(p => new Message(p.MessageId, p.EnqueuedTime, p.Body.ToString()));
         }
+
+        public override async ValueTask DisposeAsync()
+        {
+            await deadLetterReceiver.DisposeAsync();
+            await client.DisposeAsync();
+        }
     }
 }

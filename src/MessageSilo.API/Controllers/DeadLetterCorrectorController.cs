@@ -44,5 +44,11 @@ namespace MessageSilo.API.Controllers
             Request.Query.ToString();
             return await messages.Query(id.ToString(), from, to);
         }
+
+        [HttpDelete("DeadLetterCorrector/{id}")]
+        public async Task Delete(Guid id)
+        {
+            await user.DeleteDeadLetterCorrector(id);
+        }
     }
 }

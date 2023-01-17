@@ -2,7 +2,7 @@
 
 namespace MessageSilo.Shared.Models
 {
-    public interface IMessagePlatformConnection
+    public interface IMessagePlatformConnection: IAsyncDisposable
     {
         string Name { get; }
 

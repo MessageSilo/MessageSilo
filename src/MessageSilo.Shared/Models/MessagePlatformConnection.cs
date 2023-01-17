@@ -13,5 +13,7 @@ namespace MessageSilo.Shared.Models
         public abstract void InitDeadLetterCorrector();
 
         public abstract Task<IEnumerable<Message>> GetDeadLetterMessagesAsync();
+
+        public abstract ValueTask DisposeAsync();
     }
 }

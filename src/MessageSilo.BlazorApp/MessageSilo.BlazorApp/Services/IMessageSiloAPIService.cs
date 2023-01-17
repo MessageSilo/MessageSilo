@@ -13,5 +13,7 @@ namespace MessageSilo.BlazorApp.Services
         Task<List<CorrectedMessage>> GetCorrectedMessages(Guid dcId, DateTimeOffset from, DateTimeOffset to);
 
         Task UpsertDeadLetterCorrector(ConnectionSettingsDTO dto);
+
+        Task DeleteDeadLetterCorrector(Guid id);
     }
 }
