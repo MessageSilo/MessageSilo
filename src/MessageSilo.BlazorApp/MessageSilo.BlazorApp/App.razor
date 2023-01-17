@@ -16,12 +16,21 @@
         {
             BarOptions = new()
             {
-                HorizontalHeight = "72px"
+                HorizontalHeight = "72px",
+                DarkColors = new()
+                {
+                    BackgroundColor = "#002C69",
+                    Color = "white",
+                    ItemColorOptions = new()
+                    {
+                        ActiveBackgroundColor = "#C6B520",
+                    }
+                }
             },
             ColorOptions = new()
             {
-                Primary = "#0288D1",
-                Secondary = "#A65529",
+                Primary = "#C6B520",
+                Secondary = "#002C69",
                 Success = "#23C02E",
                 Info = "#9BD8FE",
                 Warning = "#F8B86C",
@@ -31,8 +40,8 @@
             },
             BackgroundOptions = new()
             {
-                Primary = "#0288D1",
-                Secondary = "#A65529",
+                Primary = "#C6B520",
+                Secondary = "#002C69",
                 Success = "#23C02E",
                 Info = "#9BD8FE",
                 Warning = "#F8B86C",
@@ -42,7 +51,7 @@
             },
             InputOptions = new()
             {
-                CheckColor = "#0288D1",
+                CheckColor = "#C6B520",
             }
         };
 }
