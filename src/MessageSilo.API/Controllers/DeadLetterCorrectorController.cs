@@ -16,7 +16,7 @@ namespace MessageSilo.API.Controllers
 
         public DeadLetterCorrectorController(ILogger<DeadLetterCorrectorController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IMessageRepository<CorrectedMessage> messages) : base(logger, client, httpContextAccessor)
         {
-            user = client.GetGrain<IUserGrain>(/*loggedInUserId*/"test");
+            user = client.GetGrain<IUserGrain>(loggedInUserId);
             this.messages = messages;
         }
 
