@@ -46,8 +46,11 @@ namespace MessageSilo.Features.DeadLetterCorrector
 
         public async Task Delete()
         {
-            timer.Dispose();
-            await messagePlatformConnection.DisposeAsync();
+            timer?.Dispose();
+
+            if (messagePlatformConnection is not null)
+                await messagePlatformConnection.DisposeAsync();
+
             await this.setting.ClearStateAsync();
         }
 

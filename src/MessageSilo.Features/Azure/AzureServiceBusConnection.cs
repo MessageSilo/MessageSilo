@@ -57,8 +57,11 @@ namespace MessageSilo.Features.Azure
 
         public override async ValueTask DisposeAsync()
         {
-            await deadLetterReceiver.DisposeAsync();
-            await client.DisposeAsync();
+            if (deadLetterReceiver is not null)
+                await deadLetterReceiver.DisposeAsync();
+
+            if (client is not null)
+                await client.DisposeAsync();
         }
     }
 }

@@ -13,12 +13,12 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddHttpClient<IMessageSiloAPIService, MessageSiloAPIService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5001");
+    client.BaseAddress = new Uri(builder.Configuration["MessageSilo.Api:Url"]!);
 }).AddHttpMessageHandler(sp =>
 {
     var handler = sp.GetService<AuthorizationMessageHandler>()!
     .ConfigureHandler(
-         authorizedUrls: new[] { "https://localhost:5001" }
+         authorizedUrls: new[] { builder.Configuration["MessageSilo.Api:Url"] }
      );
     return handler;
 });

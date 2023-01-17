@@ -19,6 +19,7 @@ namespace MessageSilo.BlazorApp.Components.DeadLetterCorrector
         public async Task Delete(Guid id)
         {
             await MessageSiloAPI.DeleteDeadLetterCorrector(id);
+            Connections = Connections.Where(p => p.Id != id).ToList();
         }
     }
 }
