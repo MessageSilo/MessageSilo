@@ -30,8 +30,15 @@ namespace MessageSilo.BlazorApp.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            ConnectionSettings = await MessageSiloAPI.GetDeadLetterCorrector(Guid.Parse(Id));
-            await FilterMessages();
+            var id = Guid.Parse(Id);
+
+            if (id == Guid.Empty)
+                ConnectionSettings = new ConnectionSettingsDTO();
+            else
+            {
+                ConnectionSettings = await MessageSiloAPI.GetDeadLetterCorrector(id);
+                await FilterMessages();
+            }
         }
 
         public async Task FilterMessages()

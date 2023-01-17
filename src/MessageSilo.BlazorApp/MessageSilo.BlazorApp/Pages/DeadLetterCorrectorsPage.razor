@@ -1,7 +1,18 @@
 ﻿@using MessageSilo.BlazorApp.Components.DeadLetterCorrector
 @page "/dead-letter-correctors"
 @attribute [Authorize]
+@inject NavigationManager Navigation
 
 <Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Dead Letter Correctors</Heading>
 
-<DeadLetterCorrectors/>
+<Row>
+    <Column>
+        <Button Color="Color.Primary" Float="Float.End" Clicked="@(() => Navigation.NavigateTo($"/dead-letter-correctors/{Guid.Empty}"))">New</Button>
+    </Column>
+</Row>
+
+<Row>
+    <Column>
+        <DeadLetterCorrectors />
+    </Column>
+</Row>
