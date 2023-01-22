@@ -1,4 +1,5 @@
 using MessageSilo.API;
+using MessageSilo.API.HealthChecks;
 using MessageSilo.Features.DeadLetterCorrector;
 using MessageSilo.Shared.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,14 +31,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks()
+    .AddCheck<ShallowHealthCheck>("shallow")
+    .AddCheck<DeepHealthCheck>("deep");
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseWebAssemblyDebugging();
+}
+
 app.UseCors(builder => builder.SetIsOriginAllowed(isOriginAllowed: _ => true).WithExposedHeaders(HeaderNames.ContentDisposition).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 app.UseHttpsRedirection();
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapFallbackToFile("index.html");
+app.MapHealthChecks("/health");
 
 app.Run();

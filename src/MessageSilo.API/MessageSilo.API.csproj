@@ -4,14 +4,21 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>f4c44b49-6670-48f5-bb7f-d5bf33815566</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.13" />
     <PackageReference Include="Microsoft.Orleans.Client" Version="3.6.5" />
+    <PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage" Version="3.6.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MessageSilo.BlazorApp\MessageSilo.BlazorApp.csproj" />
     <ProjectReference Include="..\MessageSilo.Features\MessageSilo.Features.csproj" />
   </ItemGroup>
 

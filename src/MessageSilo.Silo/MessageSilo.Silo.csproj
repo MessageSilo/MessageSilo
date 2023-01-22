@@ -4,14 +4,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>9499a9c8-d0ef-44f8-8a96-4e22f8256f93</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
+    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage" Version="3.6.5" />
     <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="3.6.5" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="3.6.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+    <PackageReference Include="OrleansDashboard" Version="3.6.2" />
   </ItemGroup>
 
   <ItemGroup>

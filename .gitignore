@@ -263,3 +263,5 @@ __pycache__/
 **/appsettings.local.json
 **/MessageSilo.TesterApp/*
 
+/src/MessageSilo.API/appsettings.Development.json
+/src/MessageSilo.Silo/appsettings.Development.json

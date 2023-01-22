@@ -6,7 +6,7 @@ namespace MessageSilo.Shared.Platforms
     {
         public string Id => "aws";
 
-        public string DisplayName => "Amazon Simple Queue Service";
+        public string Title => "Amazon Simple Queue Service";
 
         public List<MessagePlatformType> Types => new List<MessagePlatformType>() { MessagePlatformType.AWS_SQS };
     }

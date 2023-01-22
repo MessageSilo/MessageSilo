@@ -42,7 +42,7 @@
                         <Select TValue="string" @bind-SelectedValue="@ConnectionSettings.PlatformId">
                             @foreach (var p in Platforms.Where(p => p.Id == "azure"))
                             {
-                                <SelectItem Value="@p.Id">@p.DisplayName</SelectItem>
+                                <SelectItem Value="@p.Id">@p.Title</SelectItem>
                             }
                         </Select>
                     </FieldBody>

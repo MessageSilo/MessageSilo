@@ -6,7 +6,7 @@ namespace MessageSilo.Shared.Platforms
     {
         string Id { get; }
 
-        string DisplayName { get; }
+        string Title { get; }
 
         List<MessagePlatformType> Types { get; }
     }

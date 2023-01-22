@@ -6,7 +6,7 @@ namespace MessageSilo.Shared.Platforms
     {
         public string Id => "azure";
 
-        public string DisplayName => "Azure Service Bus";
+        public string Title => "Azure Service Bus";
 
         public List<MessagePlatformType> Types => new List<MessagePlatformType>() { MessagePlatformType.Azure_Queue, MessagePlatformType.Azure_Topic };
     }

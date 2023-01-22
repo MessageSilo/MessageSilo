@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  messagesilo.influxdb:
+    image: influxdb:2.0.7
+    ports:
+     - "8086:8086"
+
+  messagesilo.silo:
+    image: ${DOCKER_REGISTRY-}messagesilosilo
+    build:
+      context: .
+      dockerfile: src/MessageSilo.Silo/Dockerfile
+    ports:
+     - "30000:30000"
+     - "11111:11111"
+    depends_on:
+     - messagesilo.influxdb
+
+  messagesilo.api:
+    image: ${DOCKER_REGISTRY-}messagesiloapi
+    build:
+      context: .
+      dockerfile: src/MessageSilo.API/Dockerfile
+    ports:
+     - "5000:443"
+    depends_on:
+     - messagesilo.silo

@@ -12,12 +12,13 @@
 			Blazorise is a component library built on top of Blazor and CSS frameworks like Bootstrap, Bulma and Material.
 		</Description>
 		<Copyright>Copyright 2018-2022 Megabit</Copyright>
+		<DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
+		<UserSecretsId>4dad1a52-17d0-454d-906b-ec99ebba9ac5</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.*" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.13" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.*" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -28,8 +29,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\MessageSilo.Features\MessageSilo.Features.csproj" />
-	  <ProjectReference Include="..\..\MessageSilo.Shared\MessageSilo.Shared.csproj" />
+	  <ProjectReference Include="..\MessageSilo.Features\MessageSilo.Features.csproj" />
+	  <ProjectReference Include="..\MessageSilo.Shared\MessageSilo.Shared.csproj" />
 	</ItemGroup>
 
 </Project>
