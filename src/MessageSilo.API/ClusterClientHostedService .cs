@@ -1,4 +1,6 @@
-﻿using Orleans;
+﻿using MessageSilo.API.Controllers;
+using Microsoft.Extensions.Logging;
+using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System.Net;
@@ -9,15 +11,19 @@ namespace MessageSilo.API
     {
         public IClusterClient Client { get; }
 
-        public ClusterClientHostedService(ILoggerProvider loggerProvider, IConfiguration configuration)
+        protected readonly ILogger<ClusterClientHostedService> logger;
+
+        public ClusterClientHostedService(ILoggerProvider loggerProvider, IConfiguration configuration, ILogger<ClusterClientHostedService> logger)
         {
+            this.logger = logger;
+
             Client = new ClientBuilder()
+                        .UseStaticClustering(new IPEndPoint(IPAddress.Parse("10.5.0.5"), 30000))
                         .Configure<ClusterOptions>(options =>
                         {
                             options.ClusterId = "MessageSiloCluster001";
                             options.ServiceId = "MessageSiloService001";
                         })
-                        .UseStaticClustering(IPEndPoint.Parse("127.0.0.1:30000"))
                         .ConfigureLogging(builder => builder.AddProvider(loggerProvider))
                         .Build();
         }

@@ -16,6 +16,9 @@ services:
      - "11111:11111"
     depends_on:
      - messagesilo.influxdb
+    networks:
+      msnet:
+        ipv4_address: 10.5.0.5
 
   messagesilo.api:
     image: ${DOCKER_REGISTRY-}messagesiloapi
@@ -25,4 +28,16 @@ services:
     ports:
      - "5000:443"
     depends_on:
+     - messagesilo.influxdb
      - messagesilo.silo
+    networks:
+      msnet:
+        ipv4_address: 10.5.0.6
+
+networks:
+  msnet:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1

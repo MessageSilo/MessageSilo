@@ -37,5 +37,7 @@ cd MessageSilo
 docker-compose up --build
 ```
 
+Listening on: https://localhost:5000
+
 ## Contribution
 If you are interested in contributing to the project, please open an issue or submit a pull request.

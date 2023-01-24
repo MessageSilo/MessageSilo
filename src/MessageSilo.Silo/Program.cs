@@ -6,6 +6,7 @@ using Orleans;
 using Orleans.Hosting;
 using MessageSilo.Shared.DataAccess;
 using Orleans.Configuration;
+using System.Net;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false, true)
@@ -19,13 +20,13 @@ var builder = Host.CreateDefaultBuilder(args)
             manager.AddApplicationPart(typeof(IUserGrain).Assembly);
             manager.AddApplicationPart(typeof(IDeadLetterCorrectorGrain).Assembly);
         })
-        .Configure<ClusterOptions>(options =>
+        .UseDevelopmentClustering(primarySiloEndpoint: new IPEndPoint(IPAddress.Parse("10.5.0.5"), 11111))
+                .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "MessageSiloCluster001";
                     options.ServiceId = "MessageSiloService001";
                 })
-        .UseLocalhostClustering()
-        .ConfigureEndpoints(hostname: "messagesilo.silo", siloPort: 11111, gatewayPort: 30000)
+        .ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000)
         .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Warning).AddConsole())
         .AddMemoryGrainStorageAsDefault());
 
