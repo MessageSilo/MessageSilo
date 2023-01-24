@@ -1,6 +1,5 @@
+<img src="https://repository-images.githubusercontent.com/495369194/7373d34b-41e3-4eb7-90a7-773cc33f3fa5" align="right"></img>
 # Message Silo
-
-![Message Silo Logo](https://repository-images.githubusercontent.com/495369194/7373d34b-41e3-4eb7-90a7-773cc33f3fa5)
 
 Message Silo is a powerful and user-friendly message queue monitoring platform that allows users to easily monitor and correct their dead-lettered messages from various platforms such as Azure Service Bus, AWS SMS, RabbitMQ, and more. 
 With its intuitive and easy-to-use interface, users can quickly and easily identify and resolve issues with their messaging queues, ensuring that their systems run smoothly and efficiently at all times. 
@@ -10,7 +9,6 @@ Additionally, the platform offers a range of advanced features such as message s
 This project is currently under development and the features are not fully implemented!
 
 ## Upcoming features
-
 
 **Integration**
 - [x] Azure Service Bus
@@ -27,6 +25,7 @@ This project is currently under development and the features are not fully imple
 
 **Dead Letter Corrector**
 
+- [x] CRUD (with UI)
 - [x] Correct messages with custom JS func. 
 - [ ] Automatic resend 
 - [ ] Correct messages with a custom HTTP call
