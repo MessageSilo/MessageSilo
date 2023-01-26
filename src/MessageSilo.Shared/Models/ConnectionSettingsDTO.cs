@@ -22,5 +22,7 @@ namespace MessageSilo.Shared.Models
         public string SubscriptionName { get; set; }
 
         public string CorrectorFuncBody { get; set; }
+
+        public bool AutoReEnqueue { get; set; }
     }
 }

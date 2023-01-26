@@ -2,8 +2,15 @@ version: '3.4'
 
 services:
   messagesilo.influxdb:
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=YouAreNotPrepared!
+      - DOCKER_INFLUXDB_INIT_ORG=MessageSilo
+      - DOCKER_INFLUXDB_INIT_BUCKET=DeadLetteredMessages
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=local-test
     volumes:
-     - "${APPDATA}/Microsoft/UserSecrets/messagerepo:/var/lib/influxdb2" 
+      - "${APPDATA}/Microsoft/UserSecrets/messagerepo:/var/lib/influxdb2" 
   messagesilo.silo:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

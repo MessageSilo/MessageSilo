@@ -15,7 +15,7 @@ namespace MessageSilo.Features.DeadLetterCorrector
     {
         private readonly IMessageCorrector messageCorrector;
         private readonly IMessageRepository<CorrectedMessage> messages;
-        private readonly ILogger<UserGrain> logger;
+        private readonly ILogger<DeadLetterCorrectorGrain> logger;
 
         private IMessagePlatformConnection messagePlatformConnection;
         private IPersistentState<ConnectionSettingsDTO> setting { get; set; }
@@ -81,23 +81,16 @@ namespace MessageSilo.Features.DeadLetterCorrector
 
             foreach (var msg in msgs)
             {
-                string? correctedMessageBody = null;
-
-                try
-                {
-                    correctedMessageBody = messageCorrector.Correct(msg.Body, setting.State.CorrectorFuncBody);
-                }
-                catch (Exception ex)
-                {
-                    ex.ToString();
-                }
+                string? correctedMessageBody = messageCorrector.Correct(msg.Body, setting.State.CorrectorFuncBody);
 
                 messages.Add(setting.State.Id.ToString(), new CorrectedMessage(msg)
                 {
-                    BodyAfterCorrection = correctedMessageBody!,
+                    BodyAfterCorrection = correctedMessageBody,
                     IsCorrected = correctedMessageBody != null,
                     IsResent = false,
                 });
+
+                //TODO: Auto re-enque message if needed
             }
         }
     }

@@ -120,6 +120,12 @@
                     </Field>
                 </Validation>
                 <Field Horizontal>
+                    <FieldLabel ColumnSize="ColumnSize.Is2">Automatic Re-Enqueue</FieldLabel>
+                    <FieldBody ColumnSize="ColumnSize.Is10">
+                        <Check @bind-Checked="@ConnectionSettings.AutoReEnqueue" />
+                    </FieldBody>
+                </Field>
+                <Field Horizontal>
                     <FieldLabel ColumnSize="ColumnSize.Is2">Corrector Function</FieldLabel>
                     <FieldBody ColumnSize="ColumnSize.Is10">
                         <MemoEdit Text="@ConnectionSettings.CorrectorFuncBody" Rows="5" AutoSize />
