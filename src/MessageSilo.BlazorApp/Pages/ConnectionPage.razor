@@ -1,10 +1,9 @@
 ﻿@using MessageSilo.BlazorApp.Components
-@using MessageSilo.BlazorApp.Components.DeadLetterCorrector
 @using MessageSilo.Shared.Enums
 @using MessageSilo.Shared.Platforms;
-@page "/dead-letter-correctors/{id}"
+@page "/connection/{id}"
 
-<Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Dead Letter Corrector</Heading>
+<Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Connection</Heading>
 
 @if (ConnectionSettings != null)
 {

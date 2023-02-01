@@ -1,5 +1,5 @@
 ﻿using MessageSilo.Features.Azure;
-using MessageSilo.Features.DeadLetterCorrector;
+using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Grains;
@@ -27,7 +27,7 @@ namespace MessageSilo.Features.User
             this.grainFactory = grainFactory;
         }
 
-        public async Task AddDeadLetterCorrector(ConnectionSettingsDTO setting)
+        public async Task AddConnection(ConnectionSettingsDTO setting)
         {
             var existing = deadLetterCorrectorSettings.State.FirstOrDefault(p => p.Id == setting.Id);
 
@@ -40,30 +40,30 @@ namespace MessageSilo.Features.User
 
             await deadLetterCorrectorSettings.WriteStateAsync();
 
-            var deadLetterCorrector = grainFactory.GetGrain<IDeadLetterCorrectorGrain>(setting.Id);
+            var deadLetterCorrector = grainFactory.GetGrain<IConnectionGrain>(setting.Id);
             await deadLetterCorrector.Update(setting);
 
             return;
         }
 
-        public Task InitDeadLetterCorrectors()
+        public Task InitConnections()
         {
             foreach (var setting in deadLetterCorrectorSettings.State)
             {
-                var deadLetterCorrector = grainFactory.GetGrain<IDeadLetterCorrectorGrain>(setting.Id);
+                var deadLetterCorrector = grainFactory.GetGrain<IConnectionGrain>(setting.Id);
             }
 
             return Task.CompletedTask;
         }
 
-        public Task<List<ConnectionSettingsDTO>> GetDeadLetterCorrectors()
+        public Task<List<ConnectionSettingsDTO>> GetConnections()
         {
             return Task.FromResult(deadLetterCorrectorSettings.State);
         }
 
-        public async Task DeleteDeadLetterCorrector(Guid id)
+        public async Task DeleteConnection(Guid id)
         {
-            var deadLetterCorrector = grainFactory.GetGrain<IDeadLetterCorrectorGrain>(id);
+            var deadLetterCorrector = grainFactory.GetGrain<IConnectionGrain>(id);
             await deadLetterCorrector.Delete();
 
             var existing = deadLetterCorrectorSettings.State.First(p => p.Id == id);

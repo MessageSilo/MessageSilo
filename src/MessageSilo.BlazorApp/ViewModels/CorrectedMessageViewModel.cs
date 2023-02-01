@@ -1,4 +1,4 @@
-﻿using MessageSilo.Features.DeadLetterCorrector;
+﻿using MessageSilo.Features.Connection;
 
 namespace MessageSilo.BlazorApp.ViewModels
 {

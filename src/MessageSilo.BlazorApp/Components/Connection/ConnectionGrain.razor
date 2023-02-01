@@ -1,0 +1,4 @@
+﻿@if (ConnectionSettings is not null)
+{
+    <Div Background=Background.Light title="@ConnectionSettings.Name" onclick="@(() => Navigation.NavigateTo($"/connection/{ConnectionSettings.Id}"))"></Div>
+}

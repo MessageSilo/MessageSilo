@@ -1,14 +1,25 @@
-﻿@page "/"
-<Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Message Silo</Heading>
+﻿@using MessageSilo.BlazorApp.Components.Connection
+@page "/dashboard"
+@attribute [Authorize]
+@inject NavigationManager Navigation
+
+<Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Dashboard</Heading>
 
 <Row>
     <Column>
-        <Paragraph>Welcome!</Paragraph>
+        <Button Color="Color.Primary" Float="Float.End" Clicked="@(() => Navigation.NavigateTo($"/connection/{Guid.Empty}"))">New Connection</Button>
     </Column>
 </Row>
 
 <Row>
-    <Column></Column>
-    <Column><Image Source="/brand-logo.png"></Image></Column>
-    <Column></Column>
+    <Column>
+        <div class="silo">
+            <div class="silo-container">
+                @foreach (var item in Connections)
+                {
+                    <ConnectionGrain ConnectionSettings="@item"></ConnectionGrain>
+                }
+            </div>
+        </div>
+    </Column>
 </Row>

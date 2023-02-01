@@ -1,19 +1,18 @@
-﻿using MessageSilo.BlazorApp.Components.DeadLetterCorrector;
-using MessageSilo.Features.DeadLetterCorrector;
+﻿using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Models;
 
 namespace MessageSilo.BlazorApp.Services
 {
     public interface IMessageSiloAPIService
     {
-        Task<List<ConnectionSettingsDTO>> GetDeadLetterCorrectors();
+        Task<List<ConnectionSettingsDTO>> GetConnections();
 
-        Task<ConnectionSettingsDTO> GetDeadLetterCorrector(Guid id);
+        Task<ConnectionSettingsDTO> GetConnection(Guid id);
 
         Task<List<CorrectedMessage>> GetCorrectedMessages(Guid dcId, DateTimeOffset from, DateTimeOffset to);
 
-        Task UpsertDeadLetterCorrector(ConnectionSettingsDTO dto);
+        Task UpsertConnection(ConnectionSettingsDTO dto);
 
-        Task DeleteDeadLetterCorrector(Guid id);
+        Task DeleteConnection(Guid id);
     }
 }

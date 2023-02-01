@@ -1,13 +1,18 @@
 using MessageSilo.API;
 using MessageSilo.API.HealthChecks;
-using MessageSilo.Features.DeadLetterCorrector;
+using MessageSilo.Features.Connection;
 using MessageSilo.Shared.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Orleans;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", false, true)
+    .AddJsonFile("appsettings.Development.json", true, true);
 
 builder.Services.AddSingleton<ClusterClientHostedService>();
 builder.Services.AddSingleton<IHostedService>(

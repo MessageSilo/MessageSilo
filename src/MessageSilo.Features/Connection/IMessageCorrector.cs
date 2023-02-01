@@ -1,4 +1,4 @@
-﻿namespace MessageSilo.Features.DeadLetterCorrector
+﻿namespace MessageSilo.Features.Connection
 {
     public interface IMessageCorrector
     {

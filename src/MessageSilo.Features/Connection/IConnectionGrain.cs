@@ -1,9 +1,9 @@
 ﻿using MessageSilo.Shared.Models;
 using Orleans;
 
-namespace MessageSilo.Features.DeadLetterCorrector
+namespace MessageSilo.Features.Connection
 {
-    public interface IDeadLetterCorrectorGrain : IGrainWithGuidKey
+    public interface IConnectionGrain : IGrainWithGuidKey
     {
         Task Update(ConnectionSettingsDTO s);
 

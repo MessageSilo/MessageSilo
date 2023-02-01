@@ -5,12 +5,12 @@ namespace MessageSilo.Shared.Grains
 {
     public interface IUserGrain : IGrainWithStringKey
     {
-        Task AddDeadLetterCorrector(ConnectionSettingsDTO setting);
+        Task AddConnection(ConnectionSettingsDTO setting);
 
-        Task InitDeadLetterCorrectors();
+        Task InitConnections();
 
-        Task<List<ConnectionSettingsDTO>> GetDeadLetterCorrectors();
+        Task<List<ConnectionSettingsDTO>> GetConnections();
 
-        Task DeleteDeadLetterCorrector(Guid id);
+        Task DeleteConnection(Guid id);
     }
 }

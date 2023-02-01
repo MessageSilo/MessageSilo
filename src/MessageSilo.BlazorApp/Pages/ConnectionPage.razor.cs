@@ -1,7 +1,6 @@
-﻿using MessageSilo.BlazorApp.Components.DeadLetterCorrector;
-using MessageSilo.BlazorApp.Services;
+﻿using MessageSilo.BlazorApp.Services;
 using MessageSilo.BlazorApp.ViewModels;
-using MessageSilo.Features.DeadLetterCorrector;
+using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Platforms;
 using Microsoft.AspNetCore.Components;
@@ -9,7 +8,7 @@ using System.Collections.Generic;
 
 namespace MessageSilo.BlazorApp.Pages
 {
-    public partial class DeadLetterCorrectorPage
+    public partial class ConnectionPage
     {
         [Inject]
         public IMessageSiloAPIService MessageSiloAPI { get; set; }
@@ -35,7 +34,7 @@ namespace MessageSilo.BlazorApp.Pages
                 ConnectionSettings = new ConnectionSettingsDTO();
             else
             {
-                ConnectionSettings = await MessageSiloAPI.GetDeadLetterCorrector(id);
+                ConnectionSettings = await MessageSiloAPI.GetConnection(id);
                 await FilterMessages();
             }
         }
@@ -50,7 +49,7 @@ namespace MessageSilo.BlazorApp.Pages
 
         public async Task Save()
         {
-            await MessageSiloAPI.UpsertDeadLetterCorrector(ConnectionSettings);
+            await MessageSiloAPI.UpsertConnection(ConnectionSettings);
         }
     }
 }

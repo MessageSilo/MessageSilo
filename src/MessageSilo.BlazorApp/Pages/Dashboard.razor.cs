@@ -2,9 +2,9 @@
 using MessageSilo.Shared.Models;
 using Microsoft.AspNetCore.Components;
 
-namespace MessageSilo.BlazorApp.Components.DeadLetterCorrector
+namespace MessageSilo.BlazorApp.Pages
 {
-    public partial class DeadLetterCorrectors
+    public partial class Dashboard
     {
         [Inject]
         public IMessageSiloAPIService MessageSiloAPI { get; set; }
@@ -13,12 +13,12 @@ namespace MessageSilo.BlazorApp.Components.DeadLetterCorrector
 
         protected override async Task OnInitializedAsync()
         {
-            Connections = (await MessageSiloAPI.GetDeadLetterCorrectors()).OrderBy(p => p.Name);
+            Connections = (await MessageSiloAPI.GetConnections()).OrderBy(p => p.Name);
         }
 
         public async Task Delete(Guid id)
         {
-            await MessageSiloAPI.DeleteDeadLetterCorrector(id);
+            await MessageSiloAPI.DeleteConnection(id);
             Connections = Connections.Where(p => p.Id != id).ToList();
         }
     }

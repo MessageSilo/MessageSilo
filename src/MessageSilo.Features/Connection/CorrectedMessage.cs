@@ -1,6 +1,6 @@
 ﻿using MessageSilo.Shared.Models;
 
-namespace MessageSilo.Features.DeadLetterCorrector
+namespace MessageSilo.Features.Connection
 {
     public class CorrectedMessage : Message
     {

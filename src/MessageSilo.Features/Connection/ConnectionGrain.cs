@@ -9,29 +9,29 @@ using Orleans.Runtime;
 using System;
 using System.Drawing.Imaging;
 
-namespace MessageSilo.Features.DeadLetterCorrector
+namespace MessageSilo.Features.Connection
 {
-    public class DeadLetterCorrectorGrain : Grain, IDeadLetterCorrectorGrain
+    public class ConnectionGrain : Grain, IConnectionGrain
     {
         private readonly IMessageCorrector messageCorrector;
         private readonly IMessageRepository<CorrectedMessage> messages;
-        private readonly ILogger<DeadLetterCorrectorGrain> logger;
+        private readonly ILogger<ConnectionGrain> logger;
 
         private IMessagePlatformConnection messagePlatformConnection;
-        private IPersistentState<ConnectionSettingsDTO> setting { get; set; }
+        private IPersistentState<ConnectionState> persistence { get; set; }
 
         private IDisposable timer;
 
-        public DeadLetterCorrectorGrain([PersistentState("Setting")] IPersistentState<ConnectionSettingsDTO> setting, IMessageCorrector messageCorrector, IMessageRepository<CorrectedMessage> messages)
+        public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, IMessageCorrector messageCorrector, IMessageRepository<CorrectedMessage> messages)
         {
-            this.setting = setting;
+            this.persistence = state;
             this.messageCorrector = messageCorrector;
             this.messages = messages;
         }
 
         public override Task OnActivateAsync()
         {
-            if (this.setting.RecordExists)
+            if (this.persistence.RecordExists)
                 reInit();
 
             return base.OnActivateAsync();
@@ -39,8 +39,8 @@ namespace MessageSilo.Features.DeadLetterCorrector
 
         public async Task Update(ConnectionSettingsDTO s)
         {
-            setting.State = s;
-            await setting.WriteStateAsync();
+            persistence.State.ConnectionSettings = s;
+            await persistence.WriteStateAsync();
             reInit();
         }
 
@@ -51,18 +51,18 @@ namespace MessageSilo.Features.DeadLetterCorrector
             if (messagePlatformConnection is not null)
                 await messagePlatformConnection.DisposeAsync();
 
-            await this.setting.ClearStateAsync();
+            await this.persistence.ClearStateAsync();
         }
 
         private void reInit()
         {
-            switch (setting.State.Type)
+            switch (persistence.State.ConnectionSettings.Type)
             {
                 case MessagePlatformType.Azure_Queue:
-                    messagePlatformConnection = new AzureServiceBusConnection(setting.State.ConnectionString, setting.State.QueueName);
+                    messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName);
                     break;
                 case MessagePlatformType.Azure_Topic:
-                    messagePlatformConnection = new AzureServiceBusConnection(setting.State.ConnectionString, setting.State.TopicName, setting.State.SubscriptionName);
+                    messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.TopicName, persistence.State.ConnectionSettings.SubscriptionName);
                     break;
             }
 
@@ -79,11 +79,13 @@ namespace MessageSilo.Features.DeadLetterCorrector
             if (msgs.Count() == 0)
                 return;
 
+            persistence.State.DeadLetteredMessagesCount += msgs.Count();
+
             foreach (var msg in msgs)
             {
-                string? correctedMessageBody = messageCorrector.Correct(msg.Body, setting.State.CorrectorFuncBody);
+                string? correctedMessageBody = messageCorrector.Correct(msg.Body, persistence.State.ConnectionSettings.CorrectorFuncBody);
 
-                messages.Add(setting.State.Id.ToString(), new CorrectedMessage(msg)
+                messages.Add(persistence.State.ConnectionSettings.Id.ToString(), new CorrectedMessage(msg)
                 {
                     BodyAfterCorrection = correctedMessageBody,
                     IsCorrected = correctedMessageBody != null,

@@ -1,12 +1,12 @@
 {
   "profiles": {
-    "MessageSilo.API": {
+    "MessageSilo.Features": {
       "commandName": "Project",
+      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:5000"
+      "applicationUrl": "https://localhost:58944;http://localhost:58946"
     }
   }
 }

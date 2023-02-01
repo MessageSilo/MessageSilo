@@ -17,13 +17,22 @@ namespace MessageSilo.API
         {
             this.logger = logger;
 
-            Client = new ClientBuilder()
-                        .UseStaticClustering(new IPEndPoint(IPAddress.Parse("10.5.0.5"), 30000))
-                        .Configure<ClusterOptions>(options =>
-                        {
-                            options.ClusterId = "MessageSiloCluster001";
-                            options.ServiceId = "MessageSiloService001";
-                        })
+            IClientBuilder clientBuilder = new ClientBuilder();
+
+            var siloIP = IPAddress.Parse(configuration["Orleans:PrimarySiloAddress"]);
+
+            if (siloIP.Equals(IPAddress.Loopback))
+                clientBuilder = clientBuilder.UseLocalhostClustering();
+            else
+                clientBuilder = clientBuilder
+                    .UseStaticClustering(new IPEndPoint(siloIP, 30000))
+                    .Configure<ClusterOptions>(options =>
+                    {
+                        options.ClusterId = "MessageSiloCluster001";
+                        options.ServiceId = "MessageSiloService001";
+                    });
+
+            Client = clientBuilder
                         .ConfigureLogging(builder => builder.AddProvider(loggerProvider))
                         .Build();
         }

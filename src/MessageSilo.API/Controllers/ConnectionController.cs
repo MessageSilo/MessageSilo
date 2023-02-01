@@ -1,4 +1,4 @@
-﻿using MessageSilo.Features.DeadLetterCorrector;
+﻿using MessageSilo.Features.Connection;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Grains;
 using MessageSilo.Shared.Models;
@@ -8,47 +8,48 @@ using Orleans;
 namespace MessageSilo.API.Controllers
 {
     [Route("api/v1")]
-    public class DeadLetterCorrectorController : MessageSiloControllerBase
+    public class ConnectionController : MessageSiloControllerBase
     {
         private readonly IUserGrain user;
 
         private readonly IMessageRepository<CorrectedMessage> messages;
 
-        public DeadLetterCorrectorController(ILogger<DeadLetterCorrectorController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IMessageRepository<CorrectedMessage> messages) : base(logger, client, httpContextAccessor)
+        public ConnectionController(ILogger<ConnectionController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IMessageRepository<CorrectedMessage> messages) : base(logger, client, httpContextAccessor)
         {
             user = client.GetGrain<IUserGrain>(loggedInUserId);
             this.messages = messages;
         }
 
-        [HttpGet("DeadLetterCorrector")]
+        [HttpGet("Connection")]
         public async Task<List<ConnectionSettingsDTO>> List()
         {
-            return await user.GetDeadLetterCorrectors();
+            await user.InitConnections();
+            return await user.GetConnections();
         }
 
-        [HttpGet("DeadLetterCorrector/{id}")]
+        [HttpGet("Connection/{id}")]
         public async Task<ConnectionSettingsDTO?> Find(Guid id)
         {
-            return (await user.GetDeadLetterCorrectors()).FirstOrDefault(p => p.Id == id);
+            return (await user.GetConnections()).FirstOrDefault(p => p.Id == id);
         }
 
-        [HttpPut("DeadLetterCorrector")]
+        [HttpPut("Connection")]
         public async Task Upsert([FromBody] ConnectionSettingsDTO dto)
         {
-            await user.AddDeadLetterCorrector(dto);
+            await user.AddConnection(dto);
         }
 
-        [HttpGet("DeadLetterCorrector/{id}/Messages")]
+        [HttpGet("Connection/{id}/Messages")]
         public async Task<IEnumerable<CorrectedMessage>> Messages(Guid id, [FromQuery] DateTimeOffset from, [FromQuery] DateTimeOffset to)
         {
             Request.Query.ToString();
             return await messages.Query(id.ToString(), from, to);
         }
 
-        [HttpDelete("DeadLetterCorrector/{id}")]
+        [HttpDelete("Connection/{id}")]
         public async Task Delete(Guid id)
         {
-            await user.DeleteDeadLetterCorrector(id);
+            await user.DeleteConnection(id);
         }
     }
 }

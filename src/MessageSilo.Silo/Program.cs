@@ -1,4 +1,4 @@
-using MessageSilo.Features.DeadLetterCorrector;
+using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Grains;
@@ -13,22 +13,34 @@ var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.Development.json", true, true)
     .Build();
 
+var siloIP = IPAddress.Parse(configuration["Orleans:PrimarySiloAddress"]);
+
 var builder = Host.CreateDefaultBuilder(args)
-        .UseOrleans(siloBuilder => siloBuilder
-        .ConfigureApplicationParts(manager =>
+        .UseOrleans(siloBuilder =>
         {
-            manager.AddApplicationPart(typeof(IUserGrain).Assembly);
-            manager.AddApplicationPart(typeof(IDeadLetterCorrectorGrain).Assembly);
-        })
-        .UseDevelopmentClustering(primarySiloEndpoint: new IPEndPoint(IPAddress.Parse("10.5.0.5"), 11111))
-                .Configure<ClusterOptions>(options =>
-                {
-                    options.ClusterId = "MessageSiloCluster001";
-                    options.ServiceId = "MessageSiloService001";
-                })
-        .ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000)
-        .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Warning).AddConsole())
-        .AddMemoryGrainStorageAsDefault());
+            if (siloIP.Equals(IPAddress.Loopback))
+                siloBuilder = siloBuilder.UseLocalhostClustering();
+            else
+                siloBuilder = siloBuilder.UseDevelopmentClustering(primarySiloEndpoint: new IPEndPoint(siloIP, 11111))
+                            .Configure<ClusterOptions>(options =>
+                            {
+                                options.ClusterId = "MessageSiloCluster001";
+                                options.ServiceId = "MessageSiloService001";
+                            })
+                            .ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000);
+
+            siloBuilder = siloBuilder.ConfigureApplicationParts(manager =>
+            {
+                manager.AddApplicationPart(typeof(IUserGrain).Assembly);
+                manager.AddApplicationPart(typeof(IConnectionGrain).Assembly);
+            })
+            .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Warning).AddConsole())
+            .AddAzureTableGrainStorageAsDefault(options =>
+            {
+                options.ConfigureTableServiceClient(configuration["ConnectionStrings:GrainStateStorage"]);
+                options.UseJson = true;
+            });
+        });
 
 builder.ConfigureServices(services =>
 {
@@ -39,3 +51,6 @@ builder.ConfigureServices(services =>
 var app = builder.Build();
 
 app.Run();
+
+if (siloIP.Equals(IPAddress.Loopback))
+    Console.ReadKey();

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace MessageSilo.Features.DeadLetterCorrector
+namespace MessageSilo.Features.Connection
 {
     public class MessageCorrector : IMessageCorrector
     {
