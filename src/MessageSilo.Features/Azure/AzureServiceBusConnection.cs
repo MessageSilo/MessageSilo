@@ -1,4 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
+using CsvHelper;
+using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 
@@ -9,6 +11,8 @@ namespace MessageSilo.Features.Azure
         private ServiceBusClient client;
 
         private ServiceBusReceiver deadLetterReceiver;
+
+        private ServiceBusSender sender;
 
         private const int MAX_NUMBER_OF_MESSAGES = 100;
 
@@ -41,18 +45,28 @@ namespace MessageSilo.Features.Azure
             {
                 case MessagePlatformType.Azure_Queue:
                     deadLetterReceiver = client.CreateReceiver(QueueName, new ServiceBusReceiverOptions() { SubQueue = SubQueue.DeadLetter });
+                    sender = client.CreateSender(QueueName);
                     break;
                 case MessagePlatformType.Azure_Topic:
                     deadLetterReceiver = client.CreateReceiver(TopicName, SubscriptionName, new ServiceBusReceiverOptions() { SubQueue = SubQueue.DeadLetter });
+                    sender = client.CreateSender(TopicName);
                     break;
             }
         }
 
-        public override async Task<IEnumerable<Message>> GetDeadLetterMessagesAsync()
+        public override async Task<IEnumerable<Message>> GetDeadLetterMessagesAsync(long? lastProcessedMessageSequenceNumber)
         {
-            var msgs = await deadLetterReceiver.PeekMessagesAsync(MAX_NUMBER_OF_MESSAGES);
+            var msgs = await deadLetterReceiver.PeekMessagesAsync(MAX_NUMBER_OF_MESSAGES, lastProcessedMessageSequenceNumber + 1);
 
-            return msgs.Select(p => new Message(p.MessageId, p.EnqueuedTime, p.Body.ToString()));
+            return msgs.Select(p => new Message(p.MessageId, p.EnqueuedTime, p.Body.ToString(), p.SequenceNumber));
+        }
+
+        public override async Task Enqueue(string msgBody)
+        {
+            var msg = new ServiceBusMessage(msgBody);
+            msg.ApplicationProperties.Add("IsHandledByMessageSilo", true);
+
+            await sender.SendMessageAsync(msg);
         }
 
         public override async ValueTask DisposeAsync()

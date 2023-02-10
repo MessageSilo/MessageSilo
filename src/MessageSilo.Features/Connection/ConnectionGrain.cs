@@ -1,4 +1,5 @@
 ﻿using MessageSilo.Features.Azure;
+using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Features.User;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
@@ -13,20 +14,20 @@ namespace MessageSilo.Features.Connection
 {
     public class ConnectionGrain : Grain, IConnectionGrain
     {
-        private readonly IMessageCorrector messageCorrector;
-        private readonly IMessageRepository<CorrectedMessage> messages;
         private readonly ILogger<ConnectionGrain> logger;
+
+        private readonly IGrainFactory grainFactory;
 
         private IMessagePlatformConnection messagePlatformConnection;
         private IPersistentState<ConnectionState> persistence { get; set; }
 
         private IDisposable timer;
 
-        public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, IMessageCorrector messageCorrector, IMessageRepository<CorrectedMessage> messages)
+        public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory)
         {
             this.persistence = state;
-            this.messageCorrector = messageCorrector;
-            this.messages = messages;
+            this.logger = logger;
+            this.grainFactory = grainFactory;
         }
 
         public override Task OnActivateAsync()
@@ -54,6 +55,16 @@ namespace MessageSilo.Features.Connection
             await this.persistence.ClearStateAsync();
         }
 
+        public async Task<ConnectionState> GetState()
+        {
+            return await Task.FromResult(persistence.State);
+        }
+
+        public async Task Enqueue(string msgBody)
+        {
+            await messagePlatformConnection.Enqueue(msgBody);
+        }
+
         private void reInit()
         {
             switch (persistence.State.ConnectionSettings.Type)
@@ -74,26 +85,18 @@ namespace MessageSilo.Features.Connection
 
         private async Task processMessagesAsync(object state)
         {
-            var msgs = await messagePlatformConnection.GetDeadLetterMessagesAsync();
+            var msgs = await messagePlatformConnection.GetDeadLetterMessagesAsync(persistence.State.LastProcessedMessageSequenceNumber);
+
+            logger.Debug($"Connection: {persistence.State.ConnectionSettings.Name} ({persistence.State.ConnectionSettings.Id}) received {msgs.Count()} dead-lettered messsages.");
 
             if (msgs.Count() == 0)
                 return;
 
-            persistence.State.DeadLetteredMessagesCount += msgs.Count();
+            persistence.State.LastProcessedMessageSequenceNumber = msgs.Max(msg => msg.SequenceNumber);
 
-            foreach (var msg in msgs)
-            {
-                string? correctedMessageBody = messageCorrector.Correct(msg.Body, persistence.State.ConnectionSettings.CorrectorFuncBody);
+            var messageCorrector = grainFactory.GetGrain<IMessageCorrectorGrain>(Guid.NewGuid());
 
-                messages.Add(persistence.State.ConnectionSettings.Id.ToString(), new CorrectedMessage(msg)
-                {
-                    BodyAfterCorrection = correctedMessageBody,
-                    IsCorrected = correctedMessageBody != null,
-                    IsResent = false,
-                });
-
-                //TODO: Auto re-enque message if needed
-            }
+            messageCorrector.InvokeOneWay(p => p.CorrectMessages(this, msgs.ToList()));
         }
     }
 }

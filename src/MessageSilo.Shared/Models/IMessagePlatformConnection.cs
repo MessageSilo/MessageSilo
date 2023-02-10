@@ -2,7 +2,7 @@
 
 namespace MessageSilo.Shared.Models
 {
-    public interface IMessagePlatformConnection: IAsyncDisposable
+    public interface IMessagePlatformConnection : IAsyncDisposable
     {
         string Name { get; }
 
@@ -12,6 +12,8 @@ namespace MessageSilo.Shared.Models
 
         void InitDeadLetterCorrector();
 
-        Task<IEnumerable<Message>> GetDeadLetterMessagesAsync();
+        Task<IEnumerable<Message>> GetDeadLetterMessagesAsync(long? lastProcessedMessageSequenceNumber);
+
+        Task Enqueue(string msgBody);
     }
 }

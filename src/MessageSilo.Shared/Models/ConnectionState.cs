@@ -12,6 +12,6 @@ namespace MessageSilo.Shared.Models
 
         public bool IsConnected { get; set; }
 
-        public int DeadLetteredMessagesCount { get; set; }
+        public long? LastProcessedMessageSequenceNumber { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using MessageSilo.Features.Connection;
+﻿using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Grains;
 using MessageSilo.Shared.Models;

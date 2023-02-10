@@ -7,6 +7,7 @@ using Orleans.Hosting;
 using MessageSilo.Shared.DataAccess;
 using Orleans.Configuration;
 using System.Net;
+using MessageSilo.Features.MessageCorrector;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false, true)
@@ -33,8 +34,9 @@ var builder = Host.CreateDefaultBuilder(args)
             {
                 manager.AddApplicationPart(typeof(IUserGrain).Assembly);
                 manager.AddApplicationPart(typeof(IConnectionGrain).Assembly);
+                manager.AddApplicationPart(typeof(IMessageCorrectorGrain).Assembly);
             })
-            .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Warning).AddConsole())
+            .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Debug).AddConsole())
             .AddAzureTableGrainStorageAsDefault(options =>
             {
                 options.ConfigureTableServiceClient(configuration["ConnectionStrings:GrainStateStorage"]);
@@ -44,7 +46,6 @@ var builder = Host.CreateDefaultBuilder(args)
 
 builder.ConfigureServices(services =>
 {
-    services.AddScoped<IMessageCorrector, MessageCorrector>();
     services.AddSingleton<IMessageRepository<CorrectedMessage>, MessageRepository<CorrectedMessage>>();
 });
 

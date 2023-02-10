@@ -1,4 +1,4 @@
-﻿using MessageSilo.Features.Connection;
+﻿using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.Models;
 
 namespace MessageSilo.BlazorApp.Services

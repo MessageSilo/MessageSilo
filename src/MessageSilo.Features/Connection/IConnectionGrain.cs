@@ -8,5 +8,9 @@ namespace MessageSilo.Features.Connection
         Task Update(ConnectionSettingsDTO s);
 
         Task Delete();
+
+        Task Enqueue(string msgBody);
+
+        Task<ConnectionState> GetState();
     }
 }

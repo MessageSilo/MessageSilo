@@ -1,6 +1,6 @@
 using MessageSilo.API;
 using MessageSilo.API.HealthChecks;
-using MessageSilo.Features.Connection;
+using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

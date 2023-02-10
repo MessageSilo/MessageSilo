@@ -34,6 +34,13 @@ namespace MessageSilo.Features.User
             if (existing is not null)
             {
                 existing.Name = setting.Name;
+                existing.ConnectionString = setting.ConnectionString;
+                existing.Type = setting.Type;
+                existing.QueueName = setting.QueueName;
+                existing.TopicName = setting.TopicName;
+                existing.SubscriptionName = setting.SubscriptionName;
+                existing.AutoReEnqueue = setting.AutoReEnqueue;
+                existing.CorrectorFuncBody = setting.CorrectorFuncBody;
             }
             else
                 deadLetterCorrectorSettings.State.Add(setting);
