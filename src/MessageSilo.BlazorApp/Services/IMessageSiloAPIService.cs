@@ -13,6 +13,6 @@ namespace MessageSilo.BlazorApp.Services
 
         Task UpsertConnection(ConnectionSettingsDTO dto);
 
-        Task DeleteConnection(Guid id);
+        Task DeleteConnection(string id);
     }
 }

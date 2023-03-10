@@ -16,7 +16,7 @@ namespace MessageSilo.BlazorApp.Pages
             Connections = (await MessageSiloAPI.GetConnections()).OrderBy(p => p.Name);
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(string id)
         {
             await MessageSiloAPI.DeleteConnection(id);
             Connections = Connections.Where(p => p.Id != id).ToList();

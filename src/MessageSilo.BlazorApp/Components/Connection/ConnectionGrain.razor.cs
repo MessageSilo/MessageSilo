@@ -1,4 +1,5 @@
-﻿using MessageSilo.Shared.Models;
+﻿using Blazorise;
+using MessageSilo.Shared.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace MessageSilo.BlazorApp.Components.Connection
@@ -10,5 +11,7 @@ namespace MessageSilo.BlazorApp.Components.Connection
 
         [Parameter]
         public ConnectionSettingsDTO ConnectionSettings { get; set; }
+
+        public Background StatusColor { get; set; } = Background.Light;
     }
 }

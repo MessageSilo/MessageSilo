@@ -23,18 +23,18 @@ namespace MessageSilo.Features.MessageCorrector
             this.messages = messages;
         }
 
-        public async Task CorrectMessages(IConnectionGrain connection, List<Message> msgs)
+        public async Task CorrectMessages(IConnectionGrain sourceConnection, List<Message> msgs, IConnectionGrain? targetConnection = null)
         {
-            var connectionState = await connection.GetState();
+            var connectionState = await sourceConnection.GetState();
 
             foreach (var msg in msgs)
             {
                 string? correctedMessageBody = correct(msg.Body, connectionState.ConnectionSettings.CorrectorFuncBody);
 
-                if (correctedMessageBody != null && connectionState.ConnectionSettings.AutoReEnqueue)
-                    await connection.Enqueue(correctedMessageBody);
+                if (correctedMessageBody != null && targetConnection is not null)
+                    await targetConnection.Enqueue(correctedMessageBody);
 
-                messages.Add(connectionState.ConnectionSettings.Id.ToString(), new CorrectedMessage(msg)
+                messages.Add(connectionState.ConnectionSettings.Id, new CorrectedMessage(msg)
                 {
                     BodyAfterCorrection = correctedMessageBody
                 });

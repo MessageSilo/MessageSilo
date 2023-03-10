@@ -6,6 +6,6 @@ namespace MessageSilo.Features.MessageCorrector
 {
     public interface IMessageCorrectorGrain : IGrainWithGuidKey
     {
-        Task CorrectMessages(IConnectionGrain connection, List<Message> msgs);
+        Task CorrectMessages(IConnectionGrain sourceConnection, List<Message> msgs, IConnectionGrain? targetConnection = null);
     }
 }

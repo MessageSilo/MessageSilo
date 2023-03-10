@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MessageSilo.BlazorApp\MessageSilo.BlazorApp.csproj" />
     <ProjectReference Include="..\MessageSilo.Features\MessageSilo.Features.csproj" />
   </ItemGroup>
 

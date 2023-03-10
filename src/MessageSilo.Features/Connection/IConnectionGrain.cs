@@ -3,7 +3,7 @@ using Orleans;
 
 namespace MessageSilo.Features.Connection
 {
-    public interface IConnectionGrain : IGrainWithGuidKey
+    public interface IConnectionGrain : IGrainWithStringKey
     {
         Task Update(ConnectionSettingsDTO s);
 

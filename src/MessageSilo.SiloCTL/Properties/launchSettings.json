@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MessageSilo.SiloCTL": {
+      "commandName": "Project",
+      "commandLineArgs": "-f \"C:\\temp\\conn1.yaml\""
+    }
+  }
+}

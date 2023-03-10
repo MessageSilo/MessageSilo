@@ -5,15 +5,15 @@ namespace MessageSilo.Shared.Models
 {
     public class ConnectionSettingsDTO
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public string Token { get; set; }
 
         public string Name { get; set; }
 
+        public string Id => $"{Token}|{Name}";
+
         public string ConnectionString { get; set; }
 
-        public string PlatformId { get; set; } = new AzurePlatform().Id;
-
-        public MessagePlatformType Type { get; set; } = MessagePlatformType.Azure_Queue;
+        public MessagePlatformType Type { get; set; }
 
         public string QueueName { get; set; }
 
@@ -23,6 +23,8 @@ namespace MessageSilo.Shared.Models
 
         public string CorrectorFuncBody { get; set; }
 
-        public bool AutoReEnqueue { get; set; }
+        public string Target { get; set; }
+
+        public string TargetId => string.IsNullOrEmpty(Target) ? null! : $"{Token}|{Target}";
     }
 }

@@ -33,16 +33,34 @@
         font-size: initial;
         clip-path: polygon(0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%, 50% 0%);
         margin-bottom: calc(var(--m) - var(--s)*0.2885);
+        animation: pulse-black 2s infinite;
     }
 
-        .silo-container div:hover {
-            cursor: pointer;
-        }
-
-    .silo-container::before {
-        content: "";
-        width: calc(var(--s)/2 + var(--m));
-        float: left;
-        height: 120%;
-        shape-outside: repeating-linear-gradient( #0000 0 calc(var(--f) - 3px), #000 0 var(--f));
+@keyframes pulse-black {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
     }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    }
+}
+
+.silo-container div:hover {
+    cursor: pointer;
+}
+
+.silo-container::before {
+    content: "";
+    width: calc(var(--s)/2 + var(--m));
+    float: left;
+    height: 120%;
+    shape-outside: repeating-linear-gradient( #0000 0 calc(var(--f) - 3px), #000 0 var(--f));
+}

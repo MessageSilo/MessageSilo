@@ -8,7 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["src/MessageSilo.API/MessageSilo.API.csproj", "src/MessageSilo.API/"]
-COPY ["src/MessageSilo.BlazorApp/MessageSilo.BlazorApp.csproj", "src/MessageSilo.BlazorApp/"]
+#COPY ["src/MessageSilo.BlazorApp/MessageSilo.BlazorApp.csproj", "src/MessageSilo.BlazorApp/"]
 COPY ["src/MessageSilo.Features/MessageSilo.Features.csproj", "src/MessageSilo.Features/"]
 COPY ["src/MessageSilo.Shared/MessageSilo.Shared.csproj", "src/MessageSilo.Shared/"]
 RUN dotnet restore "src/MessageSilo.API/MessageSilo.API.csproj"

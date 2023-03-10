@@ -1,14 +1,10 @@
 ﻿using MessageSilo.Features.Azure;
 using MessageSilo.Features.MessageCorrector;
-using MessageSilo.Features.User;
-using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
-using System;
-using System.Drawing.Imaging;
 
 namespace MessageSilo.Features.Connection
 {
@@ -22,6 +18,8 @@ namespace MessageSilo.Features.Connection
         private IPersistentState<ConnectionState> persistence { get; set; }
 
         private IDisposable timer;
+
+        private IConnectionGrain? targetConnection;
 
         public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory)
         {
@@ -67,6 +65,9 @@ namespace MessageSilo.Features.Connection
 
         private void reInit()
         {
+            if (persistence.State.ConnectionSettings.TargetId is not null)
+                targetConnection = grainFactory.GetGrain<ConnectionGrain>(persistence.State.ConnectionSettings.TargetId);
+
             switch (persistence.State.ConnectionSettings.Type)
             {
                 case MessagePlatformType.Azure_Queue:
@@ -87,7 +88,7 @@ namespace MessageSilo.Features.Connection
         {
             var msgs = await messagePlatformConnection.GetDeadLetterMessagesAsync(persistence.State.LastProcessedMessageSequenceNumber);
 
-            logger.Debug($"Connection: {persistence.State.ConnectionSettings.Name} ({persistence.State.ConnectionSettings.Id}) received {msgs.Count()} dead-lettered messsages.");
+            logger.Debug($"Connection: {persistence.State.ConnectionSettings.Id} received {msgs.Count()} dead-lettered messsages.");
 
             if (msgs.Count() == 0)
                 return;
@@ -96,7 +97,7 @@ namespace MessageSilo.Features.Connection
 
             var messageCorrector = grainFactory.GetGrain<IMessageCorrectorGrain>(Guid.NewGuid());
 
-            messageCorrector.InvokeOneWay(p => p.CorrectMessages(this, msgs.ToList()));
+            messageCorrector.InvokeOneWay(p => p.CorrectMessages(this, msgs.ToList(), targetConnection));
         }
     }
 }

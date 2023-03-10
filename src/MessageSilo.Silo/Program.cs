@@ -1,13 +1,10 @@
 using MessageSilo.Features.Connection;
-using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Models;
-using MessageSilo.Shared.Grains;
-using Orleans;
-using Orleans.Hosting;
-using MessageSilo.Shared.DataAccess;
-using Orleans.Configuration;
-using System.Net;
 using MessageSilo.Features.MessageCorrector;
+using MessageSilo.Shared.DataAccess;
+using Orleans;
+using Orleans.Configuration;
+using Orleans.Hosting;
+using System.Net;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false, true)
@@ -32,7 +29,6 @@ var builder = Host.CreateDefaultBuilder(args)
 
             siloBuilder = siloBuilder.ConfigureApplicationParts(manager =>
             {
-                manager.AddApplicationPart(typeof(IUserGrain).Assembly);
                 manager.AddApplicationPart(typeof(IConnectionGrain).Assembly);
                 manager.AddApplicationPart(typeof(IMessageCorrectorGrain).Assembly);
             })

@@ -40,7 +40,7 @@ namespace MessageSilo.BlazorApp.Services
             return result!.ToList();
         }
 
-        public async Task DeleteConnection(Guid id)
+        public async Task DeleteConnection(string id)
         {
             var result = await httpClient.DeleteAsync($"api/v1/Connection/{id}");
         }

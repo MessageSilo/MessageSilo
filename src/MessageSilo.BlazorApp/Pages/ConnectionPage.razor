@@ -35,17 +35,6 @@
                         </FieldBody>
                     </Field>
                 </Validation>
-                <Field Horizontal>
-                    <FieldLabel ColumnSize="ColumnSize.Is2">Platfrom</FieldLabel>
-                    <FieldBody ColumnSize="ColumnSize.Is10">
-                        <Select TValue="string" @bind-SelectedValue="@ConnectionSettings.PlatformId">
-                            @foreach (var p in Platforms.Where(p => p.Id == "azure"))
-                            {
-                                <SelectItem Value="@p.Id">@p.Title</SelectItem>
-                            }
-                        </Select>
-                    </FieldBody>
-                </Field>
                 <Validation>
                     <Field Horizontal>
                         <FieldLabel ColumnSize="ColumnSize.Is2">Type</FieldLabel>
@@ -118,12 +107,6 @@
                         </FieldBody>
                     </Field>
                 </Validation>
-                <Field Horizontal>
-                    <FieldLabel ColumnSize="ColumnSize.Is2">Automatic Re-Enqueue</FieldLabel>
-                    <FieldBody ColumnSize="ColumnSize.Is10">
-                        <Check @bind-Checked="@ConnectionSettings.AutoReEnqueue" />
-                    </FieldBody>
-                </Field>
                 <Field Horizontal>
                     <FieldLabel ColumnSize="ColumnSize.Is2">Corrector Function</FieldLabel>
                     <FieldBody ColumnSize="ColumnSize.Is10">
