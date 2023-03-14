@@ -21,40 +21,62 @@ namespace MessageSilo.API.Controllers
         }
 
         [HttpGet("User/{token}/Connections")]
-        public async Task<IEnumerable<string>> Index(string token)
+        public async Task<IEnumerable<ConnectionState>> Index(string token)
         {
-            return await repo.QueryConnections(token);
+            var result = new List<ConnectionState>();
+
+            var connectionIds = await repo.QueryConnections(token);
+
+            foreach (var connId in connectionIds)
+            {
+                var conn = client!.GetGrain<IConnectionGrain>(connId);
+                result.Add(await conn.GetState());
+            }
+
+            return result;
         }
 
-        [HttpDelete("/Connections/{id}")]
-        public async Task Delete(string id)
+        [HttpDelete("User/{token}/Connections/{name}")]
+        public async Task Delete(string token, string name)
         {
+            var id = $"{token}|{name}";
             var conn = client!.GetGrain<IConnectionGrain>(id);
             await conn.Delete();
             await repo.DeleteConnections(new[] { id });
         }
 
-        [HttpGet("Connections/{id}")]
-        public async Task<ConnectionState> Show(string id)
+        [HttpGet("User/{token}/Connections/{name}")]
+        public async Task<ConnectionState> Show(string token, string name)
         {
+            var id = $"{token}|{name}";
+            var connectionIds = await repo.QueryConnections(token);
+
+            if (!connectionIds.Contains(id))
+            {
+                httpContextAccessor!.HttpContext!.Response.StatusCode = StatusCodes.Status404NotFound;
+                return null!;
+            }
+
             var conn = client!.GetGrain<IConnectionGrain>(id);
 
             return await conn.GetState();
         }
 
-        [HttpPut("Connections/{id}")]
-        public async Task<ConnectionState> Update(string id, [FromBody] ConnectionSettingsDTO dto)
+        [HttpPut("User/{token}/Connections/{name}")]
+        public async Task<ConnectionState> Update(string token, string name, [FromBody] ConnectionSettingsDTO dto)
         {
-            await repo.AddConnections(new[] { dto.Id });
+            var id = $"{token}|{name}";
+            await repo.AddConnections(new[] { id });
             var conn = client!.GetGrain<IConnectionGrain>(id);
             await conn.Update(dto);
 
             return await conn.GetState();
         }
 
-        [HttpGet("Connections/{id}/Messages")]
-        public async Task<IEnumerable<CorrectedMessage>> ShowMessages(string id, [FromQuery] DateTimeOffset from, [FromQuery] DateTimeOffset to)
+        [HttpGet("User/{token}/Connections/{name}/Messages")]
+        public async Task<IEnumerable<CorrectedMessage>> ShowMessages(string token, string name, [FromQuery] DateTimeOffset from, [FromQuery] DateTimeOffset to)
         {
+            var id = $"{token}|{name}";
             return await messages.Query(id, from, to);
         }
     }

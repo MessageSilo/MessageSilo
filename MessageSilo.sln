@@ -20,9 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.Shared", "src\M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.BlazorApp", "src\MessageSilo.BlazorApp\MessageSilo.BlazorApp.csproj", "{5F146956-96CF-4C12-813A-B894EE26826B}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{C0A8E926-74A3-4F66-A352-3DA626177F65}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSilo.SiloCTL", "src\MessageSilo.SiloCTL\MessageSilo.SiloCTL.csproj", "{A664DD31-8351-47CC-923C-EE5E39030D19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.SiloCTL", "src\MessageSilo.SiloCTL\MessageSilo.SiloCTL.csproj", "{A664DD31-8351-47CC-923C-EE5E39030D19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,9 +48,6 @@ Global
 		{5F146956-96CF-4C12-813A-B894EE26826B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F146956-96CF-4C12-813A-B894EE26826B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F146956-96CF-4C12-813A-B894EE26826B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C0A8E926-74A3-4F66-A352-3DA626177F65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C0A8E926-74A3-4F66-A352-3DA626177F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C0A8E926-74A3-4F66-A352-3DA626177F65}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A664DD31-8351-47CC-923C-EE5E39030D19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A664DD31-8351-47CC-923C-EE5E39030D19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A664DD31-8351-47CC-923C-EE5E39030D19}.Release|Any CPU.ActiveCfg = Release|Any CPU

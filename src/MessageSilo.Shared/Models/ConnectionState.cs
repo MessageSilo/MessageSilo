@@ -10,7 +10,7 @@ namespace MessageSilo.Shared.Models
     {
         public ConnectionSettingsDTO ConnectionSettings { get; set; }
 
-        public bool IsConnected { get; set; }
+        public string Status { get; set; }
 
         public long? LastProcessedMessageSequenceNumber { get; set; }
     }

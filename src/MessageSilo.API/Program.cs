@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Orleans;
 using System.Net;
+using System.Security.Principal;
 
 var builder = WebApplication.CreateBuilder(args);
 

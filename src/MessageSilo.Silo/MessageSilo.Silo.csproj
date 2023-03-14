@@ -5,11 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>9499a9c8-d0ef-44f8-8a96-4e22f8256f93</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>..\..</DockerfileContext>
-    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage" Version="3.6.5" />
     <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">

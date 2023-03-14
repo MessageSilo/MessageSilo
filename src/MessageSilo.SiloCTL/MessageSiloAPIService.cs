@@ -20,32 +20,32 @@ namespace MessageSilo.SiloCTL
             this.httpClient = httpClient;
         }
 
-        public IEnumerable<string> GetConnections(string token)
+        public IEnumerable<ConnectionState> GetConnections(string token)
         {
-            var result = httpClient.GetJson<List<string>>($"User/{token}/Connections");
+            var result = httpClient.GetJson<IEnumerable<ConnectionState>>($"User/{token}/Connections");
             return result!;
         }
 
-        public ConnectionState GetConnection(string id)
+        public ConnectionState? GetConnection(string token, string name)
         {
-            var result = httpClient.GetJson<ConnectionState>($"Connections/{id}");
-            return result!;
+            var result = httpClient.GetJson<ConnectionState>($"User/{token}/Connections/{name}");
+            return result;
         }
 
         public void UpdateConnection(ConnectionSettingsDTO dto)
         {
-            httpClient.PutJson<ConnectionSettingsDTO>($"Connections/{dto.Id}", dto);
+            httpClient.PutJson<ConnectionSettingsDTO>($"User/{dto.Token}/Connections/{dto.Name}", dto);
         }
 
-        public IEnumerable<CorrectedMessage> GetMessages(string connId, DateTimeOffset from, DateTimeOffset to)
+        public IEnumerable<CorrectedMessage> GetMessages(string token, string name, DateTimeOffset from, DateTimeOffset to)
         {
-            var result = httpClient.GetJson<IEnumerable<CorrectedMessage>>($"Connections/{connId}/Messages?from={from.ToString("yyyy-MM-dd HH:mm")}&to={to.ToString("yyyy-MM-dd HH:mm")}");
+            var result = httpClient.GetJson<IEnumerable<CorrectedMessage>>($"User/{token}/Connections/{name}/Messages?from={from.ToString("yyyy-MM-dd HH:mm")}&to={to.ToString("yyyy-MM-dd HH:mm")}");
             return result!;
         }
 
-        public void DeleteConnection(string id)
+        public void DeleteConnection(string token, string name)
         {
-            var request = new RestRequest($"Connections/{id}", Method.Delete);
+            var request = new RestRequest($"User/{token}/Connections/{name}", Method.Delete);
             httpClient.Delete(request);
         }
     }
