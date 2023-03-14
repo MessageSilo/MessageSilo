@@ -47,7 +47,7 @@ namespace QuickStart
                            var conn = api.GetConnection(ctlConfig.Token, o.ConnectionName);
 
                            if (conn is not null)
-                               Console.WriteLine(conn.ConnectionSettings.Name);
+                               Console.WriteLine(conn);
                            else
                                Console.WriteLine($"Connection '{o.ConnectionName}' not found.");
 

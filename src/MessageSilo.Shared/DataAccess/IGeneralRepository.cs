@@ -13,6 +13,6 @@ namespace MessageSilo.Shared.DataAccess
 
         Task DeleteConnections(IEnumerable<string> connectionIds);
 
-        Task<IEnumerable<string>> QueryConnections(string token);
+        Task<IEnumerable<string>> QueryConnections(string? token = null);
     }
 }

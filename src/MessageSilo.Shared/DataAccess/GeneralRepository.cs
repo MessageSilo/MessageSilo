@@ -38,9 +38,9 @@ namespace MessageSilo.Shared.DataAccess
             }
         }
 
-        public async Task<IEnumerable<string>> QueryConnections(string token)
+        public async Task<IEnumerable<string>> QueryConnections(string? token = null)
         {
-            var result = tableClient.Query<TableEntity>(p => p.PartitionKey == token);
+            var result = token is null ? tableClient.Query<TableEntity>() : tableClient.Query<TableEntity>(p => p.PartitionKey == token);
 
             return await Task.FromResult(result.Select(p => p.RowKey));
         }

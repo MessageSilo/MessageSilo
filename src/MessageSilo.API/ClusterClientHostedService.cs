@@ -1,4 +1,6 @@
 ﻿using MessageSilo.API.Controllers;
+using MessageSilo.Features.Connection;
+using MessageSilo.Shared.DataAccess;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
@@ -13,9 +15,12 @@ namespace MessageSilo.API
 
         protected readonly ILogger<ClusterClientHostedService> logger;
 
-        public ClusterClientHostedService(ILoggerProvider loggerProvider, IConfiguration configuration, ILogger<ClusterClientHostedService> logger)
+        protected readonly IGeneralRepository repo;
+
+        public ClusterClientHostedService(ILoggerProvider loggerProvider, IConfiguration configuration, ILogger<ClusterClientHostedService> logger, IGeneralRepository repo)
         {
             this.logger = logger;
+            this.repo = repo;
 
             IClientBuilder clientBuilder = new ClientBuilder();
 
@@ -41,6 +46,15 @@ namespace MessageSilo.API
         {
             // A retry filter could be provided here.
             await Client.Connect();
+
+            //Init connections
+            var connectionIds = await repo.QueryConnections();
+
+            foreach (var connId in connectionIds)
+            {
+                Client.GetGrain<IConnectionGrain>(connId);
+                logger.LogInformation($"Connection ({connId}) initialized.");
+            }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

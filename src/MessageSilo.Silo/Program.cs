@@ -48,6 +48,3 @@ builder.ConfigureServices(services =>
 var app = builder.Build();
 
 app.Run();
-
-if (siloIP.Equals(IPAddress.Loopback))
-    Console.ReadKey();

@@ -30,6 +30,8 @@ namespace MessageSilo.Features.Connection
 
         public override Task OnActivateAsync()
         {
+            this.persistence.State.Status = ConnectionStatus.Created;
+
             if (this.persistence.RecordExists)
                 reInit();
 
@@ -65,23 +67,33 @@ namespace MessageSilo.Features.Connection
 
         private void reInit()
         {
-            if (persistence.State.ConnectionSettings.TargetId is not null)
-                targetConnection = grainFactory.GetGrain<ConnectionGrain>(persistence.State.ConnectionSettings.TargetId);
-
-            switch (persistence.State.ConnectionSettings.Type)
+            try
             {
-                case MessagePlatformType.Azure_Queue:
-                    messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName);
-                    break;
-                case MessagePlatformType.Azure_Topic:
-                    messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.TopicName, persistence.State.ConnectionSettings.SubscriptionName);
-                    break;
+                if (persistence.State.ConnectionSettings.TargetId is not null)
+                    targetConnection = grainFactory.GetGrain<ConnectionGrain>(persistence.State.ConnectionSettings.TargetId);
+
+                switch (persistence.State.ConnectionSettings.Type)
+                {
+                    case MessagePlatformType.Azure_Queue:
+                        messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName);
+                        break;
+                    case MessagePlatformType.Azure_Topic:
+                        messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.TopicName, persistence.State.ConnectionSettings.SubscriptionName);
+                        break;
+                }
+
+                messagePlatformConnection!.InitDeadLetterCorrector();
+
+                if (timer is null)
+                    timer = RegisterTimer(processMessagesAsync, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
+
+                persistence.State.Status = ConnectionStatus.Connected;
             }
-
-            messagePlatformConnection!.InitDeadLetterCorrector();
-
-            if (timer is null)
-                timer = RegisterTimer(processMessagesAsync, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
+            catch (Exception ex)
+            {
+                persistence.State.Status = ConnectionStatus.Error;
+                logger.LogError(ex.Message);
+            }
         }
 
         private async Task processMessagesAsync(object state)
