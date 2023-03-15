@@ -70,7 +70,7 @@ namespace MessageSilo.Features.Connection
             try
             {
                 if (persistence.State.ConnectionSettings.TargetId is not null)
-                    targetConnection = grainFactory.GetGrain<ConnectionGrain>(persistence.State.ConnectionSettings.TargetId);
+                    targetConnection = grainFactory.GetGrain<IConnectionGrain>(persistence.State.ConnectionSettings.TargetId);
 
                 switch (persistence.State.ConnectionSettings.Type)
                 {
