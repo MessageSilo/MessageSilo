@@ -1,0 +1,34 @@
+name: siloctl
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore
+      working-directory: ./src/MessageSilo.SiloCTL
+      run: dotnet restore
+    - name: Build
+      working-directory: ./src/MessageSilo.SiloCTL
+      run: dotnet build --no-restore
+    - name: Publish - WINDOWS
+      working-directory: ./src/MessageSilo.SiloCTL
+      run: dotnet publish -r win-x64 -sc --no-restore
+    - name: Publish - OSX
+      working-directory: ./src/MessageSilo.SiloCTL
+      run: dotnet publish -r osx-x64 -sc --no-restore
+    - name: Publish - LINUX
+      working-directory: ./src/MessageSilo.SiloCTL
+      run: dotnet publish -r linux-x64 -sc --no-restore
