@@ -19,7 +19,7 @@ jobs:
         dotnet-version: 6.0.x
     - name: Build
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet build --no-restore
+      run: dotnet build
     - name: Publish - WINDOWS
       working-directory: ./src/MessageSilo.SiloCTL
       run: dotnet publish -r win-x64 --sc
