@@ -17,4 +17,8 @@
     <PackageReference Include="Microsoft.Orleans.Runtime.Abstractions" Version="3.6.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Orleans_CodeGenInputs Remove="Models\MessageReceivedEventArgs.cs" />
+  </ItemGroup>
+
 </Project>

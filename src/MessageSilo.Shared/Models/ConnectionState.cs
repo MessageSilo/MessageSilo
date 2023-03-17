@@ -13,8 +13,6 @@ namespace MessageSilo.Shared.Models
 
         public ConnectionStatus Status { get; set; }
 
-        public long? LastProcessedMessageSequenceNumber { get; set; }
-
         public override string ToString()
         {
             var sb = new StringBuilder();

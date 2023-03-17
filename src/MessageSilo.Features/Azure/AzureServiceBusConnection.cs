@@ -3,6 +3,8 @@ using CsvHelper;
 using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace MessageSilo.Features.Azure
 {
@@ -10,9 +12,11 @@ namespace MessageSilo.Features.Azure
     {
         private ServiceBusClient client;
 
-        private ServiceBusReceiver deadLetterReceiver;
+        private ServiceBusProcessor deadLetterProcessor;
 
         private ServiceBusSender sender;
+
+        private readonly ILogger logger;
 
         private const int MAX_NUMBER_OF_MESSAGES = 100;
 
@@ -22,43 +26,54 @@ namespace MessageSilo.Features.Azure
 
         public string SubscriptionName { get; }
 
-        public AzureServiceBusConnection(string connectionString, string queueName)
+        public AzureServiceBusConnection(string connectionString, string queueName, ILogger logger)
         {
             ConnectionString = connectionString;
             QueueName = queueName;
             Type = MessagePlatformType.Azure_Queue;
+            this.logger = logger;
         }
 
-        public AzureServiceBusConnection(string connectionString, string topicName, string subscriptionName)
+        public AzureServiceBusConnection(string connectionString, string topicName, string subscriptionName, ILogger logger)
         {
             ConnectionString = connectionString;
             TopicName = topicName;
             SubscriptionName = subscriptionName;
             Type = MessagePlatformType.Azure_Topic;
+            this.logger = logger;
         }
 
-        public override void InitDeadLetterCorrector()
+        public override async Task InitDeadLetterCorrector()
         {
             client = new ServiceBusClient(ConnectionString);
 
             switch (Type)
             {
                 case MessagePlatformType.Azure_Queue:
-                    deadLetterReceiver = client.CreateReceiver(QueueName, new ServiceBusReceiverOptions() { SubQueue = SubQueue.DeadLetter });
+                    deadLetterProcessor = client.CreateProcessor(QueueName, new ServiceBusProcessorOptions() { SubQueue = SubQueue.DeadLetter, ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete });
                     sender = client.CreateSender(QueueName);
                     break;
                 case MessagePlatformType.Azure_Topic:
-                    deadLetterReceiver = client.CreateReceiver(TopicName, SubscriptionName, new ServiceBusReceiverOptions() { SubQueue = SubQueue.DeadLetter });
+                    deadLetterProcessor = client.CreateProcessor(TopicName, SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = SubQueue.DeadLetter, ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete });
                     sender = client.CreateSender(TopicName);
                     break;
             }
+
+            deadLetterProcessor.ProcessMessageAsync += processMessageAsync;
+            deadLetterProcessor.ProcessErrorAsync += processErrorAsync;
+            await deadLetterProcessor.StartProcessingAsync();
         }
 
-        public override async Task<IEnumerable<Message>> GetDeadLetterMessagesAsync(long? lastProcessedMessageSequenceNumber)
+        private Task processErrorAsync(ProcessErrorEventArgs arg)
         {
-            var msgs = await deadLetterReceiver.PeekMessagesAsync(MAX_NUMBER_OF_MESSAGES, lastProcessedMessageSequenceNumber + 1);
+            logger.LogError(arg.Exception, "deadLetterProcessor");
+            return Task.CompletedTask;
+        }
 
-            return msgs.Select(p => new Message(p.MessageId, p.EnqueuedTime, p.Body.ToString(), p.SequenceNumber));
+        private Task processMessageAsync(ProcessMessageEventArgs arg)
+        {
+            OnMessageReceived(new MessageReceivedEventArgs(new Message(arg.Message.MessageId, arg.Message.EnqueuedTime, arg.Message.Body.ToString())));
+            return Task.CompletedTask;
         }
 
         public override async Task Enqueue(string msgBody)
@@ -71,8 +86,8 @@ namespace MessageSilo.Features.Azure
 
         public override async ValueTask DisposeAsync()
         {
-            if (deadLetterReceiver is not null)
-                await deadLetterReceiver.DisposeAsync();
+            if (deadLetterProcessor is not null)
+                await deadLetterProcessor.DisposeAsync();
 
             if (client is not null)
                 await client.DisposeAsync();

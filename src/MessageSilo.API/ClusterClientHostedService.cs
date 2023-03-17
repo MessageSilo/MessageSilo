@@ -52,7 +52,8 @@ namespace MessageSilo.API
 
             foreach (var connId in connectionIds)
             {
-                Client.GetGrain<IConnectionGrain>(connId);
+                var conn = Client.GetGrain<IConnectionGrain>(connId);
+                await conn.GetState();
                 logger.LogInformation($"Connection ({connId}) initialized.");
             }
         }

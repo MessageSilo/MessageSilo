@@ -79,9 +79,7 @@ namespace QuickStart
                        }
 
                        //Cleanup
-                       var deletableConns = existingConnections.Where(ec => !connectionSettings.Any(p => ec.ConnectionSettings.Id == p.Id));
-
-                       foreach (var deletableConn in deletableConns)
+                       foreach (var deletableConn in existingConnections)
                        {
                            api.DeleteConnection(deletableConn.ConnectionSettings.Token, deletableConn.ConnectionSettings.Name);
                        }

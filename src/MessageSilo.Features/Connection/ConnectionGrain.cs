@@ -17,9 +17,9 @@ namespace MessageSilo.Features.Connection
         private IMessagePlatformConnection messagePlatformConnection;
         private IPersistentState<ConnectionState> persistence { get; set; }
 
-        private IDisposable timer;
-
         private IConnectionGrain? targetConnection;
+
+        private IDisposable healthTimer;
 
         public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory)
         {
@@ -35,6 +35,9 @@ namespace MessageSilo.Features.Connection
             if (this.persistence.RecordExists)
                 reInit();
 
+            if (healthTimer is null)
+                healthTimer = RegisterTimer(healthCheck, null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(10));
+
             return base.OnActivateAsync();
         }
 
@@ -47,10 +50,11 @@ namespace MessageSilo.Features.Connection
 
         public async Task Delete()
         {
-            timer?.Dispose();
-
             if (messagePlatformConnection is not null)
                 await messagePlatformConnection.DisposeAsync();
+
+            if (healthTimer is not null)
+                healthTimer.Dispose();
 
             await this.persistence.ClearStateAsync();
         }
@@ -75,17 +79,16 @@ namespace MessageSilo.Features.Connection
                 switch (persistence.State.ConnectionSettings.Type)
                 {
                     case MessagePlatformType.Azure_Queue:
-                        messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName);
+                        messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName, logger);
                         break;
                     case MessagePlatformType.Azure_Topic:
-                        messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.TopicName, persistence.State.ConnectionSettings.SubscriptionName);
+                        messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.TopicName, persistence.State.ConnectionSettings.SubscriptionName, logger);
                         break;
                 }
 
-                messagePlatformConnection!.InitDeadLetterCorrector();
+                messagePlatformConnection.MessageReceived += messageReceived;
 
-                if (timer is null)
-                    timer = RegisterTimer(processMessagesAsync, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
+                messagePlatformConnection.InitDeadLetterCorrector();
 
                 persistence.State.Status = ConnectionStatus.Connected;
             }
@@ -96,20 +99,21 @@ namespace MessageSilo.Features.Connection
             }
         }
 
-        private async Task processMessagesAsync(object state)
+        private void messageReceived(object? sender, EventArgs e)
         {
-            var msgs = await messagePlatformConnection.GetDeadLetterMessagesAsync(persistence.State.LastProcessedMessageSequenceNumber);
+            var msg = (e as MessageReceivedEventArgs)!.Message;
 
-            logger.Debug($"Connection: {persistence.State.ConnectionSettings.Id} received {msgs.Count()} dead-lettered messsages.");
+            logger.Debug($"Connection: {this.GetPrimaryKeyString()} received a dead-lettered messsage: {msg.Id}.");
 
-            if (msgs.Count() == 0)
-                return;
+            var messageCorrector = grainFactory.GetGrain<IMessageCorrectorGrain>($"{this.GetPrimaryKeyString()}|corrector");
 
-            persistence.State.LastProcessedMessageSequenceNumber = msgs.Max(msg => msg.SequenceNumber);
+            messageCorrector.InvokeOneWay(p => p.CorrectMessage(this, msg, targetConnection));
+        }
 
-            var messageCorrector = grainFactory.GetGrain<IMessageCorrectorGrain>(Guid.NewGuid());
-
-            messageCorrector.InvokeOneWay(p => p.CorrectMessages(this, msgs.ToList(), targetConnection));
+        private Task healthCheck(object state)
+        {
+            logger.Info($"Connection: {this.GetPrimaryKeyString()} is healthy.");
+            return Task.CompletedTask;
         }
     }
 }

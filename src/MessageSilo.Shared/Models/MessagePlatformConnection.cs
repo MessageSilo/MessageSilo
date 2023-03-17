@@ -10,9 +10,14 @@ namespace MessageSilo.Shared.Models
 
         public MessagePlatformType Type { get; protected set; }
 
-        public abstract void InitDeadLetterCorrector();
+        public event EventHandler MessageReceived;
 
-        public abstract Task<IEnumerable<Message>> GetDeadLetterMessagesAsync(long? lastProcessedMessageSequenceNumber);
+        protected virtual void OnMessageReceived(MessageReceivedEventArgs e)
+        {
+            MessageReceived?.Invoke(this, e);
+        }
+
+        public abstract Task InitDeadLetterCorrector();
 
         public abstract Task Enqueue(string msgBody);
 

@@ -26,5 +26,7 @@ namespace MessageSilo.Shared.Models
         public string Target { get; set; }
 
         public string TargetId => string.IsNullOrEmpty(Target) ? null! : $"{Token}|{Target}";
+
+        public bool DeleteProcessedMessages { get; set; }
     }
 }

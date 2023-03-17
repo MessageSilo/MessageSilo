@@ -4,8 +4,8 @@ using Orleans;
 
 namespace MessageSilo.Features.MessageCorrector
 {
-    public interface IMessageCorrectorGrain : IGrainWithGuidKey
+    public interface IMessageCorrectorGrain : IGrainWithStringKey
     {
-        Task CorrectMessages(IConnectionGrain sourceConnection, List<Message> msgs, IConnectionGrain? targetConnection = null);
+        Task CorrectMessage(IConnectionGrain sourceConnection, Message msg, IConnectionGrain? targetConnection = null);
     }
 }
