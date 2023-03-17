@@ -25,10 +25,10 @@ jobs:
       run: dotnet build --no-restore
     - name: Publish - WINDOWS
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -r win-x64 -sc --no-restore
+      run: dotnet publish -r win-x64 --sc --no-restore
     - name: Publish - OSX
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -r osx-x64 -sc --no-restore
+      run: dotnet publish -r osx-x64 --sc --no-restore
     - name: Publish - LINUX
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -r linux-x64 -sc --no-restore
+      run: dotnet publish -r linux-x64 --sc --no-restore
