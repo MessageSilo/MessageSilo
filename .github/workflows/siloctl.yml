@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-publish:
 
     runs-on: ubuntu-latest
 
@@ -17,18 +17,15 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-    - name: Restore
-      working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet restore
     - name: Build
       working-directory: ./src/MessageSilo.SiloCTL
       run: dotnet build --no-restore
     - name: Publish - WINDOWS
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -r win-x64 --sc --no-restore
+      run: dotnet publish -r win-x64 --sc
     - name: Publish - OSX
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -r osx-x64 --sc --no-restore
+      run: dotnet publish -r osx-x64 --sc
     - name: Publish - LINUX
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -r linux-x64 --sc --no-restore
+      run: dotnet publish -r linux-x64 --sc
