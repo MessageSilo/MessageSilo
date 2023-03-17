@@ -89,6 +89,9 @@ namespace MessageSilo.Features.Azure
             if (deadLetterProcessor is not null)
                 await deadLetterProcessor.DisposeAsync();
 
+            if (sender is not null)
+                await sender.DisposeAsync();
+
             if (client is not null)
                 await client.DisposeAsync();
         }

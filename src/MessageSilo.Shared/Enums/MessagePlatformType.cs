@@ -11,6 +11,9 @@ namespace MessageSilo.Shared.Enums
         Azure_Topic,
 
         [Description("SQS")]
-        AWS_SQS
+        AWS_SQS,
+
+        [Description("RabbitMQ")]
+        RabbitMQ
     }
 }

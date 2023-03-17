@@ -1,5 +1,6 @@
 ﻿using MessageSilo.Features.Azure;
 using MessageSilo.Features.MessageCorrector;
+using MessageSilo.Features.RabbitMQ;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
@@ -83,6 +84,9 @@ namespace MessageSilo.Features.Connection
                         break;
                     case MessagePlatformType.Azure_Topic:
                         messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.TopicName, persistence.State.ConnectionSettings.SubscriptionName, logger);
+                        break;
+                    case MessagePlatformType.RabbitMQ:
+                        messagePlatformConnection = new RabbitMQConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName, logger);
                         break;
                 }
 
