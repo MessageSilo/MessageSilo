@@ -1,4 +1,5 @@
-﻿using MessageSilo.Shared.Enums;
+﻿using Azure.Messaging.ServiceBus;
+using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
@@ -21,10 +22,13 @@ namespace MessageSilo.Features.RabbitMQ
 
         public string QueueName { get; }
 
-        public RabbitMQConnection(string connectionString, string queueName, ILogger logger)
+        public string ExchangeName { get; }
+
+        public RabbitMQConnection(string connectionString, string queueName, string exchangeName, ILogger logger)
         {
             ConnectionString = connectionString;
             QueueName = queueName;
+            ExchangeName = exchangeName;
             this.logger = logger;
         }
 
@@ -39,9 +43,14 @@ namespace MessageSilo.Features.RabbitMQ
             await Task.CompletedTask;
         }
 
-        public override Task Enqueue(string msgBody)
+        public override async Task Enqueue(string msgBody)
         {
-            throw new NotImplementedException();
+            channel.BasicPublish(exchange: ExchangeName,
+                     routingKey: string.Empty,
+                     basicProperties: channel.CreateBasicProperties(),
+                     body: Encoding.UTF8.GetBytes(msgBody));
+
+            await Task.CompletedTask;
         }
 
         public override async Task InitDeadLetterCorrector()

@@ -79,8 +79,6 @@ namespace MessageSilo.Features.Azure
         public override async Task Enqueue(string msgBody)
         {
             var msg = new ServiceBusMessage(msgBody);
-            msg.ApplicationProperties.Add("IsHandledByMessageSilo", true);
-
             await sender.SendMessageAsync(msg);
         }
 

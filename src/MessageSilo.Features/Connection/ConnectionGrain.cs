@@ -86,7 +86,7 @@ namespace MessageSilo.Features.Connection
                         messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.TopicName, persistence.State.ConnectionSettings.SubscriptionName, logger);
                         break;
                     case MessagePlatformType.RabbitMQ:
-                        messagePlatformConnection = new RabbitMQConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName, logger);
+                        messagePlatformConnection = new RabbitMQConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName, persistence.State.ConnectionSettings.ExchangeName, logger);
                         break;
                 }
 
