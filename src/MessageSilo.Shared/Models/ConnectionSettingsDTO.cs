@@ -25,11 +25,15 @@ namespace MessageSilo.Shared.Models
 
         public string TargetId => string.IsNullOrEmpty(Target) ? null! : $"{Token}|{Target}";
 
+        public bool AutoAck { get; set; }
+
         //Azure
 
         public string TopicName { get; set; }
 
         public string SubscriptionName { get; set; }
+
+        public string SubQueue { get; set; }
 
         //RabbitMQ
 

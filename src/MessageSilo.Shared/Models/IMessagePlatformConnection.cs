@@ -12,7 +12,7 @@ namespace MessageSilo.Shared.Models
 
         event EventHandler MessageReceived;
 
-        Task InitDeadLetterCorrector();
+        Task Init();
 
         Task Enqueue(string msgBody);
     }

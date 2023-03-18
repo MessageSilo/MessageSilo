@@ -24,11 +24,12 @@ namespace MessageSilo.Features.RabbitMQ
 
         public string ExchangeName { get; }
 
-        public RabbitMQConnection(string connectionString, string queueName, string exchangeName, ILogger logger)
+        public RabbitMQConnection(string connectionString, string queueName, string exchangeName, bool autoAck, ILogger logger)
         {
             ConnectionString = connectionString;
             QueueName = queueName;
             ExchangeName = exchangeName;
+            AutoAck = autoAck;
             this.logger = logger;
         }
 
@@ -53,7 +54,7 @@ namespace MessageSilo.Features.RabbitMQ
             await Task.CompletedTask;
         }
 
-        public override async Task InitDeadLetterCorrector()
+        public override async Task Init()
         {
             var factory = new ConnectionFactory { Uri = new Uri(ConnectionString) };
             connection = factory.CreateConnection();
@@ -71,7 +72,7 @@ namespace MessageSilo.Features.RabbitMQ
             };
 
             channel.BasicConsume(queue: QueueName,
-                                 autoAck: true,
+                                 autoAck: AutoAck,
                                  consumer: consumer);
 
             await Task.CompletedTask;

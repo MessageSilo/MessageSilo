@@ -6,6 +6,7 @@ using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
+using System.Runtime;
 
 namespace MessageSilo.Features.Connection
 {
@@ -74,25 +75,27 @@ namespace MessageSilo.Features.Connection
         {
             try
             {
-                if (persistence.State.ConnectionSettings.TargetId is not null)
-                    targetConnection = grainFactory.GetGrain<IConnectionGrain>(persistence.State.ConnectionSettings.TargetId);
+                var settings = persistence.State.ConnectionSettings;
 
-                switch (persistence.State.ConnectionSettings.Type)
+                if (settings.TargetId is not null)
+                    targetConnection = grainFactory.GetGrain<IConnectionGrain>(settings.TargetId);
+
+                switch (settings.Type)
                 {
                     case MessagePlatformType.Azure_Queue:
-                        messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName, logger);
+                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.QueueName, settings.SubQueue, logger);
                         break;
                     case MessagePlatformType.Azure_Topic:
-                        messagePlatformConnection = new AzureServiceBusConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.TopicName, persistence.State.ConnectionSettings.SubscriptionName, logger);
+                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.TopicName, settings.SubscriptionName, settings.SubQueue, logger);
                         break;
                     case MessagePlatformType.RabbitMQ:
-                        messagePlatformConnection = new RabbitMQConnection(persistence.State.ConnectionSettings.ConnectionString, persistence.State.ConnectionSettings.QueueName, persistence.State.ConnectionSettings.ExchangeName, logger);
+                        messagePlatformConnection = new RabbitMQConnection(settings.ConnectionString, settings.QueueName, settings.ExchangeName, settings.AutoAck, logger);
                         break;
                 }
 
                 messagePlatformConnection.MessageReceived += messageReceived;
 
-                messagePlatformConnection.InitDeadLetterCorrector();
+                messagePlatformConnection.Init();
 
                 persistence.State.Status = ConnectionStatus.Connected;
             }
@@ -107,7 +110,7 @@ namespace MessageSilo.Features.Connection
         {
             var msg = (e as MessageReceivedEventArgs)!.Message;
 
-            logger.Debug($"Connection: {this.GetPrimaryKeyString()} received a dead-lettered messsage: {msg.Id}.");
+            logger.Debug($"Connection: {this.GetPrimaryKeyString()} received a messsage: {msg.Id}.");
 
             var messageCorrector = grainFactory.GetGrain<IMessageCorrectorGrain>($"{this.GetPrimaryKeyString()}|corrector");
 

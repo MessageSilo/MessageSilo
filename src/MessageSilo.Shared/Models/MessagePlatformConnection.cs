@@ -10,6 +10,8 @@ namespace MessageSilo.Shared.Models
 
         public MessagePlatformType Type { get; protected set; }
 
+        public bool AutoAck { get; protected set; }
+
         public event EventHandler MessageReceived;
 
         protected virtual void OnMessageReceived(MessageReceivedEventArgs e)
@@ -17,7 +19,7 @@ namespace MessageSilo.Shared.Models
             MessageReceived?.Invoke(this, e);
         }
 
-        public abstract Task InitDeadLetterCorrector();
+        public abstract Task Init();
 
         public abstract Task Enqueue(string msgBody);
 

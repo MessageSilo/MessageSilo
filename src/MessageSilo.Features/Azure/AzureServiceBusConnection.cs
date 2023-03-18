@@ -5,6 +5,7 @@ using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 using System;
+using SQ = Azure.Messaging.ServiceBus.SubQueue;
 
 namespace MessageSilo.Features.Azure
 {
@@ -12,13 +13,11 @@ namespace MessageSilo.Features.Azure
     {
         private ServiceBusClient client;
 
-        private ServiceBusProcessor deadLetterProcessor;
+        private ServiceBusProcessor processor;
 
         private ServiceBusSender sender;
 
         private readonly ILogger logger;
-
-        private const int MAX_NUMBER_OF_MESSAGES = 100;
 
         public string QueueName { get; }
 
@@ -26,42 +25,48 @@ namespace MessageSilo.Features.Azure
 
         public string SubscriptionName { get; }
 
-        public AzureServiceBusConnection(string connectionString, string queueName, ILogger logger)
+        public string SubQueue { get; }
+
+        private SQ sq => SubQueue == "DeadLetter" ? SQ.DeadLetter : SQ.None;
+
+        public AzureServiceBusConnection(string connectionString, string queueName, string subQueue, ILogger logger)
         {
             ConnectionString = connectionString;
             QueueName = queueName;
+            SubQueue = subQueue;
             Type = MessagePlatformType.Azure_Queue;
             this.logger = logger;
         }
 
-        public AzureServiceBusConnection(string connectionString, string topicName, string subscriptionName, ILogger logger)
+        public AzureServiceBusConnection(string connectionString, string topicName, string subscriptionName, string subQueue, ILogger logger)
         {
             ConnectionString = connectionString;
             TopicName = topicName;
             SubscriptionName = subscriptionName;
+            SubQueue = subQueue;
             Type = MessagePlatformType.Azure_Topic;
             this.logger = logger;
         }
 
-        public override async Task InitDeadLetterCorrector()
+        public override async Task Init()
         {
             client = new ServiceBusClient(ConnectionString);
 
             switch (Type)
             {
                 case MessagePlatformType.Azure_Queue:
-                    deadLetterProcessor = client.CreateProcessor(QueueName, new ServiceBusProcessorOptions() { SubQueue = SubQueue.DeadLetter, ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete });
+                    processor = client.CreateProcessor(QueueName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete });
                     sender = client.CreateSender(QueueName);
                     break;
                 case MessagePlatformType.Azure_Topic:
-                    deadLetterProcessor = client.CreateProcessor(TopicName, SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = SubQueue.DeadLetter, ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete });
+                    processor = client.CreateProcessor(TopicName, SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete });
                     sender = client.CreateSender(TopicName);
                     break;
             }
 
-            deadLetterProcessor.ProcessMessageAsync += processMessageAsync;
-            deadLetterProcessor.ProcessErrorAsync += processErrorAsync;
-            await deadLetterProcessor.StartProcessingAsync();
+            processor.ProcessMessageAsync += processMessageAsync;
+            processor.ProcessErrorAsync += processErrorAsync;
+            await processor.StartProcessingAsync();
         }
 
         private Task processErrorAsync(ProcessErrorEventArgs arg)
@@ -84,8 +89,8 @@ namespace MessageSilo.Features.Azure
 
         public override async ValueTask DisposeAsync()
         {
-            if (deadLetterProcessor is not null)
-                await deadLetterProcessor.DisposeAsync();
+            if (processor is not null)
+                await processor.DisposeAsync();
 
             if (sender is not null)
                 await sender.DisposeAsync();
