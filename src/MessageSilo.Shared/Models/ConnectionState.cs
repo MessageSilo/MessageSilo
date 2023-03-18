@@ -17,30 +17,30 @@ namespace MessageSilo.Shared.Models
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine($"Name:   {ConnectionSettings.Name}");
-            sb.AppendLine($"Type:   {ConnectionSettings.Type}");
-            sb.AppendLine($"Status: {Status}");
+            sb.AppendLine($"Name:               {ConnectionSettings.Name}");
+            sb.AppendLine($"Type:               {ConnectionSettings.Type}");
+            sb.AppendLine($"Status:             {Status}");
             sb.AppendLine($"---");
-            sb.AppendLine($"ConnectionString: {ConnectionSettings.ConnectionString}");
-            sb.AppendLine($"QueueName: {ConnectionSettings.QueueName}");
+            sb.AppendLine($"ConnectionString:   {ConnectionSettings.ConnectionString}");
+            sb.AppendLine($"QueueName:          {ConnectionSettings.QueueName}");
 
             switch (ConnectionSettings.Type)
             {
                 case MessagePlatformType.Azure_Queue:
-                    sb.AppendLine($"SubQueue: {ConnectionSettings.SubQueue}");
+                    sb.AppendLine($"SubQueue:           {ConnectionSettings.SubQueue}");
                     break;
                 case MessagePlatformType.Azure_Topic:
-                    sb.AppendLine($"TopicName: {ConnectionSettings.TopicName}");
-                    sb.AppendLine($"SubscriptionName: {ConnectionSettings.SubscriptionName}");
-                    sb.AppendLine($"SubQueue: {ConnectionSettings.SubQueue}");
+                    sb.AppendLine($"TopicName:          {ConnectionSettings.TopicName}");
+                    sb.AppendLine($"SubscriptionName:   {ConnectionSettings.SubscriptionName}");
+                    sb.AppendLine($"SubQueue:           {ConnectionSettings.SubQueue}");
                     break;
                 case MessagePlatformType.RabbitMQ:
-                    sb.AppendLine($"ExchangeName: {ConnectionSettings.ExchangeName}");
+                    sb.AppendLine($"ExchangeName:       {ConnectionSettings.ExchangeName}");
                     break;
             }
 
-            sb.AppendLine($"CorrectorFuncBody: {ConnectionSettings.CorrectorFuncBody}");
-            sb.AppendLine($"AutoAck: {ConnectionSettings.AutoAck}");
+            sb.AppendLine($"CorrectorFuncBody:  {ConnectionSettings.CorrectorFuncBody}");
+            sb.AppendLine($"AutoAck:            {ConnectionSettings.AutoAck}");
 
             return sb.ToString();
         }

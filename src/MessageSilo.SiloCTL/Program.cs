@@ -23,6 +23,12 @@ namespace QuickStart
             public string ConnectionName { get; set; }
         }
 
+        [Verb("show config", HelpText = "Display the current config and context.")]
+        public class ShowConfig
+        {
+
+        }
+
         [Verb("delete", HelpText = "Delete one or many connections.")]
         public class DeleteOptions
         {
@@ -35,7 +41,14 @@ namespace QuickStart
             var ctlConfig = new CTLConfig();
             ctlConfig.Init();
 
-            var api = new MessageSiloAPIService(new RestClient("https://localhost:5000/api/v1"));
+            Parser.Default.ParseArguments<ShowConfig>(args)
+                .WithParsed<ShowConfig>(o =>
+                {
+                    Console.WriteLine(ctlConfig);
+                    Environment.Exit(0);
+                });
+
+            var api = new MessageSiloAPIService(new RestClient(ctlConfig.ApiUrl));
 
             var existingConnections = api.GetConnections(ctlConfig.Token);
 

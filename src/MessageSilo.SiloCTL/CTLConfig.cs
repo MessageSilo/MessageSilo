@@ -15,6 +15,8 @@ namespace MessageSilo.SiloCTL
 
         public string Token { get; private set; }
 
+        public string ApiUrl { get; private set; } = "https://localhost:5000/api/v1";
+
         private ConfigReader configReader;
 
         private ConfigParser configParser;
@@ -41,6 +43,16 @@ namespace MessageSilo.SiloCTL
 
             var existing = configParser.ConvertFromYAML<CTLConfig>(configReader.FileContents.First());
             Token = existing.Token;
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"Token:  {Token}");
+            sb.AppendLine($"ApiUrl: {ApiUrl}");
+
+            return sb.ToString();
         }
     }
 }
