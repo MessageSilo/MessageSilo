@@ -25,7 +25,7 @@ jobs:
       name: approvers
     runs-on: ubuntu-latest
     steps:
-    - name: manual approve
+    - name: Manual Approve
       run: |
         echo "Approved"
         
