@@ -22,15 +22,15 @@ jobs:
       run: dotnet build
     - name: Publish - WINDOWS
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -c Release -r win-x64 --sc -o "/home/publish"
+      run: dotnet publish -c Release -r win-x64 --sc -o "/home/runner/work/MessageSilo/publish"
     - name: Publish - OSX
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -c Release -r osx-x64 --sc -o "/home/publish"
+      run: dotnet publish -c Release -r osx-x64 --sc -o "/home/runner/work/MessageSilo/publish"
     - name: Publish - LINUX
       working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -c Release -r linux-x64 --sc -o "/home/publish"
+      run: dotnet publish -c Release -r linux-x64 --sc -o "/home/runner/work/MessageSilo/publish"
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v3.1.2
       with:
         name: ciloctl-artifacts
-        path: "/home/publish"
+        path: "/home/runner/work/MessageSilo/publish"
