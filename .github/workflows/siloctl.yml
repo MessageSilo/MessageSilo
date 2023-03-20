@@ -7,10 +7,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-publish:
-
+  build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -20,6 +18,20 @@ jobs:
     - name: Build
       working-directory: ./src/MessageSilo.SiloCTL
       run: dotnet build
+     
+  approve:
+    needs: build
+    environment:
+      name: approvers
+    runs-on: ubuntu-latest
+    steps:
+    - name: manual approve
+      run: |
+        echo "Approved"
+        
+  publish:  
+    runs-on: ubuntu-latest
+    steps: 
     - name: Publish - WINDOWS
       working-directory: ./src/MessageSilo.SiloCTL
       run: dotnet publish -c Release -r win-x64 --sc -o "/home/runner/work/MessageSilo/publish/win-x64"
