@@ -30,6 +30,7 @@ jobs:
         echo "Approved"
         
   publish:  
+    needs: approve
     runs-on: ubuntu-latest
     steps: 
     - name: Publish - WINDOWS
