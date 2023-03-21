@@ -41,8 +41,6 @@ namespace MessageSilo.Shared.Models
 
         //AWS
 
-        public string QueueUrl { get; set; }
-
         public string Region { get; set; }
 
         public string AccessKey { get; set; }

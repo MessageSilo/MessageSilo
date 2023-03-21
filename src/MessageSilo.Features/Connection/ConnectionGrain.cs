@@ -93,7 +93,7 @@ namespace MessageSilo.Features.Connection
                         messagePlatformConnection = new RabbitMQConnection(settings.ConnectionString, settings.QueueName, settings.ExchangeName, settings.AutoAck, logger);
                         break;
                     case MessagePlatformType.AWS_SQS:
-                        messagePlatformConnection = new AWSSQSConnection(settings.QueueUrl, settings.Region, settings.AccessKey, settings.SecretAccessKey, settings.AutoAck, logger);
+                        messagePlatformConnection = new AWSSQSConnection(settings.QueueName, settings.Region, settings.AccessKey, settings.SecretAccessKey, settings.AutoAck, logger);
                         break;
                 }
 

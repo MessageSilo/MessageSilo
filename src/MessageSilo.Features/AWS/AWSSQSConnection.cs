@@ -18,7 +18,9 @@ namespace MessageSilo.Features.AWS
 
         private IAmazonSQS client;
 
-        public string QueueUrl { get; }
+        private string queueUrl;
+
+        public string QueueName { get; }
 
         public string Region { get; }
 
@@ -26,9 +28,9 @@ namespace MessageSilo.Features.AWS
 
         public string SecretAccessKey { get; }
 
-        public AWSSQSConnection(string queueUrl, string region, string accessKey, string secretAccessKey, bool autoAck, ILogger logger)
+        public AWSSQSConnection(string queueName, string region, string accessKey, string secretAccessKey, bool autoAck, ILogger logger)
         {
-            QueueUrl = queueUrl;
+            QueueName = queueName;
             Region = region;
             AccessKey = accessKey;
             SecretAccessKey = secretAccessKey;
@@ -50,12 +52,14 @@ namespace MessageSilo.Features.AWS
 
         public override async Task Enqueue(string msgBody)
         {
-            await client.SendMessageAsync(QueueUrl, msgBody);
+            await client.SendMessageAsync(queueUrl, msgBody);
         }
 
         public override async Task Init()
         {
             client = new AmazonSQSClient(AccessKey, SecretAccessKey, Amazon.RegionEndpoint.GetBySystemName(Region));
+
+            queueUrl = (await client.GetQueueUrlAsync(QueueName)).QueueUrl;
 
             processMessageAsync();
 
@@ -66,7 +70,7 @@ namespace MessageSilo.Features.AWS
         {
             while (client is not null)
             {
-                var response = await client.ReceiveMessageAsync(new ReceiveMessageRequest(QueueUrl));
+                var response = await client.ReceiveMessageAsync(new ReceiveMessageRequest(queueUrl));
 
                 if (response.Messages.Count == 0)
                     continue;
@@ -76,7 +80,7 @@ namespace MessageSilo.Features.AWS
                 OnMessageReceived(new MessageReceivedEventArgs(new Shared.Models.Message(msg.MessageId, msg.Body)));
 
                 if (AutoAck)
-                    await client.DeleteMessageAsync(QueueUrl, msg.ReceiptHandle);
+                    await client.DeleteMessageAsync(queueUrl, msg.ReceiptHandle);
             }
         }
     }
