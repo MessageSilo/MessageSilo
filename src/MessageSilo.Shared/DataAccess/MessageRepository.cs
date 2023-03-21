@@ -38,7 +38,7 @@ namespace MessageSilo.Shared.DataAccess
             {
                 var point = PointData.Measurement(connectionId)
                     .Field("message", JsonConvert.SerializeObject(message))
-                    .Timestamp(message.EnqueuedTime, WritePrecision.Ns);
+                    .Timestamp(DateTime.UtcNow, WritePrecision.Ns);
 
                 write.WritePoint(point, bucket, ORGANIZATION);
             });

@@ -11,7 +11,7 @@ namespace MessageSilo.Features.MessageCorrector
 
         }
 
-        public CorrectedMessage(Message msg) : base(msg.Id, msg.EnqueuedTime, msg.Body)
+        public CorrectedMessage(Message msg) : base(msg.Id, msg.Body)
         {
 
         }

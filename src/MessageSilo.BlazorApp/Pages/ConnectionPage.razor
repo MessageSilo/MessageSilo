@@ -149,7 +149,7 @@
                     <Collapse Visible="@item.IsVisible">
                         <CollapseHeader>
                             <Heading Size="HeadingSize.Is6">
-                                <Button Block Clicked="@(()=> item.IsVisible = !item.IsVisible)">@item.CorrectedMessage.EnqueuedTime.ToString("s") - @item.CorrectedMessage.Id</Button>
+                                <Button Block Clicked="@(()=> item.IsVisible = !item.IsVisible)">@item.CorrectedMessage.Id</Button>
                             </Heading>
                         </CollapseHeader>
                         <CollapseBody>

@@ -4,8 +4,6 @@
     {
         public string Id { get; set; }
 
-        public DateTimeOffset EnqueuedTime { get; set; }
-
         public string Body { get; set; }
 
         public Message()
@@ -13,10 +11,9 @@
 
         }
 
-        public Message(string id, DateTimeOffset enqueuedTime, string body)
+        public Message(string id, string body)
         {
             Id = id;
-            EnqueuedTime = enqueuedTime;
             Body = body;
         }
     }

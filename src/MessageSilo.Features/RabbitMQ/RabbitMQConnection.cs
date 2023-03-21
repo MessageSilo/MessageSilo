@@ -66,9 +66,8 @@ namespace MessageSilo.Features.RabbitMQ
             {
                 string body = Encoding.UTF8.GetString(ea.Body.ToArray());
                 var messageId = ea.BasicProperties.MessageId ?? Guid.NewGuid().ToString();
-                var enqueuedTime = ea.BasicProperties.Timestamp.UnixTime == 0 ? DateTimeOffset.FromUnixTimeSeconds(ea.BasicProperties.Timestamp.UnixTime) : DateTimeOffset.UtcNow;
 
-                OnMessageReceived(new MessageReceivedEventArgs(new Message(messageId, enqueuedTime, body)));
+                OnMessageReceived(new MessageReceivedEventArgs(new Message(messageId, body)));
             };
 
             channel.BasicConsume(queue: QueueName,

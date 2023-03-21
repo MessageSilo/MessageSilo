@@ -1,4 +1,5 @@
-﻿using MessageSilo.Features.Azure;
+﻿using MessageSilo.Features.AWS;
+using MessageSilo.Features.Azure;
 using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Features.RabbitMQ;
 using MessageSilo.Shared.Enums;
@@ -30,24 +31,24 @@ namespace MessageSilo.Features.Connection
             this.grainFactory = grainFactory;
         }
 
-        public override Task OnActivateAsync()
+        public override async Task OnActivateAsync()
         {
             this.persistence.State.Status = ConnectionStatus.Created;
 
             if (this.persistence.RecordExists)
-                reInit();
+                await reInit();
 
             if (healthTimer is null)
                 healthTimer = RegisterTimer(healthCheck, null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(10));
 
-            return base.OnActivateAsync();
+            await base.OnActivateAsync();
         }
 
         public async Task Update(ConnectionSettingsDTO s)
         {
             persistence.State.ConnectionSettings = s;
             await persistence.WriteStateAsync();
-            reInit();
+            await reInit();
         }
 
         public async Task Delete()
@@ -71,7 +72,7 @@ namespace MessageSilo.Features.Connection
             await messagePlatformConnection.Enqueue(msgBody);
         }
 
-        private void reInit()
+        private async Task reInit()
         {
             try
             {
@@ -91,11 +92,14 @@ namespace MessageSilo.Features.Connection
                     case MessagePlatformType.RabbitMQ:
                         messagePlatformConnection = new RabbitMQConnection(settings.ConnectionString, settings.QueueName, settings.ExchangeName, settings.AutoAck, logger);
                         break;
+                    case MessagePlatformType.AWS_SQS:
+                        messagePlatformConnection = new AWSSQSConnection(settings.QueueUrl, settings.Region, settings.AccessKey, settings.SecretAccessKey, settings.AutoAck, logger);
+                        break;
                 }
 
                 messagePlatformConnection.MessageReceived += messageReceived;
 
-                messagePlatformConnection.Init();
+                await messagePlatformConnection.Init();
 
                 persistence.State.Status = ConnectionStatus.Connected;
             }

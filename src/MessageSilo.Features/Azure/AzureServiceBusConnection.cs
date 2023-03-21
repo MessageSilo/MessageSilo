@@ -77,14 +77,21 @@ namespace MessageSilo.Features.Azure
 
         private Task processMessageAsync(ProcessMessageEventArgs arg)
         {
-            OnMessageReceived(new MessageReceivedEventArgs(new Message(arg.Message.MessageId, arg.Message.EnqueuedTime, arg.Message.Body.ToString())));
+            OnMessageReceived(new MessageReceivedEventArgs(new Message(arg.Message.MessageId, arg.Message.Body.ToString())));
             return Task.CompletedTask;
         }
 
         public override async Task Enqueue(string msgBody)
         {
-            var msg = new ServiceBusMessage(msgBody);
-            await sender.SendMessageAsync(msg);
+            try
+            {
+                var msg = new ServiceBusMessage(msgBody);
+                await sender.SendMessageAsync(msg);
+            }
+            catch (Exception ex)
+            {
+                ex.ToString();
+            }
         }
 
         public override async ValueTask DisposeAsync()
