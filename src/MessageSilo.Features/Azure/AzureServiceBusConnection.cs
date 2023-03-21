@@ -83,15 +83,8 @@ namespace MessageSilo.Features.Azure
 
         public override async Task Enqueue(string msgBody)
         {
-            try
-            {
-                var msg = new ServiceBusMessage(msgBody);
-                await sender.SendMessageAsync(msg);
-            }
-            catch (Exception ex)
-            {
-                ex.ToString();
-            }
+            var msg = new ServiceBusMessage(msgBody);
+            await sender.SendMessageAsync(msg);
         }
 
         public override async ValueTask DisposeAsync()
