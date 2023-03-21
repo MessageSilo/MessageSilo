@@ -1,7 +1,7 @@
-﻿using System;
-using CommandLine;
+﻿using CommandLine;
 using ConsoleTables;
 using MessageSilo.Shared.Models;
+using MessageSilo.Shared.Serialization;
 using MessageSilo.SiloCTL;
 using RestSharp;
 
@@ -23,10 +23,9 @@ namespace QuickStart
             public string ConnectionName { get; set; }
         }
 
-        [Verb("show config", HelpText = "Display the current config and context.")]
-        public class ShowConfig
+        [Verb("config", HelpText = "Display the current config and context.")]
+        public class ConfigOptions
         {
-
         }
 
         [Verb("delete", HelpText = "Delete one or many connections.")]
@@ -41,18 +40,9 @@ namespace QuickStart
             var ctlConfig = new CTLConfig();
             ctlConfig.Init();
 
-            Parser.Default.ParseArguments<ShowConfig>(args)
-                .WithParsed<ShowConfig>(o =>
-                {
-                    Console.WriteLine(ctlConfig);
-                    Environment.Exit(0);
-                });
-
             var api = new MessageSiloAPIService(new RestClient(ctlConfig.ApiUrl));
 
-            var existingConnections = api.GetConnections(ctlConfig.Token);
-
-            Parser.Default.ParseArguments<ShowOptions, ApplyOptions, DeleteOptions>(args)
+            Parser.Default.ParseArguments<ShowOptions, ApplyOptions, DeleteOptions, ConfigOptions>(args)
                    .WithParsed<ShowOptions>(o =>
                    {
                        if (!string.IsNullOrEmpty(o.ConnectionName))
@@ -66,6 +56,8 @@ namespace QuickStart
 
                            return;
                        }
+
+                       var existingConnections = api.GetConnections(ctlConfig.Token);
 
                        if (existingConnections.Count() == 0)
                        {
@@ -81,15 +73,16 @@ namespace QuickStart
                    .WithParsed<ApplyOptions>(o =>
                    {
                        var connectionSettings = new List<ConnectionSettingsDTO>();
-                       var configParser = new ConfigParser();
                        var configReader = new ConfigReader(o.FileName);
 
                        foreach (var config in configReader.FileContents)
                        {
-                           var parsed = configParser.ConvertFromYAML<ConnectionSettingsDTO>(config);
+                           var parsed = YamlConverter.Deserialize<ConnectionSettingsDTO>(config);
                            parsed.Token = ctlConfig.Token;
                            connectionSettings.Add(parsed);
                        }
+
+                       var existingConnections = api.GetConnections(ctlConfig.Token);
 
                        //Cleanup
                        foreach (var deletableConn in existingConnections)
@@ -109,6 +102,10 @@ namespace QuickStart
                        {
                            api.DeleteConnection(ctlConfig.Token, o.ConnectionName);
                        }
+                   })
+                   .WithParsed<ConfigOptions>(o =>
+                   {
+                       Console.WriteLine(ctlConfig.ToString());
                    });
         }
     }

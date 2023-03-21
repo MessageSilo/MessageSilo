@@ -21,7 +21,6 @@
     <PackageReference Include="ConsoleTables" Version="2.4.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="RestSharp" Version="108.0.3" />
-    <PackageReference Include="YamlDotNet" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>

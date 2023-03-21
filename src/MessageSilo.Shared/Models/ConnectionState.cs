@@ -1,4 +1,5 @@
 ﻿using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,34 +16,7 @@ namespace MessageSilo.Shared.Models
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
-
-            sb.AppendLine($"Name:               {ConnectionSettings.Name}");
-            sb.AppendLine($"Type:               {ConnectionSettings.Type}");
-            sb.AppendLine($"Status:             {Status}");
-            sb.AppendLine($"---");
-            sb.AppendLine($"ConnectionString:   {ConnectionSettings.ConnectionString}");
-            sb.AppendLine($"QueueName:          {ConnectionSettings.QueueName}");
-
-            switch (ConnectionSettings.Type)
-            {
-                case MessagePlatformType.Azure_Queue:
-                    sb.AppendLine($"SubQueue:           {ConnectionSettings.SubQueue}");
-                    break;
-                case MessagePlatformType.Azure_Topic:
-                    sb.AppendLine($"TopicName:          {ConnectionSettings.TopicName}");
-                    sb.AppendLine($"SubscriptionName:   {ConnectionSettings.SubscriptionName}");
-                    sb.AppendLine($"SubQueue:           {ConnectionSettings.SubQueue}");
-                    break;
-                case MessagePlatformType.RabbitMQ:
-                    sb.AppendLine($"ExchangeName:       {ConnectionSettings.ExchangeName}");
-                    break;
-            }
-
-            sb.AppendLine($"CorrectorFuncBody:  {ConnectionSettings.CorrectorFuncBody}");
-            sb.AppendLine($"AutoAck:            {ConnectionSettings.AutoAck}");
-
-            return sb.ToString();
+            return YamlConverter.Serialize(this);
         }
     }
 }

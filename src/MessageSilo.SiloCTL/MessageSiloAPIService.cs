@@ -1,13 +1,6 @@
-﻿using Azure.Core;
-using Azure;
-using MessageSilo.Features.MessageCorrector;
-using MessageSilo.Shared;
+﻿using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.Models;
 using RestSharp;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Threading;
 
 namespace MessageSilo.SiloCTL
 {

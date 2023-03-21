@@ -1,11 +1,5 @@
-﻿using Esprima.Ast;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using MessageSilo.Shared.Serialization;
 using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
 
 namespace MessageSilo.SiloCTL
 {
@@ -19,12 +13,6 @@ namespace MessageSilo.SiloCTL
 
         private ConfigReader configReader;
 
-        private ConfigParser configParser;
-
-        private readonly ISerializer serializer = new SerializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .Build();
-
         public CTLConfig()
         {
         }
@@ -34,25 +22,19 @@ namespace MessageSilo.SiloCTL
             if (!File.Exists(CONFIG_FILE_PATH))
             {
                 Token = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
-                var yaml = serializer.Serialize(this);
+                var yaml = YamlConverter.Serialize(this);
                 File.WriteAllText(CONFIG_FILE_PATH, yaml);
             }
 
-            configParser = new ConfigParser();
             configReader = new ConfigReader(CONFIG_FILE_PATH);
 
-            var existing = configParser.ConvertFromYAML<CTLConfig>(configReader.FileContents.First());
+            var existing = YamlConverter.Deserialize<CTLConfig>(configReader.FileContents.First());
             Token = existing.Token;
         }
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
-
-            sb.AppendLine($"Token:  {Token}");
-            sb.AppendLine($"ApiUrl: {ApiUrl}");
-
-            return sb.ToString();
+            return YamlConverter.Serialize(this);
         }
     }
 }
