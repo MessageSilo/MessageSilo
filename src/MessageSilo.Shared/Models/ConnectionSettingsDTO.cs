@@ -1,5 +1,4 @@
 ﻿using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Platforms;
 
 namespace MessageSilo.Shared.Models
 {
@@ -24,6 +23,8 @@ namespace MessageSilo.Shared.Models
         public string Target { get; set; }
 
         public string TargetId => string.IsNullOrEmpty(Target) ? null! : $"{Token}|{Target}";
+
+        public EntityKind TargetKind { get; set; }
 
         public bool AutoAck { get; set; }
 

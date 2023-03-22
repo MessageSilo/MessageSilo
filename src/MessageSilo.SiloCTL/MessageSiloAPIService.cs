@@ -1,5 +1,6 @@
 ﻿using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.Models;
+using Microsoft.Azure.Amqp.Framing;
 using RestSharp;
 
 namespace MessageSilo.SiloCTL
@@ -39,6 +40,29 @@ namespace MessageSilo.SiloCTL
         public void DeleteConnection(string token, string name)
         {
             var request = new RestRequest($"User/{token}/Connections/{name}", Method.Delete);
+            httpClient.Delete(request);
+        }
+
+        public IEnumerable<TargetDTO> GetTargets(string token)
+        {
+            var result = httpClient.GetJson<IEnumerable<TargetDTO>>($"User/{token}/Targets");
+            return result!;
+        }
+
+        public TargetDTO? GetTarget(string token, string name)
+        {
+            var result = httpClient.GetJson<TargetDTO>($"User/{token}/Targets/{name}");
+            return result;
+        }
+
+        public void UpdateTarget(TargetDTO dto)
+        {
+            httpClient.PutJson<TargetDTO>($"User/{dto.Token}/Targets/{dto.Name}", dto);
+        }
+
+        public void DeleteTarget(string token, string name)
+        {
+            var request = new RestRequest($"User/{token}/Targets/{name}", Method.Delete);
             httpClient.Delete(request);
         }
     }

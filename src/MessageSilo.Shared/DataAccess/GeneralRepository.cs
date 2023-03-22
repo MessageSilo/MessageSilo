@@ -1,46 +1,52 @@
 ﻿using Azure.Data.Tables;
+using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace MessageSilo.Shared.DataAccess
 {
     public class GeneralRepository : IGeneralRepository
     {
-        private const string CONNECTIONS_TABLE_NAME = "Connections";
-
-        private readonly TableClient tableClient;
+        private readonly IDictionary<EntityKind, TableClient> clients;
 
         public GeneralRepository(IConfiguration configuration)
         {
             var connectionString = configuration.GetValue<string>("ConnectionStrings:GrainStateStorage");
 
-            tableClient = new TableClient(connectionString, CONNECTIONS_TABLE_NAME);
-            tableClient.CreateIfNotExists();
+            clients = new Dictionary<EntityKind, TableClient>()
+            {
+                { EntityKind.Connection, new TableClient(connectionString, "Connections") },
+                { EntityKind.Target, new TableClient(connectionString, "Targets") }
+            };
+
+            foreach (var c in clients)
+                c.Value.CreateIfNotExists();
         }
 
-        public async Task AddConnections(IEnumerable<string> connectionIds)
+        public async Task Add(EntityKind kind, IEnumerable<string> ids)
         {
-            foreach (var connId in connectionIds)
+            foreach (var id in ids)
             {
-                var splitted = connId.Split("|");
-                var entity = new TableEntity(splitted[0], connId);
-                await tableClient.UpsertEntityAsync(entity);
+                var splitted = id.Split("|");
+                var entity = new TableEntity(splitted[0], id);
+                await clients[kind].UpsertEntityAsync(entity);
             }
         }
 
-        public async Task DeleteConnections(IEnumerable<string> connectionIds)
+        public async Task Delete(EntityKind kind, IEnumerable<string> ids)
         {
-            foreach (var connId in connectionIds)
+            foreach (var id in ids)
             {
-                var splitted = connId.Split("|");
-                await tableClient.DeleteEntityAsync(splitted[0], connId);
+                var splitted = id.Split("|");
+                await clients[kind].DeleteEntityAsync(splitted[0], id);
             }
         }
 
-        public async Task<IEnumerable<string>> QueryConnections(string? token = null)
+        public async Task<IEnumerable<string>> Query(EntityKind kind, string? token = null)
         {
-            var result = token is null ? tableClient.Query<TableEntity>() : tableClient.Query<TableEntity>(p => p.PartitionKey == token);
+            var result = token is null ? clients[kind].Query<TableEntity>() : clients[kind].Query<TableEntity>(p => p.PartitionKey == token);
 
             return await Task.FromResult(result.Select(p => p.RowKey));
         }

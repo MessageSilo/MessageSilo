@@ -20,7 +20,6 @@
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="ConsoleTables" Version="2.4.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-    <PackageReference Include="RestSharp" Version="108.0.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,5 @@
 ﻿@using MessageSilo.BlazorApp.Components
 @using MessageSilo.Shared.Enums
-@using MessageSilo.Shared.Platforms;
 @page "/connection/{id}"
 
 <Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Connection</Heading>
@@ -32,19 +31,6 @@
                                     <ValidationError />
                                 </Feedback>
                             </TextEdit>
-                        </FieldBody>
-                    </Field>
-                </Validation>
-                <Validation>
-                    <Field Horizontal>
-                        <FieldLabel ColumnSize="ColumnSize.Is2">Type</FieldLabel>
-                        <FieldBody ColumnSize="ColumnSize.Is10">
-                            <Select TValue="MessagePlatformType" @bind-SelectedValue="@ConnectionSettings.Type">
-                                @foreach (var t in Platforms.Where(p => p.Id == "azure").SelectMany(x => x.Types))
-                                {
-                                    <SelectItem Value="@t">@t.ToString()</SelectItem>
-                                }
-                            </Select>
                         </FieldBody>
                     </Field>
                 </Validation>

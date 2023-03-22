@@ -2,6 +2,7 @@
 using MessageSilo.Features.Azure;
 using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Features.RabbitMQ;
+using MessageSilo.Features.Target;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
@@ -20,9 +21,9 @@ namespace MessageSilo.Features.Connection
         private IMessagePlatformConnection messagePlatformConnection;
         private IPersistentState<ConnectionState> persistence { get; set; }
 
-        private IConnectionGrain? targetConnection;
-
         private IDisposable healthTimer;
+
+        private IMessageSenderGrain? target;
 
         public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory)
         {
@@ -33,7 +34,7 @@ namespace MessageSilo.Features.Connection
 
         public override async Task OnActivateAsync()
         {
-            this.persistence.State.Status = ConnectionStatus.Created;
+            this.persistence.State.Status = Status.Created;
 
             if (this.persistence.RecordExists)
                 await reInit();
@@ -67,7 +68,7 @@ namespace MessageSilo.Features.Connection
             return await Task.FromResult(persistence.State);
         }
 
-        public async Task Enqueue(string msgBody)
+        public async Task Send(string msgBody)
         {
             await messagePlatformConnection.Enqueue(msgBody);
         }
@@ -79,7 +80,16 @@ namespace MessageSilo.Features.Connection
                 var settings = persistence.State.ConnectionSettings;
 
                 if (settings.TargetId is not null)
-                    targetConnection = grainFactory.GetGrain<IConnectionGrain>(settings.TargetId);
+                    switch (settings.TargetKind)
+                    {
+                        case EntityKind.Connection:
+                            target = grainFactory.GetGrain<IConnectionGrain>(settings.TargetId);
+                            break;
+                        case EntityKind.Target:
+                            target = grainFactory.GetGrain<ITargetGrain>(settings.TargetId);
+                            break;
+                    }
+
 
                 switch (settings.Type)
                 {
@@ -101,11 +111,11 @@ namespace MessageSilo.Features.Connection
 
                 await messagePlatformConnection.Init();
 
-                persistence.State.Status = ConnectionStatus.Connected;
+                persistence.State.Status = Status.Connected;
             }
             catch (Exception ex)
             {
-                persistence.State.Status = ConnectionStatus.Error;
+                persistence.State.Status = Status.Error;
                 logger.LogError(ex.Message);
             }
         }
@@ -118,7 +128,7 @@ namespace MessageSilo.Features.Connection
 
             var messageCorrector = grainFactory.GetGrain<IMessageCorrectorGrain>($"{this.GetPrimaryKeyString()}|corrector");
 
-            messageCorrector.InvokeOneWay(p => p.CorrectMessage(this, msg, targetConnection));
+            messageCorrector.InvokeOneWay(p => p.CorrectMessage(this, msg, target));
         }
 
         private Task healthCheck(object state)

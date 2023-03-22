@@ -1,4 +1,5 @@
-﻿using MessageSilo.Shared.Models;
+﻿using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace MessageSilo.Shared.DataAccess
 {
     public interface IGeneralRepository
     {
-        Task AddConnections(IEnumerable<string> connectionIds);
+        Task Add(EntityKind kind, IEnumerable<string> connectionIds);
 
-        Task DeleteConnections(IEnumerable<string> connectionIds);
+        Task Delete(EntityKind kind, IEnumerable<string> connectionIds);
 
-        Task<IEnumerable<string>> QueryConnections(string? token = null);
+        Task<IEnumerable<string>> Query(EntityKind kind, string? token = null);
     }
 }

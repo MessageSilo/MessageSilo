@@ -23,14 +23,14 @@ namespace MessageSilo.Features.MessageCorrector
             this.messages = messages;
         }
 
-        public async Task CorrectMessage(IConnectionGrain sourceConnection, Message msg, IConnectionGrain? targetConnection = null)
+        public async Task CorrectMessage(IConnectionGrain sourceConnection, Message msg, IMessageSenderGrain? target = null)
         {
             var connectionState = await sourceConnection.GetState();
 
             string? correctedMessageBody = correct(msg.Body, connectionState.ConnectionSettings.CorrectorFuncBody);
 
-            if (correctedMessageBody is not null && targetConnection is not null)
-                await targetConnection.Enqueue(correctedMessageBody);
+            if (correctedMessageBody is not null && target is not null)
+                await target.Send(correctedMessageBody);
 
             messages.Add(connectionState.ConnectionSettings.Id, new CorrectedMessage(msg)
             {
@@ -40,12 +40,15 @@ namespace MessageSilo.Features.MessageCorrector
             return;
         }
 
-        public string? correct(string message, string currectorFuncBody)
+        public string? correct(string message, string correctorFuncBody)
         {
             try
             {
+                if (string.IsNullOrEmpty(correctorFuncBody))
+                    return message;
+
                 engine
-                    .Execute($"correct = {currectorFuncBody}")
+                    .Execute($"correct = {correctorFuncBody}")
                     .Execute("serializer = (m) => { return JSON.stringify(correct(m)); }");
 
                 var result = engine.Evaluate($"serializer({message})");

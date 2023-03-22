@@ -12,7 +12,7 @@ namespace MessageSilo.Shared.Models
     {
         public ConnectionSettingsDTO ConnectionSettings { get; set; }
 
-        public ConnectionStatus Status { get; set; }
+        public Status Status { get; set; }
 
         public override string ToString()
         {

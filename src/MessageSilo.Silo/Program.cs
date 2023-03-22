@@ -1,6 +1,8 @@
 using MessageSilo.Features.Connection;
 using MessageSilo.Features.MessageCorrector;
+using MessageSilo.Features.Target;
 using MessageSilo.Shared.DataAccess;
+using MessageSilo.Shared.Models;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -29,6 +31,8 @@ var builder = Host.CreateDefaultBuilder(args)
 
             siloBuilder = siloBuilder.ConfigureApplicationParts(manager =>
             {
+                manager.AddApplicationPart(typeof(IMessageSenderGrain).Assembly);
+                manager.AddApplicationPart(typeof(ITargetGrain).Assembly);
                 manager.AddApplicationPart(typeof(IConnectionGrain).Assembly);
                 manager.AddApplicationPart(typeof(IMessageCorrectorGrain).Assembly);
             })

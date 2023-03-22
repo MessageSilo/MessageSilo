@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace MessageSilo.Shared.Enums
 {
-    public enum Status
+    public enum EntityKind
     {
-        Created,
-        Connected,
-        Error
+        Connection,
+        Target
     }
 }

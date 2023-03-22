@@ -3,13 +3,11 @@ using Orleans;
 
 namespace MessageSilo.Features.Connection
 {
-    public interface IConnectionGrain : IGrainWithStringKey
+    public interface IConnectionGrain : IMessageSenderGrain
     {
         Task Update(ConnectionSettingsDTO s);
 
         Task Delete();
-
-        Task Enqueue(string msgBody);
 
         Task<ConnectionState> GetState();
     }

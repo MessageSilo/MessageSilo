@@ -1,40 +1,16 @@
 ﻿using CommandLine;
 using ConsoleTables;
+using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Serialization;
 using MessageSilo.SiloCTL;
+using MessageSilo.SiloCTL.Options;
 using RestSharp;
 
 namespace QuickStart
 {
     class Program
     {
-        [Verb("apply", HelpText = "Apply a configuration to a connection by file name or stdin.\r\n\r\nThe connection name must be specified. This connection will be created if it doesn't exist yet.\r\nYAML formats are accepted.")]
-        public class ApplyOptions
-        {
-            [Option('f', "filename", Required = true, HelpText = "Filename or directory to files to use to create the connections.")]
-            public string FileName { get; set; }
-        }
-
-        [Verb("show", HelpText = "Display one or many connections.\r\n\r\nPrints a table of the most important information about the specified connections.")]
-        public class ShowOptions
-        {
-            [Option('n', "name", Required = false, HelpText = "Display detailed informations about a specific connection.")]
-            public string ConnectionName { get; set; }
-        }
-
-        [Verb("config", HelpText = "Display the current config and context.")]
-        public class ConfigOptions
-        {
-        }
-
-        [Verb("delete", HelpText = "Delete one or many connections.")]
-        public class DeleteOptions
-        {
-            [Option('n', "name", Required = false, HelpText = "Delete the specific connection.")]
-            public string ConnectionName { get; set; }
-        }
-
         static void Main(string[] args)
         {
             var ctlConfig = new CTLConfig();
@@ -42,66 +18,15 @@ namespace QuickStart
 
             var api = new MessageSiloAPIService(new RestClient(ctlConfig.ApiUrl));
 
-            Parser.Default.ParseArguments<ShowOptions, ApplyOptions, DeleteOptions, ConfigOptions>(args)
+            Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions>(args)
                    .WithParsed<ShowOptions>(o =>
                    {
-                       if (!string.IsNullOrEmpty(o.ConnectionName))
-                       {
-                           var conn = api.GetConnection(ctlConfig.Token, o.ConnectionName);
-
-                           if (conn is not null)
-                               Console.WriteLine(conn);
-                           else
-                               Console.WriteLine($"Connection '{o.ConnectionName}' not found.");
-
-                           return;
-                       }
-
-                       var existingConnections = api.GetConnections(ctlConfig.Token);
-
-                       if (existingConnections.Count() == 0)
-                       {
-                           Console.WriteLine("No connections found.");
-                           return;
-                       }
-
-                       foreach (var c in existingConnections)
-                           Tables.ShowConnectionsTable.AddRow(c.ConnectionSettings.Name, c.ConnectionSettings.Type, c.Status);
-
-                       Tables.ShowConnectionsTable.Write(Format.Default);
+                       o.Show(ctlConfig.Token, api);
                    })
                    .WithParsed<ApplyOptions>(o =>
                    {
-                       var connectionSettings = new List<ConnectionSettingsDTO>();
-                       var configReader = new ConfigReader(o.FileName);
-
-                       foreach (var config in configReader.FileContents)
-                       {
-                           var parsed = YamlConverter.Deserialize<ConnectionSettingsDTO>(config);
-                           parsed.Token = ctlConfig.Token;
-                           connectionSettings.Add(parsed);
-                       }
-
-                       var existingConnections = api.GetConnections(ctlConfig.Token);
-
-                       //Cleanup
-                       foreach (var deletableConn in existingConnections)
-                       {
-                           api.DeleteConnection(deletableConn.ConnectionSettings.Token, deletableConn.ConnectionSettings.Name);
-                       }
-
-                       //Init connections
-                       foreach (var conn in connectionSettings)
-                       {
-                           api.UpdateConnection(conn);
-                       };
-                   })
-                   .WithParsed<DeleteOptions>(o =>
-                   {
-                       if (!string.IsNullOrEmpty(o.ConnectionName))
-                       {
-                           api.DeleteConnection(ctlConfig.Token, o.ConnectionName);
-                       }
+                       var targets = o.InitTargets(ctlConfig.Token, api);
+                       o.InitConnections(ctlConfig.Token, api, targets);
                    })
                    .WithParsed<ConfigOptions>(o =>
                    {

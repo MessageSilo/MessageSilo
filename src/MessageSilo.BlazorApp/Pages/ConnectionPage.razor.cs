@@ -2,7 +2,6 @@
 using MessageSilo.BlazorApp.ViewModels;
 using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Models;
-using MessageSilo.Shared.Platforms;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 
@@ -17,8 +16,6 @@ namespace MessageSilo.BlazorApp.Pages
         public string Id { get; set; }
 
         public ConnectionSettingsDTO ConnectionSettings { get; set; }
-
-        public List<IPlatform> Platforms { get; set; } = new List<IPlatform>() { new AzurePlatform(), new AWSPlatform() };
 
         public List<CorrectedMessageViewModel> CorrectedMessages { get; set; }
 

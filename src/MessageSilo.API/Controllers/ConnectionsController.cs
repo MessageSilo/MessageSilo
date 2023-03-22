@@ -1,6 +1,7 @@
 ﻿using MessageSilo.Features.Connection;
 using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.DataAccess;
+using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
@@ -25,7 +26,7 @@ namespace MessageSilo.API.Controllers
         {
             var result = new List<ConnectionState>();
 
-            var connectionIds = await repo.QueryConnections(token);
+            var connectionIds = await repo.Query(EntityKind.Connection, token);
 
             foreach (var connId in connectionIds)
             {
@@ -42,14 +43,14 @@ namespace MessageSilo.API.Controllers
             var id = $"{token}|{name}";
             var conn = client!.GetGrain<IConnectionGrain>(id);
             await conn.Delete();
-            await repo.DeleteConnections(new[] { id });
+            await repo.Delete(EntityKind.Connection, new[] { id });
         }
 
         [HttpGet("User/{token}/Connections/{name}")]
         public async Task<ConnectionState> Show(string token, string name)
         {
             var id = $"{token}|{name}";
-            var connectionIds = await repo.QueryConnections(token);
+            var connectionIds = await repo.Query(EntityKind.Connection, token);
 
             if (!connectionIds.Contains(id))
             {
@@ -66,7 +67,7 @@ namespace MessageSilo.API.Controllers
         public async Task<ConnectionState> Update(string token, string name, [FromBody] ConnectionSettingsDTO dto)
         {
             var id = $"{token}|{name}";
-            await repo.AddConnections(new[] { id });
+            await repo.Add(EntityKind.Connection, new[] { id });
             var conn = client!.GetGrain<IConnectionGrain>(id);
             await conn.Update(dto);
 

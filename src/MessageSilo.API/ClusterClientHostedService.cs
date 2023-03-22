@@ -1,6 +1,7 @@
 ﻿using MessageSilo.API.Controllers;
 using MessageSilo.Features.Connection;
 using MessageSilo.Shared.DataAccess;
+using MessageSilo.Shared.Enums;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
@@ -48,7 +49,7 @@ namespace MessageSilo.API
             await Client.Connect();
 
             //Init connections
-            var connectionIds = await repo.QueryConnections();
+            var connectionIds = await repo.Query(EntityKind.Connection);
 
             foreach (var connId in connectionIds)
             {
