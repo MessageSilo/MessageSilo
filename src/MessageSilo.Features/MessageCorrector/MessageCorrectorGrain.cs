@@ -15,12 +15,9 @@ namespace MessageSilo.Features.MessageCorrector
 
         private readonly ILogger<MessageCorrectorGrain> logger;
 
-        private readonly IMessageRepository<CorrectedMessage> messages;
-
-        public MessageCorrectorGrain(ILogger<MessageCorrectorGrain> logger, IMessageRepository<CorrectedMessage> messages)
+        public MessageCorrectorGrain(ILogger<MessageCorrectorGrain> logger)
         {
             this.logger = logger;
-            this.messages = messages;
         }
 
         public async Task CorrectMessage(IConnectionGrain sourceConnection, Message msg, IMessageSenderGrain? target = null)
@@ -31,11 +28,6 @@ namespace MessageSilo.Features.MessageCorrector
 
             if (correctedMessageBody is not null && target is not null)
                 await target.Send(correctedMessageBody);
-
-            messages.Add(connectionState.ConnectionSettings.Id, new CorrectedMessage(msg)
-            {
-                BodyAfterCorrection = correctedMessageBody
-            });
 
             return;
         }

@@ -15,18 +15,18 @@
 
                 foreach (var filePath in filePaths)
                 {
-                    FileContents.Add(readFileContent(filePath));
+                    FileContents.AddRange(readFileContent(filePath));
                 }
             }
             else
-                FileContents.Add(readFileContent(path));
+                FileContents.AddRange(readFileContent(path));
 
         }
 
-        private string readFileContent(string filePath)
+        private IEnumerable<string> readFileContent(string filePath)
         {
             var result = File.ReadAllText(filePath);
-            return result;
+            return result.Split("---", StringSplitOptions.RemoveEmptyEntries & StringSplitOptions.TrimEntries);
         }
     }
 }
