@@ -1,4 +1,4 @@
-<img src="https://repository-images.githubusercontent.com/495369194/7373d34b-41e3-4eb7-90a7-773cc33f3fa5" align="right"></img>
+<img src="https://www.message-silo.dev/assets/images/logo/logo.svg" align="right"></img>
 # Message Silo
 
 [![siloctl-build](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml)
