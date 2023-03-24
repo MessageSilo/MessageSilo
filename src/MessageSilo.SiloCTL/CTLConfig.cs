@@ -9,8 +9,11 @@ namespace MessageSilo.SiloCTL
 
         public string Token { get; private set; }
 
+#if DEBUG
         public string ApiUrl { get; private set; } = "https://localhost:5000/api/v1";
-
+#else
+        public string ApiUrl { get; private set; } = "https://api.message-silo.dev/api/v1";
+#endif
         private ConfigReader configReader;
 
         public CTLConfig()
@@ -30,6 +33,7 @@ namespace MessageSilo.SiloCTL
 
             var existing = YamlConverter.Deserialize<CTLConfig>(configReader.FileContents.First());
             Token = existing.Token;
+            ApiUrl = existing.ApiUrl;
         }
 
         public override string ToString()

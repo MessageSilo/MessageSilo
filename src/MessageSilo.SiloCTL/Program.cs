@@ -16,7 +16,12 @@ namespace QuickStart
             var ctlConfig = new CTLConfig();
             ctlConfig.Init();
 
-            var api = new MessageSiloAPIService(new RestClient(ctlConfig.ApiUrl));
+            var restOptions = new RestClientOptions(ctlConfig.ApiUrl)
+            {
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+
+            var api = new MessageSiloAPIService(new RestClient(restOptions));
 
             Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions>(args)
                    .WithParsed<ShowOptions>(o =>
