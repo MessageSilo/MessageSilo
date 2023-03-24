@@ -2,6 +2,8 @@
 # Message Silo
 
 [![siloctl-build](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml)
+[![API](https://github.com/MessageSilo/MessageSilo/actions/workflows/api.yaml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/api.yaml)
+[![Silo](https://github.com/MessageSilo/MessageSilo/actions/workflows/silo.yml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/silo.yml)
 
 Cleanup the mess of messages!
 
