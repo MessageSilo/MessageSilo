@@ -3,29 +3,29 @@ name: siloctl-release
 on:
   push:
     branches:
-      - 'releases/**'
+      - "releases/**"
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
+      - uses: actions/checkout@v3
 
-    - name: Publish - WINDOWS
-      working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -c Release -r win-x64 --sc -o "/home/runner/work/MessageSilo/publish/win-x64"
-    - name: Publish - OSX
-      working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -c Release -r osx-x64 --sc -o "/home/runner/work/MessageSilo/publish/osx-x64"
-    - name: Publish - LINUX
-      working-directory: ./src/MessageSilo.SiloCTL
-      run: dotnet publish -c Release -r linux-x64 --sc -o "/home/runner/work/MessageSilo/publish/linux-x64"
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v3.1.2
-      with:
-        name: ciloctl-artifacts
-        path: "/home/runner/work/MessageSilo/publish/*"
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Publish - WINDOWS
+        working-directory: ./src/MessageSilo.SiloCTL
+        run: dotnet publish -c Release -r win-x64 --sc -o "/home/runner/work/MessageSilo/publish/win-x64"
+      - name: Publish - OSX
+        working-directory: ./src/MessageSilo.SiloCTL
+        run: dotnet publish -c Release -r osx-x64 --sc -o "/home/runner/work/MessageSilo/publish/osx-x64"
+      - name: Publish - LINUX
+        working-directory: ./src/MessageSilo.SiloCTL
+        run: dotnet publish -c Release -r linux-x64 --sc -o "/home/runner/work/MessageSilo/publish/linux-x64"
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ciloctl-artifacts
+          path: "/home/runner/work/MessageSilo/publish/*"

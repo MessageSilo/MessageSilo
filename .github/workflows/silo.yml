@@ -2,21 +2,31 @@ name: Silo
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
+      - uses: actions/checkout@v3
 
-    - name: Build
-      working-directory: ./src/MessageSilo.Silo
-      run: dotnet build
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Build
+        working-directory: ./src/MessageSilo.Silo
+        run: dotnet build
+
+      - name: Publish
+        working-directory: ./src/MessageSilo.Silo
+        run: dotnet publish -c Release -o "/home/runner/work/MessageSilo/publish"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: message-silo-silo-latest
+          path: "/home/runner/work/MessageSilo/publish/*"
