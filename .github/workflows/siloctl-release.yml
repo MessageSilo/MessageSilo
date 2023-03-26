@@ -2,10 +2,10 @@ name: siloctl-release
 
 on:
   push:
-    branches:
-      - "releases/**"
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
-  publish:
+  build-and-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -15,17 +15,24 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
-      - name: Publish - WINDOWS
+      - name: Build
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release -r win-x64 --sc -o "/home/runner/work/MessageSilo/publish/win-x64"
-      - name: Publish - OSX
+        run: dotnet build
+
+      - name: Publish
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release -r osx-x64 --sc -o "/home/runner/work/MessageSilo/publish/osx-x64"
-      - name: Publish - LINUX
-        working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release -r linux-x64 --sc -o "/home/runner/work/MessageSilo/publish/linux-x64"
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3.1.2
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish"
+
+      - name: Create release
+        id: siloctl_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: ciloctl-artifacts
-          path: "/home/runner/work/MessageSilo/publish/*"
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First verion
+          draft: false
+          prerelease: false
