@@ -5,7 +5,7 @@ on:
     tags:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
-  build-and-release:
+  build-and-publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,16 +23,12 @@ jobs:
         working-directory: ./src/MessageSilo.SiloCTL
         run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish"
 
-      - name: Create release
-        id: siloctl_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare package
+        working-directory: /home/runner/work/MessageSilo/publish
+        run: mv MessageSilo.SiloCTL.exe siloctl.exe
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3.1.2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First verion
-          draft: false
-          prerelease: false
+          name: message-silo-api-latest
+          path: "/home/runner/work/MessageSilo/publish/siloctl.exe"
