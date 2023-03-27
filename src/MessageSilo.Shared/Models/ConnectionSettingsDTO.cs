@@ -2,16 +2,8 @@
 
 namespace MessageSilo.Shared.Models
 {
-    public class ConnectionSettingsDTO
+    public class ConnectionSettingsDTO : Entity
     {
-        //Common
-
-        public string Token { get; set; }
-
-        public string Name { get; set; }
-
-        public string Id => $"{Token}|{Name}";
-
         public string ConnectionString { get; set; }
 
         public MessagePlatformType Type { get; set; }
@@ -22,7 +14,7 @@ namespace MessageSilo.Shared.Models
 
         public string Target { get; set; }
 
-        public string TargetId => string.IsNullOrEmpty(Target) ? null! : $"{Token}|{Target}";
+        public string TargetId => string.IsNullOrEmpty(Target) ? null! : $"{PartitionKey}|{Target}";
 
         public EntityKind TargetKind { get; set; }
 
@@ -47,5 +39,10 @@ namespace MessageSilo.Shared.Models
         public string AccessKey { get; set; }
 
         public string SecretAccessKey { get; set; }
+
+        public ConnectionSettingsDTO()
+        {
+            Kind = EntityKind.Connection;
+        }
     }
 }

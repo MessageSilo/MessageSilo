@@ -27,7 +27,7 @@ namespace MessageSilo.SiloCTL.Options
             foreach (var config in configReader.FileContents.Where(p => p.Contains($"kind: {EntityKind.Connection}")))
             {
                 var parsed = YamlConverter.Deserialize<ConnectionSettingsDTO>(config);
-                parsed.Token = token;
+                parsed.PartitionKey = token;
                 parsed.TargetKind = targets.Any(p => p.Id == parsed.TargetId) ? EntityKind.Target : EntityKind.Connection;
                 connectionSettings.Add(parsed);
             }
@@ -36,7 +36,7 @@ namespace MessageSilo.SiloCTL.Options
 
             foreach (var s in existingConnections)
             {
-                api.DeleteConnection(s.ConnectionSettings.Token, s.ConnectionSettings.Name);
+                api.DeleteConnection(s.ConnectionSettings.PartitionKey, s.ConnectionSettings.RowKey);
             }
 
             foreach (var conn in connectionSettings)
@@ -55,7 +55,7 @@ namespace MessageSilo.SiloCTL.Options
             foreach (var config in configReader.FileContents.Where(p => p.Contains($"kind: {EntityKind.Target}")))
             {
                 var parsed = YamlConverter.Deserialize<TargetDTO>(config);
-                parsed.Token = token;
+                parsed.PartitionKey = token;
                 targets.Add(parsed);
             }
 
@@ -63,7 +63,7 @@ namespace MessageSilo.SiloCTL.Options
 
             foreach (var t in existingTargets)
             {
-                api.DeleteTarget(t.Token, t.Name);
+                api.DeleteTarget(t.PartitionKey, t.RowKey);
             }
 
             foreach (var target in targets)

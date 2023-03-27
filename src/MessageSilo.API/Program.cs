@@ -24,7 +24,7 @@ builder.Services.AddSingleton<IClusterClient>(
 builder.Services.AddSingleton<IGrainFactory>(
             sp => sp.GetService<ClusterClientHostedService>()!.Client);
 builder.Services.AddSingleton<IMessageRepository<CorrectedMessage>, MessageRepository<CorrectedMessage>>();
-builder.Services.AddSingleton<IGeneralRepository, GeneralRepository>();
+builder.Services.AddSingleton<IEntityRepository, EntityRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>

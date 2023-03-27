@@ -13,9 +13,9 @@ namespace MessageSilo.API.Controllers
     [Route("api/v1")]
     public class TargetsController : MessageSiloControllerBase
     {
-        private readonly IGeneralRepository repo;
+        private readonly IEntityRepository repo;
 
-        public TargetsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IGeneralRepository repo) : base(logger, httpContextAccessor, client)
+        public TargetsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IEntityRepository repo) : base(logger, httpContextAccessor, client)
         {
             this.repo = repo;
         }
@@ -25,11 +25,11 @@ namespace MessageSilo.API.Controllers
         {
             var result = new List<TargetDTO>();
 
-            var targetIds = await repo.Query(EntityKind.Target, token);
+            var targets = await repo.Query(EntityKind.Target, token);
 
-            foreach (var connId in targetIds)
+            foreach (var t in targets)
             {
-                var target = client!.GetGrain<ITargetGrain>(connId);
+                var target = client!.GetGrain<ITargetGrain>(t.Id);
                 result.Add(await target.GetState());
             }
 
@@ -40,9 +40,9 @@ namespace MessageSilo.API.Controllers
         public async Task<TargetDTO> Show(string token, string name)
         {
             var id = $"{token}|{name}";
-            var targetIds = await repo.Query(EntityKind.Target, token);
+            var targets = await repo.Query(EntityKind.Target, token);
 
-            if (!targetIds.Contains(id))
+            if (!targets.Any(p => p.Id == id))
             {
                 httpContextAccessor!.HttpContext!.Response.StatusCode = StatusCodes.Status404NotFound;
                 return null!;
@@ -57,7 +57,17 @@ namespace MessageSilo.API.Controllers
         public async Task<TargetDTO> Update(string token, string name, [FromBody] TargetDTO dto)
         {
             var id = $"{token}|{name}";
-            await repo.Add(EntityKind.Target, new[] { id });
+
+            await repo.Add(new[]
+            {
+                new Entity()
+                {
+                    PartitionKey = token,
+                    RowKey = name,
+                    Kind = EntityKind.Target
+                }
+            });
+
             var target = client!.GetGrain<ITargetGrain>(id);
             await target.Update(dto);
 

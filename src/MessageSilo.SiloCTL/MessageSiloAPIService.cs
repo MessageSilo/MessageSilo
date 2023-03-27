@@ -28,7 +28,7 @@ namespace MessageSilo.SiloCTL
 
         public void UpdateConnection(ConnectionSettingsDTO dto)
         {
-            httpClient.PutJson<ConnectionSettingsDTO>($"User/{dto.Token}/Connections/{dto.Name}", dto);
+            httpClient.PutJson<ConnectionSettingsDTO>($"User/{dto.PartitionKey}/Connections/{dto.RowKey}", dto);
         }
 
         public IEnumerable<CorrectedMessage> GetMessages(string token, string name, DateTimeOffset from, DateTimeOffset to)
@@ -57,7 +57,7 @@ namespace MessageSilo.SiloCTL
 
         public void UpdateTarget(TargetDTO dto)
         {
-            httpClient.PutJson<TargetDTO>($"User/{dto.Token}/Targets/{dto.Name}", dto);
+            httpClient.PutJson<TargetDTO>($"User/{dto.PartitionKey}/Targets/{dto.RowKey}", dto);
         }
 
         public void DeleteTarget(string token, string name)

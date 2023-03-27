@@ -13,7 +13,7 @@ namespace MessageSilo.BlazorApp.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            Connections = (await MessageSiloAPI.GetConnections()).OrderBy(p => p.Name);
+            Connections = (await MessageSiloAPI.GetConnections()).OrderBy(p => p.RowKey);
         }
 
         public async Task Delete(string id)

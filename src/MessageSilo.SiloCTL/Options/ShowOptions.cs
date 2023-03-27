@@ -48,10 +48,10 @@ namespace MessageSilo.SiloCTL.Options
             }
 
             foreach (var c in existingConnections)
-                showEntitesTable.AddRow(EntityKind.Connection, c.ConnectionSettings.Name, c.ConnectionSettings.Type, c.Status);
+                showEntitesTable.AddRow(c.ConnectionSettings.Kind, c.ConnectionSettings.RowKey, c.ConnectionSettings.Type, c.Status);
 
-            foreach (var c in existingTargets)
-                showEntitesTable.AddRow(EntityKind.Target, c.Name, c.Type, Status.Created);
+            foreach (var t in existingTargets)
+                showEntitesTable.AddRow(t.Kind, t.RowKey, t.Type, Status.Created);
 
             showEntitesTable.Write(Format.Default);
         }

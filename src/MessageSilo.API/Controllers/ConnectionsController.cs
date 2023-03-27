@@ -13,9 +13,9 @@ namespace MessageSilo.API.Controllers
     {
         private readonly IMessageRepository<CorrectedMessage> messages;
 
-        private readonly IGeneralRepository repo;
+        private readonly IEntityRepository repo;
 
-        public ConnectionsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IMessageRepository<CorrectedMessage> messages, IGeneralRepository repo) : base(logger, httpContextAccessor, client)
+        public ConnectionsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IMessageRepository<CorrectedMessage> messages, IEntityRepository repo) : base(logger, httpContextAccessor, client)
         {
             this.messages = messages;
             this.repo = repo;
@@ -26,11 +26,11 @@ namespace MessageSilo.API.Controllers
         {
             var result = new List<ConnectionState>();
 
-            var connectionIds = await repo.Query(EntityKind.Connection, token);
+            var connections = await repo.Query(EntityKind.Connection, token);
 
-            foreach (var connId in connectionIds)
+            foreach (var c in connections)
             {
-                var conn = client!.GetGrain<IConnectionGrain>(connId);
+                var conn = client!.GetGrain<IConnectionGrain>(c.Id);
                 result.Add(await conn.GetState());
             }
 
@@ -43,16 +43,16 @@ namespace MessageSilo.API.Controllers
             var id = $"{token}|{name}";
             var conn = client!.GetGrain<IConnectionGrain>(id);
             await conn.Delete();
-            await repo.Delete(EntityKind.Connection, new[] { id });
+            await repo.Delete(token, new[] { name });
         }
 
         [HttpGet("User/{token}/Connections/{name}")]
         public async Task<ConnectionState> Show(string token, string name)
         {
             var id = $"{token}|{name}";
-            var connectionIds = await repo.Query(EntityKind.Connection, token);
+            var connections = await repo.Query(EntityKind.Connection, token);
 
-            if (!connectionIds.Contains(id))
+            if (!connections.Any(p => p.Id == id))
             {
                 httpContextAccessor!.HttpContext!.Response.StatusCode = StatusCodes.Status404NotFound;
                 return null!;
@@ -67,7 +67,17 @@ namespace MessageSilo.API.Controllers
         public async Task<ConnectionState> Update(string token, string name, [FromBody] ConnectionSettingsDTO dto)
         {
             var id = $"{token}|{name}";
-            await repo.Add(EntityKind.Connection, new[] { id });
+
+            await repo.Add(new[]
+            {
+                new Entity()
+                {
+                    PartitionKey = token,
+                    RowKey = name,
+                    Kind = EntityKind.Connection
+                }
+            });
+
             var conn = client!.GetGrain<IConnectionGrain>(id);
             await conn.Update(dto);
 

@@ -16,9 +16,9 @@ namespace MessageSilo.API
 
         protected readonly ILogger<ClusterClientHostedService> logger;
 
-        protected readonly IGeneralRepository repo;
+        protected readonly IEntityRepository repo;
 
-        public ClusterClientHostedService(ILoggerProvider loggerProvider, IConfiguration configuration, ILogger<ClusterClientHostedService> logger, IGeneralRepository repo)
+        public ClusterClientHostedService(ILoggerProvider loggerProvider, IConfiguration configuration, ILogger<ClusterClientHostedService> logger, IEntityRepository repo)
         {
             this.logger = logger;
             this.repo = repo;
@@ -49,13 +49,13 @@ namespace MessageSilo.API
             await Client.Connect();
 
             //Init connections
-            var connectionIds = await repo.Query(EntityKind.Connection);
+            var connections = await repo.Query(EntityKind.Connection);
 
-            foreach (var connId in connectionIds)
+            foreach (var e in connections)
             {
-                var conn = Client.GetGrain<IConnectionGrain>(connId);
+                var conn = Client.GetGrain<IConnectionGrain>(e.Id);
                 await conn.GetState();
-                logger.LogInformation($"Connection ({connId}) initialized.");
+                logger.LogInformation($"Connection ({e.Id}) initialized.");
             }
         }
 

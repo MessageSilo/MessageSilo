@@ -7,17 +7,16 @@ using System.Threading.Tasks;
 
 namespace MessageSilo.Shared.Models
 {
-    public class TargetDTO
+    public class TargetDTO : Entity
     {
         //Common
-        public string Token { get; set; }
-
-        public string Name { get; set; }
-
-        public string Id => $"{Token}|{Name}";
-
         public TargetType Type { get; set; }
 
         public string Url { get; set; }
+
+        public TargetDTO()
+        {
+            Kind = EntityKind.Target;
+        }
     }
 }
