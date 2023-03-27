@@ -16,11 +16,11 @@ jobs:
 
       - name: Build
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet build
+        run: dotnet build -c Release -p:Version=1.0.${{github.run_number}}
 
       - name: Publish
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish" --version-suffix ${{github.run_number}}
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish"
 
       - name: Prepare package
         working-directory: /home/runner/work/MessageSilo/publish
