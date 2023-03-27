@@ -13,12 +13,10 @@ namespace MessageSilo.API.Controllers
     {
         private readonly IMessageRepository<CorrectedMessage> messages;
 
-        private readonly IEntityRepository repo;
-
-        public ConnectionsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IMessageRepository<CorrectedMessage> messages, IEntityRepository repo) : base(logger, httpContextAccessor, client)
+        public ConnectionsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IMessageRepository<CorrectedMessage> messages, IEntityRepository repo)
+            : base(logger, httpContextAccessor, client, repo)
         {
             this.messages = messages;
-            this.repo = repo;
         }
 
         [HttpGet("User/{token}/Connections")]

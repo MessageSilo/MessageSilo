@@ -22,6 +22,11 @@ namespace MessageSilo.Shared.DataAccess
 
         public async Task Add(IEnumerable<Entity> entites)
         {
+            var countOfEntities = await Count(entites.First().PartitionKey);
+
+            if (countOfEntities >= 5)
+                throw Exception("Count of max allowed entities reached! ==WIP: Only in BETA nad FREE tier==");
+
             foreach (var e in entites)
             {
                 await client.UpsertEntityAsync<Entity>(e);
@@ -43,6 +48,13 @@ namespace MessageSilo.Shared.DataAccess
                 client.Query<Entity>(p => p.PartitionKey == token && p.Kind == kind);
 
             return await Task.FromResult(result);
+        }
+
+        public async Task<int> Count(string? token = null)
+        {
+            var result = client.Query<Entity>(p => p.PartitionKey == token, select: new[] { "PartitionKey " });
+
+            return await Task.FromResult(result.Count());
         }
     }
 }

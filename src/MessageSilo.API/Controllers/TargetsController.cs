@@ -13,11 +13,9 @@ namespace MessageSilo.API.Controllers
     [Route("api/v1")]
     public class TargetsController : MessageSiloControllerBase
     {
-        private readonly IEntityRepository repo;
-
-        public TargetsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IEntityRepository repo) : base(logger, httpContextAccessor, client)
+        public TargetsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IEntityRepository repo)
+            : base(logger, httpContextAccessor, client, repo)
         {
-            this.repo = repo;
         }
 
         [HttpGet("User/{token}/Targets")]
