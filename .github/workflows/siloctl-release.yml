@@ -16,15 +16,15 @@ jobs:
 
       - name: Build
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet build -c Release -p:Version=1.0.${{github.run_number}}
+        run: dotnet build -c Release
 
       - name: Publish
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish"
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish" -p:Version=1.0.${{github.run_number}}
 
       - name: Prepare package
         working-directory: /home/runner/work/MessageSilo/publish
-        run: mv MessageSilo.SiloCTL.exe siloctl.exe
+        run: ls -a
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3.1.2
