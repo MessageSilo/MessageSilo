@@ -1,10 +1,10 @@
 name: siloctl-release
 
 on: workflow_dispatch
-  
+
 jobs:
   build-and-publish:
-  name: siloctl-v1.0.${{github.run_number}}
+    name: siloctl-v1.0.${{github.run_number}}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
