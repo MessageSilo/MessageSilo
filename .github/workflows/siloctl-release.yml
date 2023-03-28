@@ -3,7 +3,7 @@ name: siloctl-release
 on: workflow_dispatch
 
 env:
-  VERSION_NUMBER: "1.0.${{github.run_number}}"
+  VERSION_NUMBER: 1.0.${{github.run_number}}
 
 jobs:
   build-and-publish:
