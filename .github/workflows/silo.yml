@@ -3,8 +3,9 @@ name: Silo
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
+    paths-ignore:
+      - ".github/workflows/**"
+      - "scripts/**"
 
 jobs:
   build:
