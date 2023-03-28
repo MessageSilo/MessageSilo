@@ -26,6 +26,10 @@ jobs:
         working-directory: ./src/MessageSilo.Silo
         run: dotnet publish -c Release -o "/home/runner/work/MessageSilo/publish"
 
+      - name: Remove appsettings
+        working-directory: /home/runner/work/MessageSilo/publish
+        run: rm appsettings.json
+
       - name: Upload build artifact
         uses: appleboy/scp-action@master
         with:
@@ -33,7 +37,7 @@ jobs:
           username: ${{ secrets.U }}
           password: ${{ secrets.P }}
           port: ${{ secrets.PORT }}
-          source: "/home/runner/work/MessageSilo/publish/"
+          source: "/home/runner/work/MessageSilo/publish/YamlDotNet.dll"
           target: "/root/temp/silo/"
           strip_components: 1
 
