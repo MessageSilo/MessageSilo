@@ -2,13 +2,12 @@ name: siloctl-release
 
 on: workflow_dispatch
 
-env:
-  VERSION_NUMBER: "1.0.${{github.run_number}}"
-
 jobs:
   build-and-publish:
     name: siloctl-v${{ env.VERSION_NUMBER }}
     runs-on: ubuntu-latest
+    env:
+      VERSION_NUMBER: "1.0.${{github.run_number}}"
     steps:
       - uses: actions/checkout@v3
 
