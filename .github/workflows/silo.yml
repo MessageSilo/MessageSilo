@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  steps:
     environment: prd
     runs-on: ubuntu-latest
     steps:
@@ -33,8 +33,9 @@ jobs:
           username: ${{ secrets.U }}
           password: ${{ secrets.P }}
           port: ${{ secrets.PORT }}
-          source: "/home/runner/work/MessageSilo/publish/*"
-          target: "/home/temp/silo"
+          source: "/home/runner/work/MessageSilo/publish/"
+          target: "/root/temp/silo/"
+          strip_components: 1
 
 #      - name: Upload build artifact
 #        uses: actions/upload-artifact@v3.1.2
