@@ -2,12 +2,9 @@ name: siloctl-release
 
 on: workflow_dispatch
 
-env:
-  VERSION_NUMBER: 1.0.${{github.run_number}}
-
 jobs:
   build-and-publish:
-    name: siloctl-$VERSION_NUMBER
+    name: siloctl-1.0.${{github.run_number}}
     runs-on: ubuntu-latest
 
     steps:
@@ -24,18 +21,18 @@ jobs:
 
       - name: Publish - Windows
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/win-x64" -p:Version=$VERSION_NUMBER -r win-x64"
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/win-x64" -p:Version=1.0.${{github.run_number}} -r win-x64"
 
       - name: Publish - Linux
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/linux-x64" -p:Version=$VERSION_NUMBER -r linux-x64
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/linux-x64" -p:Version=1.0.${{github.run_number}} -r linux-x64
 
       - name: Publish - MacOS
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/osx-x64" -p:Version=$VERSION_NUMBER -r osx-x64
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/osx-x64" -p:Version=1.0.${{github.run_number}} -r osx-x64
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: siloctl-$VERSION_NUMBER-windows
+          name: siloctl-1.0.${{github.run_number}}-windows
           path: "/home/runner/work/MessageSilo/publish/win-x64/siloctl.exe"
