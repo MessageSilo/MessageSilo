@@ -21,7 +21,7 @@ jobs:
 
       - name: Publish - Windows
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/win-x64" -p:Version="1.0.${{github.run_number}}" -r win-x64"
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/win-x64" -p:Version="1.0.${{github.run_number}}" -r win-x64
 
       - name: Publish - Linux
         working-directory: ./src/MessageSilo.SiloCTL
