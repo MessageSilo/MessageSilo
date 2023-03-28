@@ -34,7 +34,7 @@ jobs:
       - name: Upload build artifact
         uses: bacongobbler/azure-blob-storage-upload@main
         with:
-          source_dir: /home/runner/work/MessageSilo/publish
+          source_dir: '/home/runner/work/MessageSilo/publish/*'
           container_name: siloctl
           connection_string: ${{ secrets.RELEASES_STORAGE_CONNECTION_STRING }}
           overwrite: 'true'
