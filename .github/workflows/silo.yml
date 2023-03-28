@@ -8,7 +8,8 @@ on:
       - "scripts/**"
 
 jobs:
-  build:
+  steps:
+    environment: prd
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -26,8 +27,22 @@ jobs:
         working-directory: ./src/MessageSilo.Silo
         run: dotnet publish -c Release -o "/home/runner/work/MessageSilo/publish"
 
+      - name: Remove appsettings
+        working-directory: /home/runner/work/MessageSilo/publish
+        run: rm appsettings.json
+
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3.1.2
+        uses: garygrossgarten/github-action-scp@release
         with:
-          name: message-silo-silo-latest
-          path: "/home/runner/work/MessageSilo/publish/*"
+          host: ${{ secrets.IP }}
+          username: ${{ secrets.U }}
+          password: ${{ secrets.P }}
+          port: ${{ secrets.PORT }}
+          local: /home/runner/work/MessageSilo/publish
+          remote: /home/temp/silo
+
+#      - name: Upload build artifact
+#        uses: actions/upload-artifact@v3.1.2
+#        with:
+#          name: message-silo-silo-latest
+#          path: "/home/runner/work/MessageSilo/publish/*"
