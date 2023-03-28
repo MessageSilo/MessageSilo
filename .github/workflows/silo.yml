@@ -38,7 +38,7 @@ jobs:
           password: ${{ secrets.P }}
           port: ${{ secrets.PORT }}
           source: "/home/runner/work/MessageSilo/publish/YamlDotNet.dll"
-          target: "/root/temp/silo/"
+          target: "/home/temp/silo/"
           strip_components: 1
 
 #      - name: Upload build artifact
