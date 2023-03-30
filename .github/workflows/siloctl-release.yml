@@ -40,4 +40,4 @@ jobs:
         uses: azure/CLI@v1
         with:
           azcliversion: latest
-          inlineScript: az storage blob upload-batch --account-name messagesiloreleases -d "siloctl" -s "./home/runner/work/MessageSilo/publish" --pattern "*"
+          inlineScript: az storage blob upload --account-name messagesiloreleases -c siloctl -s /home/runner/work/MessageSilo/publish --pattern "*" --recursive
