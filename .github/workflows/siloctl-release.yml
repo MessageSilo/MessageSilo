@@ -31,10 +31,13 @@ jobs:
         working-directory: ./src/MessageSilo.SiloCTL
         run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/osx-x64" -p:Version="1.0.${{github.run_number}}-beta" -r osx-x64
 
-      - name: Upload build artifact
-        uses: bacongobbler/azure-blob-storage-upload@main
+      - name: Login to Azure
+        uses: azure/login@v1
         with:
-          source_dir: './home/runner/work/MessageSilo/publish'
-          container_name: siloctl
-          connection_string: ${{ secrets.RELEASES_STORAGE_CONNECTION_STRING }}
-          overwrite: 'true'
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Upload build artifacts
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: az storage blob upload-batch --account-name messagesiloreleases -d 'siloctl' -s '/home/runner/work/MessageSilo/publish'
