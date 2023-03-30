@@ -40,4 +40,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           azcliversion: latest
-          inlineScript: az storage blob upload --account-name messagesiloreleases -c siloctl -s /home/runner/work/MessageSilo/publish --pattern "*" --recursive
+          inlineScript: |
+            az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-win-x64" -s "/home/runner/work/MessageSilo/publish/win-x64" --pattern "*"
+            az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-linux-x64" -s "/home/runner/work/MessageSilo/publish/linux-x64" --pattern "*"
+            az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-osx-x64" -s "/home/runner/work/MessageSilo/publish/osx-x64" --pattern "*"
