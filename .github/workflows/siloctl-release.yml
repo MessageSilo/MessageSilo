@@ -41,6 +41,7 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-win-x64" -s \home\runner\work\MessageSilo\publish\win-x64 --pattern "*"
-            az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-linux-x64" -s \home\runner\work\MessageSilo\publish\linux-x64 --pattern "*"
-            az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-osx-x64" -s \home\runner\work\MessageSilo\publish\osx-x64 --pattern "*"
+            cd /home/runner/work/MessageSilo/publish
+            az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-win-x64" -s "win-x64" --pattern "*"
+            az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-linux-x64" -s "linux-x64" --pattern "*"
+            az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-osx-x64" -s "osx-x64" --pattern "*"
