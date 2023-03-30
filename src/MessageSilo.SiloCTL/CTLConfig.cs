@@ -1,11 +1,13 @@
 ﻿using MessageSilo.Shared.Serialization;
+using Microsoft.Extensions.Configuration;
 using System.Text;
+using static System.Environment;
 
 namespace MessageSilo.SiloCTL
 {
     internal class CTLConfig
     {
-        private const string CONFIG_FILE_PATH = "message-silo-config.yaml";
+        private const string CONFIG_FILE_NAME = "message-silo-config.yaml";
 
         public string Token { get; private set; }
 
@@ -22,14 +24,21 @@ namespace MessageSilo.SiloCTL
 
         public void Init()
         {
-            if (!File.Exists(CONFIG_FILE_PATH))
+            var appDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.LocalApplicationData, SpecialFolderOption.DoNotVerify), "siloctl");
+
+            if(!Directory.Exists(appDataFolder))
+                Directory.CreateDirectory(appDataFolder);
+
+            var configPath = $"{appDataFolder}/{CONFIG_FILE_NAME}";
+
+            if (!File.Exists(configPath))
             {
                 Token = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
                 var yaml = YamlConverter.Serialize(this);
-                File.WriteAllText(CONFIG_FILE_PATH, yaml);
+                File.WriteAllText(configPath, yaml);
             }
 
-            configReader = new ConfigReader(CONFIG_FILE_PATH);
+            configReader = new ConfigReader(configPath);
 
             var existing = YamlConverter.Deserialize<CTLConfig>(configReader.FileContents.First());
             Token = existing.Token;
