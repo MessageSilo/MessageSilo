@@ -21,7 +21,7 @@ namespace MessageSilo.SiloCTL.Options
             NumberAlignment = Alignment.Right
         });
 
-        [Option('n', "name", Required = false, HelpText = "Display detailed informations about a specific entity.")]
+        [Option('n', "name", Required = false, HelpText = "Display detailed information about a specific entity.")]
         public string Name { get; set; }
 
         public void Show(string token, MessageSiloAPIService api)

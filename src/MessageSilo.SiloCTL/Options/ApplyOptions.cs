@@ -32,13 +32,6 @@ namespace MessageSilo.SiloCTL.Options
                 connectionSettings.Add(parsed);
             }
 
-            var existingConnections = api.GetConnections(token);
-
-            foreach (var s in existingConnections)
-            {
-                api.DeleteConnection(s.ConnectionSettings.PartitionKey, s.ConnectionSettings.RowKey);
-            }
-
             foreach (var conn in connectionSettings)
             {
                 api.UpdateConnection(conn);
@@ -57,13 +50,6 @@ namespace MessageSilo.SiloCTL.Options
                 var parsed = YamlConverter.Deserialize<TargetDTO>(config);
                 parsed.PartitionKey = token;
                 targets.Add(parsed);
-            }
-
-            var existingTargets = api.GetTargets(token);
-
-            foreach (var t in existingTargets)
-            {
-                api.DeleteTarget(t.PartitionKey, t.RowKey);
             }
 
             foreach (var target in targets)
