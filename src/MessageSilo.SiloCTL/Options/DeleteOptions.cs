@@ -13,10 +13,10 @@ using ConsoleTables;
 
 namespace MessageSilo.SiloCTL.Options
 {
-    [Verb("delete", HelpText = "Apply a configuration to an entity by file name or stdin.\r\n\r\nThe entity name must be specified. This entity will be created if it doesn't exist yet.\r\nYAML formats are accepted.")]
+    [Verb("delete", HelpText = "Deletes one or all entities.")]
     public class DeleteOptions
     {
-        [Option('n', "name", Required = true, HelpText = "Deletes a specific entity.")]
+        [Option('n', "name", Required = true, HelpText = "Name of the entity to delete.")]
         public string Name { get; set; }
 
         public void Delete(string token, MessageSiloAPIService api)
@@ -24,6 +24,21 @@ namespace MessageSilo.SiloCTL.Options
             if (!string.IsNullOrEmpty(Name))
             {
                 api.DeleteConnection(token, Name);
+                return;
+            }
+
+            var connections = api.GetConnections(token);
+
+            foreach (var connection in connections)
+            {
+                api.DeleteConnection(token, connection.ConnectionSettings.RowKey);
+            }
+
+            var targets = api.GetTargets(token);
+
+            foreach (var target in targets)
+            {
+                api.DeleteTarget(token, target.RowKey);
             }
         }
     }
