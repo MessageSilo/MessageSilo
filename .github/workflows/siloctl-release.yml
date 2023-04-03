@@ -42,6 +42,6 @@ jobs:
       - name: Upload build artifacts
         working-directory: /home/runner/work/MessageSilo/publish
         run: |
-          az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-win-x64" -s "win-x64" --pattern "*"
-          az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-linux-x64" -s "linux-x64" --pattern "*"
-          az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-osx-x64" -s "osx-x64" --pattern "*"
+          az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-win-x64" -s "win-x64" --pattern "*" --overwrite true
+          az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-linux-x64" -s "linux-x64" --pattern "*" --overwrite true
+          az storage blob upload-batch --account-name messagesiloreleases -d "siloctl-osx-x64" -s "osx-x64" --pattern "*" --overwrite true
