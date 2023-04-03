@@ -41,6 +41,7 @@ var builder = Host.CreateDefaultBuilder(args)
             {
                 options.ConfigureTableServiceClient(configuration["ConnectionStrings:GrainStateStorage"]);
                 options.UseJson = true;
+                options.DeleteStateOnClear = true;
             });
         });
 
