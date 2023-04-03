@@ -6,6 +6,7 @@ using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using SQ = Azure.Messaging.ServiceBus.SubQueue;
+using RM = Azure.Messaging.ServiceBus.ServiceBusReceiveMode;
 
 namespace MessageSilo.Features.Azure
 {
@@ -28,6 +29,8 @@ namespace MessageSilo.Features.Azure
         public string SubQueue { get; }
 
         private SQ sq => SubQueue == "DeadLetter" ? SQ.DeadLetter : SQ.None;
+
+        private RM rm => AutoAck ? RM.ReceiveAndDelete : RM.PeekLock;
 
         public AzureServiceBusConnection(string connectionString, string queueName, string subQueue, ILogger logger)
         {
@@ -55,11 +58,11 @@ namespace MessageSilo.Features.Azure
             switch (Type)
             {
                 case MessagePlatformType.Azure_Queue:
-                    processor = client.CreateProcessor(QueueName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete });
+                    processor = client.CreateProcessor(QueueName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = rm, AutoCompleteMessages = AutoAck });
                     sender = client.CreateSender(QueueName);
                     break;
                 case MessagePlatformType.Azure_Topic:
-                    processor = client.CreateProcessor(TopicName, SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete });
+                    processor = client.CreateProcessor(TopicName, SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = rm, AutoCompleteMessages = AutoAck });
                     sender = client.CreateSender(TopicName);
                     break;
             }

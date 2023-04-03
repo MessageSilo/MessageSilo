@@ -44,8 +44,8 @@ namespace MessageSilo.Shared.DataAccess
         public async Task<IEnumerable<Entity>> Query(EntityKind kind, string? token = null)
         {
             var result = token is null ?
-                client.Query<Entity>(p => p.Kind == kind) :
-                client.Query<Entity>(p => p.PartitionKey == token && p.Kind == kind);
+                client.Query<Entity>(filter: $"Kind eq '{kind}'") :
+                client.Query<Entity>(filter: $"PartitionKey eq '{token}' and Kind eq '{kind}'");
 
             return await Task.FromResult(result);
         }

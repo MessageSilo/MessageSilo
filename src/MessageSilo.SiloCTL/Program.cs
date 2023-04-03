@@ -23,7 +23,7 @@ namespace QuickStart
 
             var api = new MessageSiloAPIService(new RestClient(restOptions));
 
-            Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions>(args)
+            Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions, DeleteOptions>(args)
                    .WithParsed<ShowOptions>(o =>
                    {
                        o.Show(ctlConfig.Token, api);
@@ -36,6 +36,10 @@ namespace QuickStart
                    .WithParsed<ConfigOptions>(o =>
                    {
                        Console.WriteLine(ctlConfig.ToString());
+                   })
+                   .WithParsed<DeleteOptions>(o =>
+                   {
+                       o.Delete(ctlConfig.Token, api);
                    });
         }
     }

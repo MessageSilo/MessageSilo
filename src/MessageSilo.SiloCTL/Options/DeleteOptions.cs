@@ -16,7 +16,7 @@ namespace MessageSilo.SiloCTL.Options
     [Verb("delete", HelpText = "Deletes one or all entities.")]
     public class DeleteOptions
     {
-        [Option('n', "name", Required = true, HelpText = "Name of the entity to delete.")]
+        [Option('n', "name", Required = false, HelpText = "Name of the entity to delete.")]
         public string Name { get; set; }
 
         public void Delete(string token, MessageSiloAPIService api)
