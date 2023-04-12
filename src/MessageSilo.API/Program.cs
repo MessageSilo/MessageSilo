@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Orleans;
+using Serilog;
+using Serilog.Events;
 using System.Net;
 using System.Security.Principal;
 
@@ -15,6 +17,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .AddJsonFile("appsettings.json", false, true)
     .AddJsonFile("appsettings.Development.json", true, true);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
 
 builder.Services.AddSingleton<ClusterClientHostedService>();
 builder.Services.AddSingleton<IHostedService>(
@@ -43,22 +49,18 @@ builder.Services.AddHealthChecks()
     .AddCheck<ShallowHealthCheck>("shallow")
     .AddCheck<DeepHealthCheck>("deep");
 
+builder.Host.UseSerilog();
+
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseWebAssemblyDebugging();
-}
-
+app.UseStaticFiles();
+app.UseSerilogRequestLogging();
 app.UseCors(builder => builder.SetIsOriginAllowed(isOriginAllowed: _ => true).WithExposedHeaders(HeaderNames.ContentDisposition).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 app.UseHttpsRedirection();
-app.UseBlazorFrameworkFiles();
-app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapFallbackToFile("index.html");
 app.MapHealthChecks("/health");
 
 app.Run();
