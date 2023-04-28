@@ -14,55 +14,55 @@ namespace MessageSilo.SiloCTL
             this.httpClient = httpClient;
         }
 
-        public IEnumerable<ConnectionState> GetConnections(string token)
+        public IEnumerable<ConnectionState> GetConnections()
         {
-            var result = httpClient.GetJson<IEnumerable<ConnectionState>>($"User/{token}/Connections");
+            var result = httpClient.GetJson<IEnumerable<ConnectionState>>($"Connections");
             return result!;
         }
 
-        public ConnectionState? GetConnection(string token, string name)
+        public ConnectionState? GetConnection(string name)
         {
-            var result = httpClient.GetJson<ConnectionState>($"User/{token}/Connections/{name}");
+            var result = httpClient.GetJson<ConnectionState>($"Connections/{name}");
             return result;
         }
 
         public void UpdateConnection(ConnectionSettingsDTO dto)
         {
-            httpClient.PutJson<ConnectionSettingsDTO>($"User/{dto.PartitionKey}/Connections/{dto.RowKey}", dto);
+            httpClient.PutJson<ConnectionSettingsDTO>($"Connections/{dto.RowKey}", dto);
         }
 
-        public IEnumerable<CorrectedMessage> GetMessages(string token, string name, DateTimeOffset from, DateTimeOffset to)
+        public IEnumerable<CorrectedMessage> GetMessages(string name, DateTimeOffset from, DateTimeOffset to)
         {
-            var result = httpClient.GetJson<IEnumerable<CorrectedMessage>>($"User/{token}/Connections/{name}/Messages?from={from.ToString("yyyy-MM-dd HH:mm")}&to={to.ToString("yyyy-MM-dd HH:mm")}");
+            var result = httpClient.GetJson<IEnumerable<CorrectedMessage>>($"Connections/{name}/Messages?from={from.ToString("yyyy-MM-dd HH:mm")}&to={to.ToString("yyyy-MM-dd HH:mm")}");
             return result!;
         }
 
-        public void DeleteConnection(string token, string name)
+        public void DeleteConnection(string name)
         {
-            var request = new RestRequest($"User/{token}/Connections/{name}", Method.Delete);
+            var request = new RestRequest($"Connections/{name}", Method.Delete);
             httpClient.Delete(request);
         }
 
-        public IEnumerable<TargetDTO> GetTargets(string token)
+        public IEnumerable<TargetDTO> GetTargets()
         {
-            var result = httpClient.GetJson<IEnumerable<TargetDTO>>($"User/{token}/Targets");
+            var result = httpClient.GetJson<IEnumerable<TargetDTO>>($"Targets");
             return result!;
         }
 
-        public TargetDTO? GetTarget(string token, string name)
+        public TargetDTO? GetTarget(string name)
         {
-            var result = httpClient.GetJson<TargetDTO>($"User/{token}/Targets/{name}");
+            var result = httpClient.GetJson<TargetDTO>($"Targets/{name}");
             return result;
         }
 
         public void UpdateTarget(TargetDTO dto)
         {
-            httpClient.PutJson<TargetDTO>($"User/{dto.PartitionKey}/Targets/{dto.RowKey}", dto);
+            httpClient.PutJson<TargetDTO>($"Targets/{dto.RowKey}", dto);
         }
 
-        public void DeleteTarget(string token, string name)
+        public void DeleteTarget(string name)
         {
-            var request = new RestRequest($"User/{token}/Targets/{name}", Method.Delete);
+            var request = new RestRequest($"Targets/{name}", Method.Delete);
             httpClient.Delete(request);
         }
     }

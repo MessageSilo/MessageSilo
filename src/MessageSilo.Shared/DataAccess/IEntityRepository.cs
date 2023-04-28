@@ -12,10 +12,10 @@ namespace MessageSilo.Shared.DataAccess
     {
         Task Add(IEnumerable<Entity> entities);
 
-        Task Delete(string token, IEnumerable<string> name);
+        Task Delete(string userId, IEnumerable<string> name);
 
-        Task<IEnumerable<Entity>> Query(EntityKind kind, string? token = null);
+        Task<IEnumerable<Entity>> Query(EntityKind kind, string? userId = null);
 
-        Task<int> Count(string? token = null);
+        Task<int> Count(string? userId = null);
     }
 }

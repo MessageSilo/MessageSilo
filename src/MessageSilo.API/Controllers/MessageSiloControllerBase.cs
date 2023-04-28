@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace MessageSilo.API.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public abstract class MessageSiloControllerBase : ControllerBase
     {
         protected readonly ILogger<MessageSiloControllerBase> logger;
@@ -17,7 +17,7 @@ namespace MessageSilo.API.Controllers
 
         protected readonly IEntityRepository repo;
 
-        //protected readonly string loggedInUserId;
+        protected readonly string loggedInUserId;
 
         public MessageSiloControllerBase(ILogger<MessageSiloControllerBase> logger, IHttpContextAccessor httpContextAccessor, IClusterClient client, IEntityRepository repo)
         {
@@ -26,7 +26,7 @@ namespace MessageSilo.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
             this.repo = repo;
 
-            //loggedInUserId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+            loggedInUserId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
         }
     }
 }

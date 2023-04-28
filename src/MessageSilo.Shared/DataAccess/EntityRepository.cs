@@ -33,26 +33,26 @@ namespace MessageSilo.Shared.DataAccess
             }
         }
 
-        public async Task Delete(string token, IEnumerable<string> names)
+        public async Task Delete(string userId, IEnumerable<string> names)
         {
             foreach (var name in names)
             {
-                await client.DeleteEntityAsync(token, name);
+                await client.DeleteEntityAsync(userId, name);
             }
         }
 
-        public async Task<IEnumerable<Entity>> Query(EntityKind kind, string? token = null)
+        public async Task<IEnumerable<Entity>> Query(EntityKind kind, string? userId = null)
         {
-            var result = token is null ?
+            var result = userId is null ?
                 client.Query<Entity>(filter: $"Kind eq '{kind}'") :
-                client.Query<Entity>(filter: $"PartitionKey eq '{token}' and Kind eq '{kind}'");
+                client.Query<Entity>(filter: $"PartitionKey eq '{userId}' and Kind eq '{kind}'");
 
             return await Task.FromResult(result);
         }
 
-        public async Task<int> Count(string? token = null)
+        public async Task<int> Count(string? userId = null)
         {
-            var result = client.Query<Entity>(p => p.PartitionKey == token, select: new[] { "PartitionKey " });
+            var result = client.Query<Entity>(p => p.PartitionKey == userId, select: new[] { "PartitionKey " });
 
             return await Task.FromResult(result.Count());
         }

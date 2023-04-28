@@ -1,6 +1,5 @@
 using MessageSilo.API;
 using MessageSilo.API.HealthChecks;
-using MessageSilo.Features.Connection;
 using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -8,9 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Orleans;
 using Serilog;
-using Serilog.Events;
-using System.Net;
-using System.Security.Principal;
 
 var builder = WebApplication.CreateBuilder(args);
 

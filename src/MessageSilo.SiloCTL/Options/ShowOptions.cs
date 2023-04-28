@@ -28,7 +28,7 @@ namespace MessageSilo.SiloCTL.Options
         {
             if (!string.IsNullOrEmpty(Name))
             {
-                var conn = api.GetConnection(token, Name);
+                var conn = api.GetConnection(Name);
 
                 if (conn is not null)
                     Console.WriteLine(conn);
@@ -38,8 +38,8 @@ namespace MessageSilo.SiloCTL.Options
                 return;
             }
 
-            var existingConnections = api.GetConnections(token);
-            var existingTargets = api.GetTargets(token);
+            var existingConnections = api.GetConnections();
+            var existingTargets = api.GetTargets();
 
             if (existingConnections.Count() + existingTargets.Count() == 0)
             {

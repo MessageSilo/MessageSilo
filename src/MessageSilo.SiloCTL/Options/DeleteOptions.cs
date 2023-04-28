@@ -23,22 +23,22 @@ namespace MessageSilo.SiloCTL.Options
         {
             if (!string.IsNullOrEmpty(Name))
             {
-                api.DeleteConnection(token, Name);
+                api.DeleteConnection(Name);
                 return;
             }
 
-            var connections = api.GetConnections(token);
+            var connections = api.GetConnections();
 
             foreach (var connection in connections)
             {
-                api.DeleteConnection(token, connection.ConnectionSettings.RowKey);
+                api.DeleteConnection(connection.ConnectionSettings.RowKey);
             }
 
-            var targets = api.GetTargets(token);
+            var targets = api.GetTargets();
 
             foreach (var target in targets)
             {
-                api.DeleteTarget(token, target.RowKey);
+                api.DeleteTarget(target.RowKey);
             }
         }
     }

@@ -19,12 +19,12 @@ namespace MessageSilo.API.Controllers
             this.messages = messages;
         }
 
-        [HttpGet("User/{token}/Connections")]
-        public async Task<IEnumerable<ConnectionState>> Index(string token)
+        [HttpGet("Connections")]
+        public async Task<IEnumerable<ConnectionState>> Index()
         {
             var result = new List<ConnectionState>();
 
-            var connections = await repo.Query(EntityKind.Connection, token);
+            var connections = await repo.Query(EntityKind.Connection, loggedInUserId);
 
             foreach (var c in connections)
             {
@@ -35,20 +35,20 @@ namespace MessageSilo.API.Controllers
             return result;
         }
 
-        [HttpDelete("User/{token}/Connections/{name}")]
-        public async Task Delete(string token, string name)
+        [HttpDelete("Connections/{name}")]
+        public async Task Delete(string name)
         {
-            var id = $"{token}|{name}";
+            var id = $"{loggedInUserId}|{name}";
             var conn = client!.GetGrain<IConnectionGrain>(id);
             await conn.Delete();
-            await repo.Delete(token, new[] { name });
+            await repo.Delete(loggedInUserId, new[] { name });
         }
 
-        [HttpGet("User/{token}/Connections/{name}")]
-        public async Task<ConnectionState> Show(string token, string name)
+        [HttpGet("Connections/{name}")]
+        public async Task<ConnectionState> Show(string name)
         {
-            var id = $"{token}|{name}";
-            var connections = await repo.Query(EntityKind.Connection, token);
+            var id = $"{loggedInUserId}|{name}";
+            var connections = await repo.Query(EntityKind.Connection, loggedInUserId);
 
             if (!connections.Any(p => p.Id == id))
             {
@@ -61,16 +61,16 @@ namespace MessageSilo.API.Controllers
             return await conn.GetState();
         }
 
-        [HttpPut("User/{token}/Connections/{name}")]
-        public async Task<ConnectionState> Update(string token, string name, [FromBody] ConnectionSettingsDTO dto)
+        [HttpPut("Connections/{name}")]
+        public async Task<ConnectionState> Update(string name, [FromBody] ConnectionSettingsDTO dto)
         {
-            var id = $"{token}|{name}";
+            var id = $"{loggedInUserId}|{name}";
 
             await repo.Add(new[]
             {
                 new Entity()
                 {
-                    PartitionKey = token,
+                    PartitionKey = loggedInUserId,
                     RowKey = name,
                     Kind = EntityKind.Connection
                 }
@@ -82,10 +82,10 @@ namespace MessageSilo.API.Controllers
             return await conn.GetState();
         }
 
-        [HttpGet("User/{token}/Connections/{name}/Messages")]
-        public async Task<IEnumerable<CorrectedMessage>> ShowMessages(string token, string name, [FromQuery] DateTimeOffset from, [FromQuery] DateTimeOffset to)
+        [HttpGet("Connections/{name}/Messages")]
+        public async Task<IEnumerable<CorrectedMessage>> ShowMessages(string name, [FromQuery] DateTimeOffset from, [FromQuery] DateTimeOffset to)
         {
-            var id = $"{token}|{name}";
+            var id = $"{loggedInUserId}|{name}";
             return await messages.Query(id, from, to);
         }
     }

@@ -9,45 +9,70 @@ namespace MessageSilo.SiloCTL
     {
         private const string CONFIG_FILE_NAME = "message-silo-config.yaml";
 
-        public string Token { get; private set; }
+        public string Auth0Domain { get; private set; } = "message-silo.eu.auth0.com";
+
+        public string Auth0ClinetID { get; private set; } = "NDhyYxtmtQp51kpc22JMB3m46TymaZAp";
+
+        public string Auth0RedirectUrl { get; private set; } = "http://localhost:4242";
+
+        public string Auth0Audiance { get; private set; } = "https://api.message-silo.dev";
+
+        public string Id { get; set; }
+
+        public string Token { get; set; }
 
 #if DEBUG
         public string ApiUrl { get; private set; } = "https://localhost:5000/api/v1";
 #else
         public string ApiUrl { get; private set; } = "https://api.message-silo.dev/api/v1";
 #endif
+
         private ConfigReader configReader;
 
         public CTLConfig()
         {
         }
 
-        public void Init()
+        public void CreateIfNotExist()
         {
-            var appDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.LocalApplicationData, SpecialFolderOption.DoNotVerify), "siloctl");
+            var appDataFolder = getAppDataFolder();
 
-            if(!Directory.Exists(appDataFolder))
+            if (!Directory.Exists(appDataFolder))
                 Directory.CreateDirectory(appDataFolder);
 
             var configPath = $"{appDataFolder}/{CONFIG_FILE_NAME}";
 
             if (!File.Exists(configPath))
             {
-                Token = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
+                Id = $"{Guid.NewGuid()}-{Guid.NewGuid()}-{Guid.NewGuid()}";
                 var yaml = YamlConverter.Serialize(this);
                 File.WriteAllText(configPath, yaml);
             }
+        }
 
+        public void Load()
+        {
+            var appDataFolder = getAppDataFolder();
+            var configPath = $"{appDataFolder}/{CONFIG_FILE_NAME}";
             configReader = new ConfigReader(configPath);
 
             var existing = YamlConverter.Deserialize<CTLConfig>(configReader.FileContents.First());
             Token = existing.Token;
-            ApiUrl = existing.ApiUrl;
+        }
+
+        public void Save()
+        {
+            var appDataFolder = getAppDataFolder();
+            var configPath = $"{appDataFolder}/{CONFIG_FILE_NAME}";
+            var yaml = YamlConverter.Serialize(this);
+            File.WriteAllText(configPath, yaml);
         }
 
         public override string ToString()
         {
             return YamlConverter.Serialize(this);
         }
+
+        private string getAppDataFolder() => Path.Combine(Environment.GetFolderPath(SpecialFolder.LocalApplicationData, SpecialFolderOption.DoNotVerify), "siloctl");
     }
 }

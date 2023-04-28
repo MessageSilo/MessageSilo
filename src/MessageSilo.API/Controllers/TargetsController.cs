@@ -18,12 +18,12 @@ namespace MessageSilo.API.Controllers
         {
         }
 
-        [HttpGet("User/{token}/Targets")]
-        public async Task<IEnumerable<TargetDTO>> Index(string token)
+        [HttpGet("Targets")]
+        public async Task<IEnumerable<TargetDTO>> Index()
         {
             var result = new List<TargetDTO>();
 
-            var targets = await repo.Query(EntityKind.Target, token);
+            var targets = await repo.Query(EntityKind.Target, loggedInUserId);
 
             foreach (var t in targets)
             {
@@ -34,11 +34,11 @@ namespace MessageSilo.API.Controllers
             return result;
         }
 
-        [HttpGet("User/{token}/Targets/{name}")]
-        public async Task<TargetDTO> Show(string token, string name)
+        [HttpGet("Targets/{name}")]
+        public async Task<TargetDTO> Show(string name)
         {
-            var id = $"{token}|{name}";
-            var targets = await repo.Query(EntityKind.Target, token);
+            var id = $"{loggedInUserId}|{name}";
+            var targets = await repo.Query(EntityKind.Target, loggedInUserId);
 
             if (!targets.Any(p => p.Id == id))
             {
@@ -51,16 +51,16 @@ namespace MessageSilo.API.Controllers
             return await target.GetState();
         }
 
-        [HttpPut("User/{token}/Targets/{name}")]
-        public async Task<TargetDTO> Update(string token, string name, [FromBody] TargetDTO dto)
+        [HttpPut("Targets/{name}")]
+        public async Task<TargetDTO> Update(string name, [FromBody] TargetDTO dto)
         {
-            var id = $"{token}|{name}";
+            var id = $"{loggedInUserId}|{name}";
 
             await repo.Add(new[]
             {
                 new Entity()
                 {
-                    PartitionKey = token,
+                    PartitionKey = loggedInUserId,
                     RowKey = name,
                     Kind = EntityKind.Target
                 }
