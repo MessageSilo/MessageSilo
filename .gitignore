@@ -265,3 +265,4 @@ __pycache__/
 
 /src/MessageSilo.API/appsettings.Development.json
 /src/MessageSilo.Silo/appsettings.Development.json
+/src/MessageSilo.SiloCTL/Properties/PublishProfiles/FolderProfile.pubxml
