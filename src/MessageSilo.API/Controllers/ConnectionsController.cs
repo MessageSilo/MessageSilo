@@ -64,7 +64,7 @@ namespace MessageSilo.API.Controllers
         [HttpPut("Connections/{name}")]
         public async Task<ConnectionState> Update(string name, [FromBody] ConnectionSettingsDTO dto)
         {
-            var id = $"{loggedInUserId}|{name}";
+            dto.PartitionKey = loggedInUserId;
 
             await repo.Add(new[]
             {
@@ -76,7 +76,7 @@ namespace MessageSilo.API.Controllers
                 }
             });
 
-            var conn = client!.GetGrain<IConnectionGrain>(id);
+            var conn = client!.GetGrain<IConnectionGrain>(dto.Id);
             await conn.Update(dto);
 
             return await conn.GetState();

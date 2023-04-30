@@ -54,7 +54,7 @@ namespace MessageSilo.API.Controllers
         [HttpPut("Targets/{name}")]
         public async Task<TargetDTO> Update(string name, [FromBody] TargetDTO dto)
         {
-            var id = $"{loggedInUserId}|{name}";
+            dto.PartitionKey = loggedInUserId;
 
             await repo.Add(new[]
             {
@@ -66,7 +66,7 @@ namespace MessageSilo.API.Controllers
                 }
             });
 
-            var target = client!.GetGrain<ITargetGrain>(id);
+            var target = client!.GetGrain<ITargetGrain>(dto.Id);
             await target.Update(dto);
 
             return await target.GetState();

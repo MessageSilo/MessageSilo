@@ -1,5 +1,7 @@
 ﻿using Azure;
 using RestSharp;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -9,7 +11,7 @@ using static System.Net.WebRequestMethods;
 
 namespace MessageSilo.SiloCTL
 {
-    internal class AuthAPIService
+    public class AuthAPIService
     {
         private readonly CTLConfig config;
 
@@ -18,7 +20,7 @@ namespace MessageSilo.SiloCTL
             this.config = config;
         }
 
-        public string? HandleAuthResponse(string codeChallenge)
+        public string? HandleAuthResponse()
         {
             using var listener = new HttpListener();
             listener.Prefixes.Add($"{config.Auth0RedirectUrl}/");
@@ -58,12 +60,12 @@ namespace MessageSilo.SiloCTL
             return null;
         }
 
-        public string GetAuthUrl(string codeChallenge)
+        public string GetAuthUrl()
         {
-            return $"https://{config.Auth0Domain}/authorize?response_type=code&code_challenge_method=S256&code_challenge={codeChallenge}&client_id={config.Auth0ClinetID}&redirect_uri={config.Auth0RedirectUrl}&scope=openid%20profile%20email&audience={config.Auth0Audiance}";
+            return $"https://{config.Auth0Domain}/authorize?prompt=login&response_type=code&code_challenge_method=S256&code_challenge={config.Id}&client_id={config.Auth0ClinetID}&redirect_uri={config.Auth0RedirectUrl}&scope=openid%20profile%20email&audience={config.Auth0Audiance}";
         }
 
-        public string GetToken(string codeChallenge, string code)
+        public string GetToken(string code)
         {
             var client = new RestClient($"https://{config.Auth0Domain}");
 
@@ -72,22 +74,41 @@ namespace MessageSilo.SiloCTL
             var contentType = "application/x-www-form-urlencoded";
 
             request.AddHeader("content-type", contentType);
-            request.AddParameter(contentType, $"grant_type=authorization_code&client_id={config.Auth0ClinetID}&code_verifier={codeChallenge}&code={code}&redirect_uri={config.Auth0RedirectUrl}", ParameterType.RequestBody);
+            request.AddParameter(contentType, $"grant_type=authorization_code&client_id={config.Auth0ClinetID}&code_verifier={config.Id}&code={code}&redirect_uri={config.Auth0RedirectUrl}", ParameterType.RequestBody);
 
             var response = client.Execute(request);
+
+            if (!response.IsSuccessStatusCode)
+                return null;
 
             var data = JsonSerializer.Deserialize<JsonNode>(response.Content!);
 
             return data["access_token"].GetValue<string>();
         }
 
-        public bool IsValidtoken(string token)
+        public bool IsValidtoken()
         {
             var client = new RestClient($"https://{config.Auth0Domain}");
 
             var request = new RestRequest("/userinfo", Method.Get);
 
-            request.AddHeader("Authorization", $"Bearer {token}");
+            request.AddHeader("Authorization", $"Bearer {config.Token}");
+
+            var response = client.Execute(request);
+
+            return response.IsSuccessStatusCode;
+        }
+
+        public bool Logout()
+        {
+            var client = new RestClient($"https://{config.Auth0Domain}");
+
+            var request = new RestRequest("/oidc/logout", Method.Post);
+
+            var contentType = "application/x-www-form-urlencoded";
+
+            request.AddHeader("content-type", contentType);
+            request.AddParameter(contentType, $"federated&client_id={config.Auth0ClinetID}&logout_hint=SESSION_ID", ParameterType.RequestBody);
 
             var response = client.Execute(request);
 

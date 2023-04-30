@@ -5,7 +5,7 @@ using static System.Environment;
 
 namespace MessageSilo.SiloCTL
 {
-    internal class CTLConfig
+    public class CTLConfig
     {
         private const string CONFIG_FILE_NAME = "message-silo-config.yaml";
 
@@ -66,6 +66,16 @@ namespace MessageSilo.SiloCTL
             var configPath = $"{appDataFolder}/{CONFIG_FILE_NAME}";
             var yaml = YamlConverter.Serialize(this);
             File.WriteAllText(configPath, yaml);
+        }
+
+        public void Delete()
+        {
+            var appDataFolder = getAppDataFolder();
+
+            var configPath = $"{appDataFolder}/{CONFIG_FILE_NAME}";
+
+            if (File.Exists(configPath))
+                File.Delete(configPath);
         }
 
         public override string ToString()

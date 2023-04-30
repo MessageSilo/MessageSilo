@@ -14,12 +14,16 @@ using ConsoleTables;
 namespace MessageSilo.SiloCTL.Options
 {
     [Verb("delete", HelpText = "Deletes one or all entities.")]
-    public class DeleteOptions
+    public class DeleteOptions : AuthorizedOptions
     {
+        public DeleteOptions() : base()
+        {
+        }
+
         [Option('n', "name", Required = false, HelpText = "Name of the entity to delete.")]
         public string Name { get; set; }
 
-        public void Delete(string token, MessageSiloAPIService api)
+        public void Delete()
         {
             if (!string.IsNullOrEmpty(Name))
             {

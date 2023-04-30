@@ -9,7 +9,15 @@ using System.Threading.Tasks;
 namespace MessageSilo.SiloCTL.Options
 {
     [Verb("config", HelpText = "Display the current config and context.")]
-    public class ConfigOptions
+    public class ConfigOptions : Options
     {
+        public ConfigOptions() : base()
+        {
+        }
+
+        public void Show()
+        {
+            Console.WriteLine(config);
+        }
     }
 }

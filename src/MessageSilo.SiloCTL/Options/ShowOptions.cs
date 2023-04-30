@@ -12,7 +12,7 @@ using MessageSilo.Shared.Enums;
 namespace MessageSilo.SiloCTL.Options
 {
     [Verb("show", HelpText = "Display one or many entities.\r\n\r\nPrints a table of the most important information about the specified entities.")]
-    public class ShowOptions
+    public class ShowOptions : AuthorizedOptions
     {
         private readonly ConsoleTable showEntitesTable = new ConsoleTable(new ConsoleTableOptions()
         {
@@ -21,10 +21,14 @@ namespace MessageSilo.SiloCTL.Options
             NumberAlignment = Alignment.Right
         });
 
+        public ShowOptions() : base()
+        {
+        }
+
         [Option('n', "name", Required = false, HelpText = "Display detailed information about a specific entity.")]
         public string Name { get; set; }
 
-        public void Show(string token, MessageSiloAPIService api)
+        public void Show()
         {
             if (!string.IsNullOrEmpty(Name))
             {
