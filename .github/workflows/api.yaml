@@ -4,7 +4,6 @@ on:
   push:
     branches: ["main"]
     paths-ignore:
-      - ".github/workflows/**"
       - "scripts/**"
 
 jobs:
@@ -28,10 +27,14 @@ jobs:
         run: dotnet publish -c Release -o "/home/runner/work/MessageSilo/publish"
 
       - name: Transform appsettings
-        working-directory: /home/runner/work/MessageSilo/publish
-        run: |
-          sed -i 's/$(ConnectionStrings.AI)/${{ secrets.CONNECTIONSTRINGS_AI }}/g' appsettings.json
-          sed -i 's/$(ConnectionStrings.GrainStateStorage)/${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}/g' appsettings.json
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: '$('
+          tokenSuffix: ')'
+          files: '["**/appsettings.js"]'
+        env:
+          ConnectionStrings.AI: ${{ secrets.CONNECTIONSTRINGS_AI }}
+          ConnectionStrings.GrainStateStorage: ${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}
 
       - name: Upload build artifact
         uses: garygrossgarten/github-action-scp@release
