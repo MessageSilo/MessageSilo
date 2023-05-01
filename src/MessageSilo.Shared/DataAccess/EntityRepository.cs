@@ -25,7 +25,7 @@ namespace MessageSilo.Shared.DataAccess
             var countOfEntities = await Count(entites.First().PartitionKey);
 
             if (countOfEntities >= 5)
-                throw new Exception("Count of max. allowed entities reached! ==WIP: Only in BETA nad FREE tier==");
+                throw new Exception("Count of max. allowed entities reached! ==WIP: Only in BETA and FREE tier==");
 
             foreach (var e in entites)
             {
