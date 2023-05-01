@@ -1,12 +1,9 @@
 ﻿using Azure.Messaging.ServiceBus;
-using CsvHelper;
-using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
-using System;
-using SQ = Azure.Messaging.ServiceBus.SubQueue;
 using RM = Azure.Messaging.ServiceBus.ServiceBusReceiveMode;
+using SQ = Azure.Messaging.ServiceBus.SubQueue;
 
 namespace MessageSilo.Features.Azure
 {
@@ -32,22 +29,24 @@ namespace MessageSilo.Features.Azure
 
         private RM rm => AutoAck ? RM.ReceiveAndDelete : RM.PeekLock;
 
-        public AzureServiceBusConnection(string connectionString, string queueName, string subQueue, ILogger logger)
+        public AzureServiceBusConnection(string connectionString, string queueName, string subQueue, bool autoAck, ILogger logger)
         {
             ConnectionString = connectionString;
             QueueName = queueName;
             SubQueue = subQueue;
             Type = MessagePlatformType.Azure_Queue;
+            AutoAck = autoAck;
             this.logger = logger;
         }
 
-        public AzureServiceBusConnection(string connectionString, string topicName, string subscriptionName, string subQueue, ILogger logger)
+        public AzureServiceBusConnection(string connectionString, string topicName, string subscriptionName, string subQueue, bool autoAck, ILogger logger)
         {
             ConnectionString = connectionString;
             TopicName = topicName;
             SubscriptionName = subscriptionName;
             SubQueue = subQueue;
             Type = MessagePlatformType.Azure_Topic;
+            AutoAck = autoAck;
             this.logger = logger;
         }
 
@@ -84,9 +83,9 @@ namespace MessageSilo.Features.Azure
             return Task.CompletedTask;
         }
 
-        public override async Task Enqueue(string msgBody)
+        public override async Task Enqueue(Message message)
         {
-            var msg = new ServiceBusMessage(msgBody);
+            var msg = new ServiceBusMessage(message.Body);
             await sender.SendMessageAsync(msg);
         }
 

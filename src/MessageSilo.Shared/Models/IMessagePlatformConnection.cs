@@ -14,6 +14,6 @@ namespace MessageSilo.Shared.Models
 
         Task Init();
 
-        Task Enqueue(string msgBody);
+        Task Enqueue(Message message);
     }
 }

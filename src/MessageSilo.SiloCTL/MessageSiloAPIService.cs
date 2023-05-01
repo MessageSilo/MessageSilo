@@ -1,6 +1,4 @@
-﻿using MessageSilo.Features.MessageCorrector;
-using MessageSilo.Shared.Models;
-using Microsoft.Azure.Amqp.Framing;
+﻿using MessageSilo.Shared.Models;
 using RestSharp;
 
 namespace MessageSilo.SiloCTL
@@ -13,6 +11,8 @@ namespace MessageSilo.SiloCTL
         {
             this.httpClient = httpClient;
         }
+
+        #region Connections
 
         public IEnumerable<ConnectionState> GetConnections()
         {
@@ -31,17 +31,15 @@ namespace MessageSilo.SiloCTL
             httpClient.PutJson<ConnectionSettingsDTO>($"Connections/{dto.RowKey}", dto);
         }
 
-        public IEnumerable<CorrectedMessage> GetMessages(string name, DateTimeOffset from, DateTimeOffset to)
-        {
-            var result = httpClient.GetJson<IEnumerable<CorrectedMessage>>($"Connections/{name}/Messages?from={from.ToString("yyyy-MM-dd HH:mm")}&to={to.ToString("yyyy-MM-dd HH:mm")}");
-            return result!;
-        }
-
         public void DeleteConnection(string name)
         {
             var request = new RestRequest($"Connections/{name}", Method.Delete);
             httpClient.Delete(request);
         }
+
+        #endregion
+
+        #region Tragets
 
         public IEnumerable<TargetDTO> GetTargets()
         {
@@ -65,5 +63,34 @@ namespace MessageSilo.SiloCTL
             var request = new RestRequest($"Targets/{name}", Method.Delete);
             httpClient.Delete(request);
         }
+
+        #endregion
+
+        #region Enrichers
+
+        public IEnumerable<EnricherDTO> GetEnrichers()
+        {
+            var result = httpClient.GetJson<IEnumerable<EnricherDTO>>($"Enrichers");
+            return result!;
+        }
+
+        public EnricherDTO? GetEnricher(string name)
+        {
+            var result = httpClient.GetJson<EnricherDTO>($"Enrichers/{name}");
+            return result;
+        }
+
+        public void UpdateEnricher(EnricherDTO dto)
+        {
+            httpClient.PutJson<EnricherDTO>($"Enrichers/{dto.RowKey}", dto);
+        }
+
+        public void DeleteEnricher(string name)
+        {
+            var request = new RestRequest($"Enrichers/{name}", Method.Delete);
+            httpClient.Delete(request);
+        }
+
+        #endregion
     }
 }

@@ -10,7 +10,7 @@ namespace MessageSilo.Shared.Models
 
         public string QueueName { get; set; }
 
-        public string CorrectorFuncBody { get; set; }
+        public IEnumerable<string> Enrichers { get; set; } = new List<string>();
 
         public string Target { get; set; }
 

@@ -14,7 +14,7 @@ namespace MessageSilo.Shared.Models
 {
     public class Entity : ITableEntity
     {
-        [YamlMember(Alias = "token")]
+        [YamlMember(Alias = "userId")]
         public string PartitionKey { get; set; }
 
         [YamlMember(Alias = "name")]

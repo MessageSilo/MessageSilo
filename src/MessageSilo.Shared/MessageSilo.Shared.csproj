@@ -26,4 +26,8 @@
     <Orleans_CodeGenInputs Remove="Models\Entity.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Orleans_CodeGenInputs Remove="Enums\EnricherType.cs" />
+  </ItemGroup>
+
 </Project>

@@ -1,9 +1,7 @@
 using MessageSilo.Features.Connection;
-using MessageSilo.Features.MessageCorrector;
+using MessageSilo.Features.Enricher;
 using MessageSilo.Features.Target;
-using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Models;
-using Microsoft.ApplicationInsights.Extensibility;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -40,7 +38,7 @@ var builder = Host.CreateDefaultBuilder(args)
                 manager.AddApplicationPart(typeof(IMessageSenderGrain).Assembly);
                 manager.AddApplicationPart(typeof(ITargetGrain).Assembly);
                 manager.AddApplicationPart(typeof(IConnectionGrain).Assembly);
-                manager.AddApplicationPart(typeof(IMessageCorrectorGrain).Assembly);
+                manager.AddApplicationPart(typeof(IEnricherGrain).Assembly);
             })
             .AddAzureTableGrainStorageAsDefault(options =>
             {
@@ -49,11 +47,6 @@ var builder = Host.CreateDefaultBuilder(args)
                 options.DeleteStateOnClear = true;
             });
         });
-
-builder.ConfigureServices(services =>
-{
-    services.AddSingleton<IMessageRepository<CorrectedMessage>, MessageRepository<CorrectedMessage>>();
-});
 
 builder.UseSerilog(Log.Logger);
 

@@ -1,11 +1,8 @@
-﻿using MessageSilo.Features.Connection;
-using MessageSilo.Features.MessageCorrector;
-using MessageSilo.Features.Target;
+﻿using MessageSilo.Features.Target;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Amqp.Framing;
 using Orleans;
 
 namespace MessageSilo.API.Controllers

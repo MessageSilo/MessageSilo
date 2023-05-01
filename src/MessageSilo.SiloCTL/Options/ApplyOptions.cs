@@ -61,5 +61,24 @@ namespace MessageSilo.SiloCTL.Options
 
             return targets;
         }
+
+        public IEnumerable<EnricherDTO> InitEnrichers()
+        {
+            var enrichers = new List<EnricherDTO>();
+            var configReader = new ConfigReader(FileName);
+
+            foreach (var config in configReader.FileContents.Where(p => p.Contains($"kind: {EntityKind.Enricher}")))
+            {
+                var parsed = YamlConverter.Deserialize<EnricherDTO>(config);
+                enrichers.Add(parsed);
+            }
+
+            foreach (var enricher in enrichers)
+            {
+                api.UpdateEnricher(enricher);
+            };
+
+            return enrichers;
+        }
     }
 }

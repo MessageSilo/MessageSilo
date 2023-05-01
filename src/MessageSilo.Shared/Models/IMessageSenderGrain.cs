@@ -9,6 +9,6 @@ namespace MessageSilo.Shared.Models
 {
     public interface IMessageSenderGrain : IGrainWithStringKey
     {
-        Task Send(string msgBody);
+        Task Send(Message message);
     }
 }

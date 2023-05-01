@@ -44,12 +44,12 @@ namespace MessageSilo.Features.RabbitMQ
             await Task.CompletedTask;
         }
 
-        public override async Task Enqueue(string msgBody)
+        public override async Task Enqueue(Message message)
         {
             channel.BasicPublish(exchange: ExchangeName,
                      routingKey: string.Empty,
                      basicProperties: channel.CreateBasicProperties(),
-                     body: Encoding.UTF8.GetBytes(msgBody));
+                     body: Encoding.UTF8.GetBytes(message.Body));
 
             await Task.CompletedTask;
         }

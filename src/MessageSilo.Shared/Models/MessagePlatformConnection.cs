@@ -21,7 +21,7 @@ namespace MessageSilo.Shared.Models
 
         public abstract Task Init();
 
-        public abstract Task Enqueue(string msgBody);
+        public abstract Task Enqueue(Message message);
 
         public abstract ValueTask DisposeAsync();
     }

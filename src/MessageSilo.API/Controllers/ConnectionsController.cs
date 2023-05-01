@@ -1,5 +1,4 @@
 ﻿using MessageSilo.Features.Connection;
-using MessageSilo.Features.MessageCorrector;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
@@ -11,12 +10,9 @@ namespace MessageSilo.API.Controllers
     [Route("api/v1")]
     public class ConnectionsController : MessageSiloControllerBase
     {
-        private readonly IMessageRepository<CorrectedMessage> messages;
-
-        public ConnectionsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IMessageRepository<CorrectedMessage> messages, IEntityRepository repo)
+        public ConnectionsController(ILogger<ConnectionsController> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IEntityRepository repo)
             : base(logger, httpContextAccessor, client, repo)
         {
-            this.messages = messages;
         }
 
         [HttpGet("Connections")]
@@ -80,13 +76,6 @@ namespace MessageSilo.API.Controllers
             await conn.Update(dto);
 
             return await conn.GetState();
-        }
-
-        [HttpGet("Connections/{name}/Messages")]
-        public async Task<IEnumerable<CorrectedMessage>> ShowMessages(string name, [FromQuery] DateTimeOffset from, [FromQuery] DateTimeOffset to)
-        {
-            var id = $"{loggedInUserId}|{name}";
-            return await messages.Query(id, from, to);
         }
     }
 }

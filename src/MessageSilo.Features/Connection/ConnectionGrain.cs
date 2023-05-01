@@ -1,6 +1,6 @@
 ﻿using MessageSilo.Features.AWS;
 using MessageSilo.Features.Azure;
-using MessageSilo.Features.MessageCorrector;
+using MessageSilo.Features.Enricher;
 using MessageSilo.Features.RabbitMQ;
 using MessageSilo.Features.Target;
 using MessageSilo.Shared.Enums;
@@ -8,7 +8,6 @@ using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
-using System.Runtime;
 
 namespace MessageSilo.Features.Connection
 {
@@ -68,9 +67,24 @@ namespace MessageSilo.Features.Connection
             return await Task.FromResult(persistence.State);
         }
 
-        public async Task Send(string msgBody)
+        public async Task Send(Message message)
         {
-            await messagePlatformConnection.Enqueue(msgBody);
+            await messagePlatformConnection.Enqueue(message);
+        }
+
+        public async Task TransformAndSend(Message message)
+        {
+            var settings = persistence.State.ConnectionSettings;
+
+            foreach (var enricherName in settings.Enrichers)
+            {
+                var enricherGrain = grainFactory.GetGrain<IEnricherGrain>($"{settings.PartitionKey}|{enricherName}");
+
+                message = await enricherGrain.Enrich(message);
+            }
+
+            if (target is not null)
+                target.InvokeOneWay(p => p.Send(message));
         }
 
         private async Task reInit()
@@ -90,14 +104,13 @@ namespace MessageSilo.Features.Connection
                             break;
                     }
 
-
                 switch (settings.Type)
                 {
                     case MessagePlatformType.Azure_Queue:
-                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.QueueName, settings.SubQueue, logger);
+                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.QueueName, settings.SubQueue, settings.AutoAck, logger);
                         break;
                     case MessagePlatformType.Azure_Topic:
-                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.TopicName, settings.SubscriptionName, settings.SubQueue, logger);
+                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.TopicName, settings.SubscriptionName, settings.SubQueue, settings.AutoAck, logger);
                         break;
                     case MessagePlatformType.RabbitMQ:
                         messagePlatformConnection = new RabbitMQConnection(settings.ConnectionString, settings.QueueName, settings.ExchangeName, settings.AutoAck, logger);
@@ -126,9 +139,7 @@ namespace MessageSilo.Features.Connection
 
             logger.Debug($"Connection: {this.GetPrimaryKeyString()} received a messsage: {msg.Id}.");
 
-            var messageCorrector = grainFactory.GetGrain<IMessageCorrectorGrain>($"{this.GetPrimaryKeyString()}|corrector");
-
-            messageCorrector.InvokeOneWay(p => p.CorrectMessage(this, msg, target));
+            grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString()).InvokeOneWay(p => p.TransformAndSend(msg));
         }
 
         private Task healthCheck(object state)

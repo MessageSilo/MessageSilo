@@ -50,9 +50,9 @@ namespace MessageSilo.Features.AWS
             await Task.CompletedTask;
         }
 
-        public override async Task Enqueue(string msgBody)
+        public override async Task Enqueue(Shared.Models.Message message)
         {
-            await client.SendMessageAsync(queueUrl, msgBody);
+            await client.SendMessageAsync(queueUrl, message.Body);
         }
 
         public override async Task Init()

@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace MessageSilo.Shared.Enums
 {
-    public enum EntityKind
+    public enum EnricherType
     {
-        Connection,
-        Enricher,
-        Target
+        Inline,
+        API
     }
 }

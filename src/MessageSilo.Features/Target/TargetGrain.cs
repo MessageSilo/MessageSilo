@@ -30,10 +30,10 @@ namespace MessageSilo.Features.Target
             this.grainFactory = grainFactory;
         }
 
-        public async Task Send(string msgBody)
+        public async Task Send(Message message)
         {
             var request = new RestRequest(persistence.State.Url, Method.Post);
-            request.AddBody(msgBody, contentType: ContentType.Json);
+            request.AddBody(message.Body, contentType: ContentType.Json);
 
             var response = await client.ExecutePostAsync(request);
 

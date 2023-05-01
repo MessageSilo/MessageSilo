@@ -27,6 +27,7 @@ namespace MessageSilo.SiloCTL
                        .WithParsed<ApplyOptions>(o =>
                        {
                            var targets = o.InitTargets();
+                           o.InitEnrichers();
                            o.InitConnections(targets);
                        })
                        .WithParsed<ConfigOptions>(o =>

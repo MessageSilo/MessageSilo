@@ -10,5 +10,7 @@ namespace MessageSilo.Features.Connection
         Task Delete();
 
         Task<ConnectionState> GetState();
+
+        Task TransformAndSend(Message message);
     }
 }

@@ -44,6 +44,13 @@ namespace MessageSilo.SiloCTL.Options
             {
                 api.DeleteTarget(target.RowKey);
             }
+
+            var enrichers = api.GetEnrichers();
+
+            foreach (var enricher in enrichers)
+            {
+                api.DeleteTarget(enricher.RowKey);
+            }
         }
     }
 }

@@ -44,8 +44,9 @@ namespace MessageSilo.SiloCTL.Options
 
             var existingConnections = api.GetConnections();
             var existingTargets = api.GetTargets();
+            var existingEnrichers = api.GetEnrichers();
 
-            if (existingConnections.Count() + existingTargets.Count() == 0)
+            if ((existingConnections.Count() + existingTargets.Count() + existingEnrichers.Count()) == 0)
             {
                 Console.WriteLine("No entities found.");
                 return;
@@ -55,6 +56,9 @@ namespace MessageSilo.SiloCTL.Options
                 showEntitesTable.AddRow(c.ConnectionSettings.Kind, c.ConnectionSettings.RowKey, c.ConnectionSettings.Type, c.Status);
 
             foreach (var t in existingTargets)
+                showEntitesTable.AddRow(t.Kind, t.RowKey, t.Type, Status.Created);
+
+            foreach (var t in existingEnrichers)
                 showEntitesTable.AddRow(t.Kind, t.RowKey, t.Type, Status.Created);
 
             showEntitesTable.Write(Format.Default);

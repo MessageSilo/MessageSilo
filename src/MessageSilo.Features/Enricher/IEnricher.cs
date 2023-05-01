@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MessageSilo.Shared.Enums
+namespace MessageSilo.Features.Enricher
 {
-    public enum EntityKind
+    public interface IEnricher
     {
-        Connection,
-        Enricher,
-        Target
+        Task<string> TransformMessage(string message);
     }
 }
