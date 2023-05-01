@@ -18,14 +18,6 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
-      - name: Build
-        working-directory: ./src/MessageSilo.API
-        run: dotnet build
-
-      - name: Publish
-        working-directory: ./src/MessageSilo.API
-        run: dotnet publish -c Release -o "/home/runner/work/MessageSilo/publish"
-
       - name: Transform appsettings
         uses: cschleiden/replace-tokens@v1
         with:
@@ -35,6 +27,14 @@ jobs:
         env:
           ConnectionStrings.AI: ${{ secrets.CONNECTIONSTRINGS_AI }}
           ConnectionStrings.GrainStateStorage: ${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}
+
+      - name: Build
+        working-directory: ./src/MessageSilo.API
+        run: dotnet build
+
+      - name: Publish
+        working-directory: ./src/MessageSilo.API
+        run: dotnet publish -c Release -o "/home/runner/work/MessageSilo/publish"
 
       - name: Upload build artifact
         uses: garygrossgarten/github-action-scp@release
