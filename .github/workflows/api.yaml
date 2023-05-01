@@ -31,7 +31,7 @@ jobs:
         with:
           tokenPrefix: '$('
           tokenSuffix: ')'
-          files: '["**/appsettings.js"]'
+          files: '["**/appsettings.json"]'
         env:
           ConnectionStrings.AI: ${{ secrets.CONNECTIONSTRINGS_AI }}
           ConnectionStrings.GrainStateStorage: ${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}
