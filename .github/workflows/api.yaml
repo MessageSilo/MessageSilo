@@ -30,8 +30,8 @@ jobs:
       - name: Transform appsettings
         working-directory: /home/runner/work/MessageSilo/publish
         run: |
-          sed -i 's/$(ConnectionStrings.AI)/${{ secret.CONNECTIONSTRINGS_AI }}/g' appsettings.json
-          sed -i 's/$(ConnectionStrings.GrainStateStorage)/${{ secret.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}/g' appsettings.json
+          sed -i 's/$(ConnectionStrings.AI)/${{ secrets.CONNECTIONSTRINGS_AI }}/g' appsettings.json
+          sed -i 's/$(ConnectionStrings.GrainStateStorage)/${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}/g' appsettings.json
 
       - name: Upload build artifact
         uses: garygrossgarten/github-action-scp@release
