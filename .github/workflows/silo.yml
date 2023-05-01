@@ -4,7 +4,6 @@ on:
   push:
     branches: ["main"]
     paths-ignore:
-      - ".github/workflows/**"
       - "scripts/**"
 
 jobs:
@@ -19,6 +18,16 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
+      - name: Transform appsettings
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: '$('
+          tokenSuffix: ')'
+          files: '["**/appsettings.json"]'
+        env:
+          ConnectionStrings.AI: ${{ secrets.CONNECTIONSTRINGS_AI }}
+          ConnectionStrings.GrainStateStorage: ${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}
+
       - name: Build
         working-directory: ./src/MessageSilo.Silo
         run: dotnet build
@@ -26,10 +35,6 @@ jobs:
       - name: Publish
         working-directory: ./src/MessageSilo.Silo
         run: dotnet publish -c Release -o "/home/runner/work/MessageSilo/publish"
-
-      - name: Remove appsettings
-        working-directory: /home/runner/work/MessageSilo/publish
-        run: rm appsettings.json
 
       - name: Upload build artifact
         uses: garygrossgarten/github-action-scp@release
