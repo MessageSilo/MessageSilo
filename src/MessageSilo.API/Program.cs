@@ -18,12 +18,9 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Services.AddSingleton<ClusterClientHostedService>();
-builder.Services.AddSingleton<IHostedService>(
-            sp => sp.GetService<ClusterClientHostedService>()!);
-builder.Services.AddSingleton<IClusterClient>(
-            sp => sp.GetService<ClusterClientHostedService>()!.Client);
-builder.Services.AddSingleton<IGrainFactory>(
-            sp => sp.GetService<ClusterClientHostedService>()!.Client);
+builder.Services.AddSingleton<IHostedService>(sp => sp.GetService<ClusterClientHostedService>()!);
+builder.Services.AddSingleton<IClusterClient>(sp => sp.GetService<ClusterClientHostedService>()!.Client);
+builder.Services.AddSingleton<IGrainFactory>(sp => sp.GetService<ClusterClientHostedService>()!.Client);
 builder.Services.AddSingleton<IEntityRepository, EntityRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
