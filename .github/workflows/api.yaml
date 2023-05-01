@@ -27,9 +27,11 @@ jobs:
         working-directory: ./src/MessageSilo.API
         run: dotnet publish -c Release -o "/home/runner/work/MessageSilo/publish"
 
-      - name: Remove appsettings
+      - name: Transform appsettings
         working-directory: /home/runner/work/MessageSilo/publish
-        run: rm appsettings.json
+        run: |
+          sed -i 's/$(ConnectionStrings.AI)/${{ secret.CONNECTIONSTRINGS_AI }}/g' appsettings.json
+          sed -i 's/$(ConnectionStrings.GrainStateStorage)/${{ secret.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}/g' appsettings.json
 
       - name: Upload build artifact
         uses: garygrossgarten/github-action-scp@release
