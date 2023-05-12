@@ -12,12 +12,14 @@ namespace MessageSilo.Shared.Models
     {
         public R? Data { get; set; }
 
-        public List<ValidationFailure>? Errors { get; set; } = new List<ValidationFailure>();
+        public List<ValidationFailure> Errors { get; set; } = new List<ValidationFailure>();
 
         public ApiContract(IHttpContextAccessor hca, int httpStatusCode, R? data = null, List<ValidationFailure>? errors = null)
         {
             Data = data;
-            Errors = errors;
+
+            if (errors is not null)
+                Errors = errors;
 
             hca.HttpContext.Response.StatusCode = httpStatusCode;
         }

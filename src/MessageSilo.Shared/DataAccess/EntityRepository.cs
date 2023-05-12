@@ -4,6 +4,7 @@ using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text;
 
 namespace MessageSilo.Shared.DataAccess
 {
@@ -41,11 +42,22 @@ namespace MessageSilo.Shared.DataAccess
             }
         }
 
-        public async Task<IEnumerable<Entity>> Query(EntityKind kind, string? userId = null)
+        public async Task<IEnumerable<Entity>> Query(EntityKind? kind = null, string? userId = null)
         {
-            var result = userId is null ?
-                client.Query<Entity>(filter: $"Kind eq '{kind}'") :
-                client.Query<Entity>(filter: $"PartitionKey eq '{userId}' and Kind eq '{kind}'");
+            var kindFilter = $"Kind eq '{kind}'";
+            var userIdFilter = $"PartitionKey eq '{userId}'";
+
+            var filters = new List<string>();
+
+            if (kind is not null)
+                filters.Add(kindFilter);
+
+            if (userId is not null)
+                filters.Add(userIdFilter);
+
+            var result = filters.Count == 0 ?
+                client.Query<Entity>() :
+                client.Query<Entity>(filter: string.Join(" and ", filters));
 
             return await Task.FromResult(result);
         }

@@ -2,7 +2,7 @@
   "profiles": {
     "MessageSilo.SiloCTL": {
       "commandName": "Project",
-      "commandLineArgs": "apply -f C:/temp/ms_test"
+      "commandLineArgs": "config"
     }
   }
 }

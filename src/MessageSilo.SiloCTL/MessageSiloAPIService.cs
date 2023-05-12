@@ -12,86 +12,34 @@ namespace MessageSilo.SiloCTL
             this.httpClient = httpClient;
         }
 
-        #region Connections
-
-        public IEnumerable<ConnectionState> GetConnections()
+        public ApiContract<IEnumerable<Entity>> GetEntities()
         {
-            var result = httpClient.GetJson<ApiContract<IEnumerable<ConnectionState>>>($"Connections");
-
-            return result.Data;
+            var result = httpClient.GetJson<ApiContract<IEnumerable<Entity>>>("Entities");
+            return result!;
         }
 
-        public ConnectionState? GetConnection(string name)
+        public ApiContract<IEnumerable<R>> Get<R>(string controller) where R : class
         {
-            var result = httpClient.GetJson<ApiContract<ConnectionState>>($"Connections/{name}");
-            return result.Data;
+            var result = httpClient.GetJson<ApiContract<IEnumerable<R>>>(controller);
+            return result!;
         }
 
-        public void UpdateConnection(ConnectionSettingsDTO dto)
+        public ApiContract<R> Get<R>(string controller, string name) where R : class
         {
-            httpClient.PutJson<ConnectionSettingsDTO>($"Connections/{dto.RowKey}", dto);
+            var result = httpClient.GetJson<ApiContract<R>>($"{controller}/{name}");
+            return result!;
         }
 
-        public void DeleteConnection(string name)
+        public ApiContract<R> Update<DTO, R>(string controller, DTO dto) where DTO : Entity where R : class
         {
-            var request = new RestRequest($"Connections/{name}", Method.Delete);
+            var result = httpClient.PutJson<DTO, ApiContract<R>>($"{controller}/{dto.RowKey}", dto);
+            return result!;
+        }
+
+        public void Delete(string controller, string name)
+        {
+            var request = new RestRequest($"{controller}/{name}", Method.Delete);
             httpClient.Delete(request);
         }
-
-        #endregion
-
-        #region Tragets
-
-        public IEnumerable<TargetDTO> GetTargets()
-        {
-            var result = httpClient.GetJson<ApiContract<IEnumerable<TargetDTO>>>($"Targets");
-            return result.Data;
-        }
-
-        public TargetDTO? GetTarget(string name)
-        {
-            var result = httpClient.GetJson<ApiContract<TargetDTO>>($"Targets/{name}");
-            return result.Data;
-        }
-
-        public void UpdateTarget(TargetDTO dto)
-        {
-            httpClient.PutJson<TargetDTO>($"Targets/{dto.RowKey}", dto);
-        }
-
-        public void DeleteTarget(string name)
-        {
-            var request = new RestRequest($"Targets/{name}", Method.Delete);
-            httpClient.Delete(request);
-        }
-
-        #endregion
-
-        #region Enrichers
-
-        public IEnumerable<EnricherDTO> GetEnrichers()
-        {
-            var result = httpClient.GetJson<ApiContract<IEnumerable<EnricherDTO>>>($"Enrichers");
-            return result.Data;
-        }
-
-        public EnricherDTO? GetEnricher(string name)
-        {
-            var result = httpClient.GetJson<ApiContract<EnricherDTO>>($"Enrichers/{name}");
-            return result.Data;
-        }
-
-        public void UpdateEnricher(EnricherDTO dto)
-        {
-            httpClient.PutJson<EnricherDTO>($"Enrichers/{dto.RowKey}", dto);
-        }
-
-        public void DeleteEnricher(string name)
-        {
-            var request = new RestRequest($"Enrichers/{name}", Method.Delete);
-            httpClient.Delete(request);
-        }
-
-        #endregion
     }
 }

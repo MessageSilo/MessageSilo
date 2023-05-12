@@ -42,6 +42,8 @@ namespace MessageSilo.SiloCTL
                        {
                            o.Logout();
                        });
+
+            Console.ReadKey();
         }
     }
 }

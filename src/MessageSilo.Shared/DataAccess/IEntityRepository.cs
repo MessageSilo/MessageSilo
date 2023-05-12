@@ -14,7 +14,7 @@ namespace MessageSilo.Shared.DataAccess
 
         Task Delete(string userId, IEnumerable<string> name);
 
-        Task<IEnumerable<Entity>> Query(EntityKind kind, string? userId = null);
+        Task<IEnumerable<Entity>> Query(EntityKind? kind = null, string? userId = null);
 
         Task<int> Count(string? userId = null);
     }

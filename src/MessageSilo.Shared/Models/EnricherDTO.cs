@@ -1,4 +1,5 @@
 ﻿using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,11 @@ namespace MessageSilo.Shared.Models
         public EnricherDTO()
         {
             Kind = EntityKind.Enricher;
+        }
+
+        public override string ToString()
+        {
+            return YamlConverter.Serialize(this);
         }
     }
 }

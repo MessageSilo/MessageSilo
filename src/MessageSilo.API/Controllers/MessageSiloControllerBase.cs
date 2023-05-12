@@ -17,7 +17,7 @@ namespace MessageSilo.API.Controllers
 
         protected readonly string loggedInUserId;
 
-        public MessageSiloControllerBase(ILogger<MessageSiloControllerBase> logger, IHttpContextAccessor httpContextAccessor, IClusterClient client)
+        public MessageSiloControllerBase(ILogger<MessageSiloControllerBase> logger, IHttpContextAccessor httpContextAccessor, IClusterClient? client = null)
         {
             this.logger = logger;
             this.client = client;

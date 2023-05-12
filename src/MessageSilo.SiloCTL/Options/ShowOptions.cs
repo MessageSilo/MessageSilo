@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Amazon.Util;
 using ConsoleTables;
 using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Models;
 
 namespace MessageSilo.SiloCTL.Options
 {
@@ -32,19 +33,34 @@ namespace MessageSilo.SiloCTL.Options
         {
             if (!string.IsNullOrEmpty(Name))
             {
-                var conn = api.GetConnection(Name);
+                var entities = api.GetEntities();
 
-                if (conn is not null)
-                    Console.WriteLine(conn);
+                var entity = entities.Data!.FirstOrDefault(p => p.RowKey == Name);
+
+                if (entity is not null)
+                {
+                    switch (entity.Kind)
+                    {
+                        case EntityKind.Connection:
+                            Console.WriteLine(api.Get<ConnectionState>("Connections", entity.RowKey).Data);
+                            break;
+                        case EntityKind.Enricher:
+                            Console.WriteLine(api.Get<EnricherDTO>("Enrichers", entity.RowKey).Data);
+                            break;
+                        case EntityKind.Target:
+                            Console.WriteLine(api.Get<TargetDTO>("Targets", entity.RowKey).Data);
+                            break;
+                    }
+                }
                 else
-                    Console.WriteLine($"Connection '{Name}' not found.");
+                    Console.WriteLine($"Entity '{Name}' not found.");
 
                 return;
             }
 
-            var existingConnections = api.GetConnections();
-            var existingTargets = api.GetTargets();
-            var existingEnrichers = api.GetEnrichers();
+            var existingConnections = api.Get<ConnectionState>("Connections").Data!;
+            var existingTargets = api.Get<TargetDTO>("Targets").Data!;
+            var existingEnrichers = api.Get<EnricherDTO>("Enrichers").Data!;
 
             if ((existingConnections.Count() + existingTargets.Count() + existingEnrichers.Count()) == 0)
             {

@@ -27,29 +27,29 @@ namespace MessageSilo.SiloCTL.Options
         {
             if (!string.IsNullOrEmpty(Name))
             {
-                api.DeleteConnection(Name);
+                api.Delete("Connections", Name);
                 return;
             }
 
-            var connections = api.GetConnections();
+            var connections = api.Get<ConnectionState>("Connections");
 
-            foreach (var connection in connections)
+            foreach (var connection in connections.Data)
             {
-                api.DeleteConnection(connection.ConnectionSettings.RowKey);
+                api.Delete("Connections", connection.ConnectionSettings.RowKey);
             }
 
-            var targets = api.GetTargets();
+            var targets = api.Get<TargetDTO>("Targets");
 
-            foreach (var target in targets)
+            foreach (var target in targets.Data)
             {
-                api.DeleteTarget(target.RowKey);
+                api.Delete("Targets", target.RowKey);
             }
 
-            var enrichers = api.GetEnrichers();
+            var enrichers = api.Get<EnricherDTO>("Enrichers");
 
-            foreach (var enricher in enrichers)
+            foreach (var enricher in enrichers.Data)
             {
-                api.DeleteTarget(enricher.RowKey);
+                api.Delete("Enrichers", enricher.RowKey);
             }
         }
     }

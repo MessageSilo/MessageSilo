@@ -10,6 +10,7 @@ using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Serialization;
 using MessageSilo.Shared.Enums;
 using ConsoleTables;
+using Microsoft.Azure.Amqp.Framing;
 
 namespace MessageSilo.SiloCTL.Options
 {
@@ -37,7 +38,8 @@ namespace MessageSilo.SiloCTL.Options
 
             foreach (var conn in connectionSettings)
             {
-                api.UpdateConnection(conn);
+                var result = api.Update<ConnectionSettingsDTO, ConnectionState>("Connections", conn);
+                displayResult(conn, result);
             };
 
             return connectionSettings;
@@ -56,7 +58,8 @@ namespace MessageSilo.SiloCTL.Options
 
             foreach (var target in targets)
             {
-                api.UpdateTarget(target);
+                var result = api.Update<TargetDTO, TargetDTO>("Targets", target);
+                displayResult(target, result);
             };
 
             return targets;
@@ -75,10 +78,30 @@ namespace MessageSilo.SiloCTL.Options
 
             foreach (var enricher in enrichers)
             {
-                api.UpdateEnricher(enricher);
+                var result = api.Update<EnricherDTO, EnricherDTO>("Enrichers", enricher);
+                displayResult(enricher, result);
             };
 
             return enrichers;
+        }
+
+        private void displayResult<R>(Entity entity, ApiContract<R> apiContract) where R : class
+        {
+            if (apiContract.Errors.Count == 0)
+            {
+                Console.WriteLine($"Changes applied on '{entity.RowKey}' successfully!");
+                return;
+            }
+
+            Console.WriteLine($"Cannot apply changes on '{entity.RowKey}' because the following errors:");
+
+            if (apiContract.Errors.Count > 0)
+            {
+                foreach (var err in apiContract.Errors)
+                {
+                    Console.WriteLine($"\t- {err.ErrorMessage}");
+                }
+            }
         }
     }
 }
