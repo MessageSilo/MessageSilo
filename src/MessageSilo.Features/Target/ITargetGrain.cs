@@ -8,10 +8,7 @@ using System.Threading.Tasks;
 
 namespace MessageSilo.Features.Target
 {
-    public interface ITargetGrain : IMessageSenderGrain
+    public interface ITargetGrain : IEntityGrain<TargetDTO, TargetDTO>, IMessageSenderGrain
     {
-        Task Update(TargetDTO t);
-
-        Task<TargetDTO> GetState();
     }
 }

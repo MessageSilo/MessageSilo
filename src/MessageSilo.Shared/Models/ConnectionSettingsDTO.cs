@@ -6,7 +6,7 @@ namespace MessageSilo.Shared.Models
     {
         public string ConnectionString { get; set; }
 
-        public MessagePlatformType Type { get; set; }
+        public MessagePlatformType? Type { get; set; }
 
         public string QueueName { get; set; }
 

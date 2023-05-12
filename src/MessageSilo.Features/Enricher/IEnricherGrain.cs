@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace MessageSilo.Features.Enricher
 {
-    public interface IEnricherGrain : IGrainWithStringKey
+    public interface IEnricherGrain : IEntityGrain<EnricherDTO, EnricherDTO>
     {
-        Task Update(EnricherDTO e);
-
-        Task<EnricherDTO> GetState();
-
         Task<Message> Enrich(Message message);
     }
 }

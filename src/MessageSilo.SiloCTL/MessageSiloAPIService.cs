@@ -16,14 +16,15 @@ namespace MessageSilo.SiloCTL
 
         public IEnumerable<ConnectionState> GetConnections()
         {
-            var result = httpClient.GetJson<IEnumerable<ConnectionState>>($"Connections");
-            return result!;
+            var result = httpClient.GetJson<ApiContract<IEnumerable<ConnectionState>>>($"Connections");
+
+            return result.Data;
         }
 
         public ConnectionState? GetConnection(string name)
         {
-            var result = httpClient.GetJson<ConnectionState>($"Connections/{name}");
-            return result;
+            var result = httpClient.GetJson<ApiContract<ConnectionState>>($"Connections/{name}");
+            return result.Data;
         }
 
         public void UpdateConnection(ConnectionSettingsDTO dto)
@@ -43,14 +44,14 @@ namespace MessageSilo.SiloCTL
 
         public IEnumerable<TargetDTO> GetTargets()
         {
-            var result = httpClient.GetJson<IEnumerable<TargetDTO>>($"Targets");
-            return result!;
+            var result = httpClient.GetJson<ApiContract<IEnumerable<TargetDTO>>>($"Targets");
+            return result.Data;
         }
 
         public TargetDTO? GetTarget(string name)
         {
-            var result = httpClient.GetJson<TargetDTO>($"Targets/{name}");
-            return result;
+            var result = httpClient.GetJson<ApiContract<TargetDTO>>($"Targets/{name}");
+            return result.Data;
         }
 
         public void UpdateTarget(TargetDTO dto)
@@ -70,14 +71,14 @@ namespace MessageSilo.SiloCTL
 
         public IEnumerable<EnricherDTO> GetEnrichers()
         {
-            var result = httpClient.GetJson<IEnumerable<EnricherDTO>>($"Enrichers");
-            return result!;
+            var result = httpClient.GetJson<ApiContract<IEnumerable<EnricherDTO>>>($"Enrichers");
+            return result.Data;
         }
 
         public EnricherDTO? GetEnricher(string name)
         {
-            var result = httpClient.GetJson<EnricherDTO>($"Enrichers/{name}");
-            return result;
+            var result = httpClient.GetJson<ApiContract<EnricherDTO>>($"Enrichers/{name}");
+            return result.Data;
         }
 
         public void UpdateEnricher(EnricherDTO dto)

@@ -3,14 +3,8 @@ using Orleans;
 
 namespace MessageSilo.Features.Connection
 {
-    public interface IConnectionGrain : IMessageSenderGrain
+    public interface IConnectionGrain : IEntityGrain<ConnectionSettingsDTO, ConnectionState>, IMessageSenderGrain
     {
-        Task Update(ConnectionSettingsDTO s);
-
-        Task Delete();
-
-        Task<ConnectionState> GetState();
-
         Task TransformAndSend(Message message);
     }
 }

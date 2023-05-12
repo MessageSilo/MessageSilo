@@ -10,7 +10,7 @@ namespace MessageSilo.Shared.Models
     public class EnricherDTO : Entity
     {
         //Common
-        public EnricherType Type { get; set; }
+        public EnricherType? Type { get; set; }
 
         //Inline
         public string Function { get; set; }

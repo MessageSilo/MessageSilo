@@ -74,5 +74,10 @@ namespace MessageSilo.Features.Enricher
                     break;
             }
         }
+
+        public async Task Delete()
+        {
+            await Task.CompletedTask;
+        }
     }
 }

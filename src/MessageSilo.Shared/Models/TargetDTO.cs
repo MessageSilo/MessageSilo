@@ -10,7 +10,7 @@ namespace MessageSilo.Shared.Models
     public class TargetDTO : Entity
     {
         //Common
-        public TargetType Type { get; set; }
+        public TargetType? Type { get; set; }
 
         public string Url { get; set; }
 
