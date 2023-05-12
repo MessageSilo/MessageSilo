@@ -12,8 +12,9 @@ https://www.message-silo.dev
 A platform to auto-correct your dead-lettered messages and make integration simpler for event-driven systems.
 Azure Service Bus, AWS SQS, RabbitMQ, and more...
 
-## Note
-This project is currently under development and the features are not fully implemented!
+## Getting Started
+- [Check the Docs](https://github.com/MessageSilo/MessageSilo/wiki)
+- [Download siloctl](https://github.com/MessageSilo/MessageSilo/wiki/01.-Getting-Started)
 
 ## Build & Run
 
