@@ -36,10 +36,10 @@ namespace MessageSilo.SiloCTL
             return result!;
         }
 
-        public void Delete(string controller, string name)
+        public ApiContract<R> Delete<R>(string controller, string name) where R : class
         {
             var request = new RestRequest($"{controller}/{name}", Method.Delete);
-            httpClient.Delete(request);
+            return httpClient.Delete<ApiContract<R>>(request)!;
         }
     }
 }

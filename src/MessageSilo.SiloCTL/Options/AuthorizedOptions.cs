@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using InfluxDB.Client.Api.Domain;
+using System.Net;
 
 namespace MessageSilo.SiloCTL.Options
 {
@@ -35,7 +36,12 @@ namespace MessageSilo.SiloCTL.Options
             var restOptions = new RestClientOptions(this.config.ApiUrl)
             {
                 RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true,
-                Authenticator = new JwtAuthenticator(this.config.Token)
+                Authenticator = new JwtAuthenticator(this.config.Token),
+                CalculateResponseStatus = httpResponse =>
+                httpResponse.IsSuccessStatusCode ||
+                httpResponse.StatusCode == HttpStatusCode.NotFound ||
+                httpResponse.StatusCode == HttpStatusCode.BadRequest
+                ? ResponseStatus.Completed : ResponseStatus.Error
             };
 
             api = new MessageSiloAPIService(new RestClient(restOptions));

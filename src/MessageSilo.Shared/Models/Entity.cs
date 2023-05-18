@@ -12,7 +12,7 @@ using YamlDotNet.Serialization;
 
 namespace MessageSilo.Shared.Models
 {
-    public class Entity : ITableEntity
+    public class Entity : ITableEntity, IComparable<Entity>
     {
         [YamlMember(Alias = "userId")]
         public string PartitionKey { get; set; }
@@ -24,10 +24,18 @@ namespace MessageSilo.Shared.Models
 
         public string Id => $"{PartitionKey}|{RowKey}";
 
-
-
         public DateTimeOffset? Timestamp { get; set; }
 
         public ETag ETag { get; set; }
+
+        public int CompareTo(Entity? other)
+        {
+            var result = this.Id.CompareTo(other?.Id);
+
+            if (result == 0)
+                result = this.Kind.CompareTo(other?.Kind);
+
+            return result;
+        }
     }
 }

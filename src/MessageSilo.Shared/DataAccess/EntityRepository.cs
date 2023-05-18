@@ -2,9 +2,6 @@
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MessageSilo.Shared.DataAccess
 {
@@ -21,25 +18,14 @@ namespace MessageSilo.Shared.DataAccess
             client.CreateIfNotExists();
         }
 
-        public async Task Add(IEnumerable<Entity> entites)
+        public async Task Upsert(Entity entity)
         {
-            var countOfEntities = await Count(entites.First().PartitionKey);
-
-            if (countOfEntities >= 5)
-                throw new Exception("Count of max. allowed entities reached! ==WIP: Only in BETA and FREE tier==");
-
-            foreach (var e in entites)
-            {
-                await client.UpsertEntityAsync<Entity>(e);
-            }
+            await client.UpsertEntityAsync<Entity>(entity);
         }
 
-        public async Task Delete(string userId, IEnumerable<string> names)
+        public async Task Delete(string userId, string entityName)
         {
-            foreach (var name in names)
-            {
-                await client.DeleteEntityAsync(userId, name);
-            }
+            await client.DeleteEntityAsync(userId, entityName);
         }
 
         public async Task<IEnumerable<Entity>> Query(EntityKind? kind = null, string? userId = null)
@@ -60,13 +46,6 @@ namespace MessageSilo.Shared.DataAccess
                 client.Query<Entity>(filter: string.Join(" and ", filters));
 
             return await Task.FromResult(result);
-        }
-
-        public async Task<int> Count(string? userId = null)
-        {
-            var result = client.Query<Entity>(p => p.PartitionKey == userId, select: new[] { "PartitionKey " });
-
-            return await Task.FromResult(result.Count());
         }
     }
 }

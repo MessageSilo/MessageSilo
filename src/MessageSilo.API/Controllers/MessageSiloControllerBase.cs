@@ -1,4 +1,5 @@
-﻿using MessageSilo.Shared.DataAccess;
+﻿using MessageSilo.Features.EntityManager;
+using MessageSilo.Shared.DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
@@ -11,19 +12,25 @@ namespace MessageSilo.API.Controllers
     {
         protected readonly ILogger<MessageSiloControllerBase> logger;
 
-        protected readonly IClusterClient? client;
+        protected readonly IClusterClient client;
 
         protected readonly IHttpContextAccessor httpContextAccessor;
 
         protected readonly string loggedInUserId;
 
-        public MessageSiloControllerBase(ILogger<MessageSiloControllerBase> logger, IHttpContextAccessor httpContextAccessor, IClusterClient? client = null)
+        protected readonly IEntityManagerGrain entityManagerGrain;
+
+        public MessageSiloControllerBase(
+            ILogger<MessageSiloControllerBase> logger,
+            IHttpContextAccessor httpContextAccessor,
+            IClusterClient client)
         {
             this.logger = logger;
             this.client = client;
             this.httpContextAccessor = httpContextAccessor;
 
             loggedInUserId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+            this.entityManagerGrain = client.GetGrain<IEntityManagerGrain>(loggedInUserId);
         }
     }
 }

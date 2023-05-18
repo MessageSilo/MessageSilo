@@ -26,10 +26,6 @@ builder.Services.AddSingleton<IClusterClient>(sp => sp.GetService<ClusterClientH
 builder.Services.AddSingleton<IGrainFactory>(sp => sp.GetService<ClusterClientHostedService>()!.Client);
 builder.Services.AddSingleton<IEntityRepository, EntityRepository>();
 
-builder.Services.AddScoped<IValidator<ConnectionSettingsDTO>, ConnectionValidator>();
-builder.Services.AddScoped<IValidator<TargetDTO>, TargetValidator>();
-builder.Services.AddScoped<IValidator<EnricherDTO>, EnricherValidator>();
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
         {

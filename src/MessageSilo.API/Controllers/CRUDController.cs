@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
+using MessageSilo.Features.EntityManager;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
@@ -15,15 +17,15 @@ namespace MessageSilo.API.Controllers
     {
         protected readonly IEntityRepository repo;
 
-        protected readonly IValidator<DTO> validator;
-
         protected abstract EntityKind GetKind();
 
-        public CRUDController(ILogger<CRUDController<DTO, STATE, GRAIN>> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IEntityRepository repo, IValidator<DTO> validator)
+        public CRUDController(
+            ILogger<CRUDController<DTO, STATE, GRAIN>> logger,
+            IClusterClient client, IHttpContextAccessor httpContextAccessor,
+            IEntityRepository repo)
             : base(logger, httpContextAccessor, client)
         {
             this.repo = repo;
-            this.validator = validator;
         }
 
         [HttpGet()]
@@ -39,7 +41,7 @@ namespace MessageSilo.API.Controllers
                 result.Add(await entity.GetState());
             }
 
-            return new ApiContract<IEnumerable<STATE>>(httpContextAccessor, StatusCodes.Status200OK, data: result);
+            return await Task.FromResult(new ApiContract<IEnumerable<STATE>>(httpContextAccessor, StatusCodes.Status200OK, data: result));
         }
 
         [HttpDelete(template: "{name}")]
@@ -47,10 +49,16 @@ namespace MessageSilo.API.Controllers
         {
             var id = $"{loggedInUserId}|{name}";
             var entity = client!.GetGrain<GRAIN>(id);
-            await entity.Delete();
-            await repo.Delete(loggedInUserId, new[] { name });
 
-            return new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK);
+            var validationResults = await entityManagerGrain.Delete(name);
+
+            if (validationResults is not null)
+                return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status400BadRequest, errors: validationResults));
+
+            await entity.Delete();
+            await repo.Delete(loggedInUserId, name);
+
+            return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK));
         }
 
         [HttpGet(template: "{name}")]
@@ -61,12 +69,12 @@ namespace MessageSilo.API.Controllers
 
             if (!entities.Any(p => p.Id == id))
             {
-                return new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status404NotFound);
+                return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status404NotFound));
             }
 
             var entity = client!.GetGrain<GRAIN>(id);
 
-            return new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK, data: await entity.GetState());
+            return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK, data: await entity.GetState()));
         }
 
         [HttpPut(template: "{name}")]
@@ -74,25 +82,24 @@ namespace MessageSilo.API.Controllers
         {
             dto.PartitionKey = loggedInUserId;
 
-            var validationResults = await validator.ValidateAsync(dto);
+            var validationResults = await entityManagerGrain.Upsert(dto);
 
-            if (!validationResults.IsValid)
-                return new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status400BadRequest, errors: validationResults.Errors);
+            if (validationResults is not null)
+                return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status400BadRequest, errors: validationResults));
 
-            await repo.Add(new[]
-            {
-                    new Entity()
-                    {
-                        PartitionKey = loggedInUserId,
-                        RowKey = name,
-                        Kind = GetKind()
-                    }
-                });
+            await repo.Upsert(
+                new Entity()
+                {
+                    PartitionKey = loggedInUserId,
+                    RowKey = name,
+                    Kind = GetKind()
+                }
+            );
 
             var entity = client!.GetGrain<GRAIN>(dto.Id);
             await entity.Update(dto);
 
-            return new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK, data: await entity.GetState());
+            return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK, data: await entity.GetState()));
         }
     }
 }

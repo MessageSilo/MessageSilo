@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MessageSilo.Features.Connection;
+using MessageSilo.Features.EntityManager;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
@@ -11,7 +12,12 @@ namespace MessageSilo.API.Controllers
     {
         protected override EntityKind GetKind() => EntityKind.Connection;
 
-        public ConnectionsController(ILogger<CRUDController<ConnectionSettingsDTO, ConnectionState, IConnectionGrain>> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IEntityRepository repo, IValidator<ConnectionSettingsDTO> validator) : base(logger, client, httpContextAccessor, repo, validator)
+        public ConnectionsController(
+            ILogger<CRUDController<ConnectionSettingsDTO, ConnectionState, IConnectionGrain>> logger,
+            IClusterClient client,
+            IHttpContextAccessor httpContextAccessor,
+            IEntityRepository repo) :
+            base(logger, client, httpContextAccessor, repo)
         {
         }
     }

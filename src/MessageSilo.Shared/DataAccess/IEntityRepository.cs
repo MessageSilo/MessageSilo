@@ -10,12 +10,10 @@ namespace MessageSilo.Shared.DataAccess
 {
     public interface IEntityRepository
     {
-        Task Add(IEnumerable<Entity> entities);
+        Task Upsert(Entity entity);
 
-        Task Delete(string userId, IEnumerable<string> name);
+        Task Delete(string userId, string entityName);
 
         Task<IEnumerable<Entity>> Query(EntityKind? kind = null, string? userId = null);
-
-        Task<int> Count(string? userId = null);
     }
 }

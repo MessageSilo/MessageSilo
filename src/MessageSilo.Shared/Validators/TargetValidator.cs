@@ -11,16 +11,22 @@ namespace MessageSilo.Shared.Validators
 {
     public class TargetValidator : AbstractValidator<TargetDTO>
     {
-        public TargetValidator()
+        public TargetValidator(IEnumerable<Entity> entities)
         {
             RuleFor(p => p.PartitionKey).NotEmpty().WithName("UserId");
+
             RuleFor(p => p.RowKey)
                 .NotEmpty()
                 .MaximumLength(20)
                 .Matches("^[a-zA-Z0-9$_-]+$")
+                .Must((e, x) => IsUnique(entities, e)).WithMessage(p => $"Entity with name '{p.RowKey}' already exist")
                 .WithName("Name");
+
             RuleFor(p => p.Type).NotEmpty();
+
             RuleFor(p => p.Url).NotEmpty();
         }
+
+        private bool IsUnique(IEnumerable<Entity> entities, TargetDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);
     }
 }

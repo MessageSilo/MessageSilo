@@ -10,6 +10,7 @@ using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Serialization;
 using MessageSilo.Shared.Enums;
 using ConsoleTables;
+using Microsoft.Azure.Amqp.Framing;
 
 namespace MessageSilo.SiloCTL.Options
 {
@@ -25,31 +26,45 @@ namespace MessageSilo.SiloCTL.Options
 
         public void Delete()
         {
-            if (!string.IsNullOrEmpty(Name))
+            var entitiesToDelete = api.GetEntities().Data!;
+
+            entitiesToDelete = entitiesToDelete.Where(p => string.IsNullOrEmpty(Name) || p.RowKey == Name);
+
+            foreach (var connection in entitiesToDelete.Where(p => p.Kind == EntityKind.Connection))
             {
-                api.Delete("Connections", Name);
+                var result = api.Delete<ConnectionSettingsDTO>("Connections", connection.RowKey);
+                displayResult(connection, result);
+            }
+
+            foreach (var target in entitiesToDelete.Where(p => p.Kind == EntityKind.Target))
+            {
+                var result = api.Delete<TargetDTO>("Targets", target.RowKey);
+                displayResult(target, result);
+            }
+
+            foreach (var enricher in entitiesToDelete.Where(p => p.Kind == EntityKind.Enricher))
+            {
+                var result = api.Delete<EnricherDTO>("Enrichers", enricher.RowKey);
+                displayResult(enricher, result);
+            }
+        }
+
+        private void displayResult<R>(Entity entity, ApiContract<R> apiContract) where R : class
+        {
+            if (apiContract.Errors.Count == 0)
+            {
+                Console.WriteLine($"Entity '{entity.RowKey} - {entity.Kind}' deleted successfully!");
                 return;
             }
 
-            var connections = api.Get<ConnectionState>("Connections");
+            Console.WriteLine($"Cannot delete '{entity.RowKey}' because the following errors:");
 
-            foreach (var connection in connections.Data)
+            if (apiContract.Errors.Count > 0)
             {
-                api.Delete("Connections", connection.ConnectionSettings.RowKey);
-            }
-
-            var targets = api.Get<TargetDTO>("Targets");
-
-            foreach (var target in targets.Data)
-            {
-                api.Delete("Targets", target.RowKey);
-            }
-
-            var enrichers = api.Get<EnricherDTO>("Enrichers");
-
-            foreach (var enricher in enrichers.Data)
-            {
-                api.Delete("Enrichers", enricher.RowKey);
+                foreach (var err in apiContract.Errors)
+                {
+                    Console.WriteLine($"\t- {err.ErrorMessage}");
+                }
             }
         }
     }

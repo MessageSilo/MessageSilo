@@ -89,7 +89,7 @@ namespace MessageSilo.SiloCTL.Options
         {
             if (apiContract.Errors.Count == 0)
             {
-                Console.WriteLine($"Changes applied on '{entity.RowKey}' successfully!");
+                Console.WriteLine($"Changes applied on '{entity.RowKey} - {entity.Kind}' successfully!");
                 return;
             }
 

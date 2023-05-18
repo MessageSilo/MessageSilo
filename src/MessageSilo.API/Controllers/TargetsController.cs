@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using MessageSilo.Features.EntityManager;
 using MessageSilo.Features.Target;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
@@ -12,7 +13,12 @@ namespace MessageSilo.API.Controllers
     {
         protected override EntityKind GetKind() => EntityKind.Target;
 
-        public TargetsController(ILogger<CRUDController<TargetDTO, TargetDTO, ITargetGrain>> logger, IClusterClient client, IHttpContextAccessor httpContextAccessor, IEntityRepository repo, IValidator<TargetDTO> validator) : base(logger, client, httpContextAccessor, repo, validator)
+        public TargetsController(
+            ILogger<CRUDController<TargetDTO, TargetDTO, ITargetGrain>> logger,
+            IClusterClient client,
+            IHttpContextAccessor httpContextAccessor,
+            IEntityRepository repo) :
+            base(logger, client, httpContextAccessor, repo)
         {
         }
     }

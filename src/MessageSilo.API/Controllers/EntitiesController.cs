@@ -1,4 +1,5 @@
-﻿using MessageSilo.Shared.DataAccess;
+﻿using MessageSilo.Features.EntityManager;
+using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
@@ -10,7 +11,11 @@ namespace MessageSilo.API.Controllers
     {
         protected readonly IEntityRepository repo;
 
-        public EntitiesController(ILogger<MessageSiloControllerBase> logger, IHttpContextAccessor httpContextAccessor, IEntityRepository repo) : base(logger, httpContextAccessor)
+        public EntitiesController(
+            ILogger<MessageSiloControllerBase> logger,
+            IHttpContextAccessor httpContextAccessor,
+            IEntityRepository repo,
+            IClusterClient client) : base(logger, httpContextAccessor, client)
         {
             this.repo = repo;
         }
@@ -18,7 +23,7 @@ namespace MessageSilo.API.Controllers
         [HttpGet()]
         public async Task<ApiContract<IEnumerable<Entity>>> Index()
         {
-            var result = await repo.Query(userId: loggedInUserId);
+            var result = await entityManagerGrain.GetAll();
 
             return new ApiContract<IEnumerable<Entity>>(httpContextAccessor, StatusCodes.Status200OK, data: result);
         }

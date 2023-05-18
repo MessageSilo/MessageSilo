@@ -1,6 +1,8 @@
 using MessageSilo.Features.Connection;
 using MessageSilo.Features.Enricher;
+using MessageSilo.Features.EntityManager;
 using MessageSilo.Features.Target;
+using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Models;
 using Orleans;
 using Orleans.Configuration;
@@ -22,6 +24,11 @@ Log.Logger = new LoggerConfiguration()
 var builder = Host.CreateDefaultBuilder(args)
         .UseOrleans(siloBuilder =>
         {
+            siloBuilder.ConfigureServices(services =>
+            {
+                services.AddSingleton<IEntityRepository>(new EntityRepository(configuration));
+            });
+
             if (siloIP.Equals(IPAddress.Loopback))
                 siloBuilder = siloBuilder.UseLocalhostClustering();
             else
@@ -39,6 +46,7 @@ var builder = Host.CreateDefaultBuilder(args)
                 manager.AddApplicationPart(typeof(ITargetGrain).Assembly);
                 manager.AddApplicationPart(typeof(IConnectionGrain).Assembly);
                 manager.AddApplicationPart(typeof(IEnricherGrain).Assembly);
+                manager.AddApplicationPart(typeof(IEntityManagerGrain).Assembly);
             })
             .AddAzureTableGrainStorageAsDefault(options =>
             {
