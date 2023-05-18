@@ -56,7 +56,7 @@ namespace MessageSilo.Features.Target
 
         public async Task Delete()
         {
-            await Task.CompletedTask;
+            await this.persistence.ClearStateAsync();
         }
     }
 }

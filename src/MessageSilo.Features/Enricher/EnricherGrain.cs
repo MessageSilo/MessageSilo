@@ -77,7 +77,7 @@ namespace MessageSilo.Features.Enricher
 
         public async Task Delete()
         {
-            await Task.CompletedTask;
+            await this.persistence.ClearStateAsync();
         }
     }
 }
