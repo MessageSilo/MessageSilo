@@ -11,3 +11,8 @@ kill -9 123
 cp -R /home/temp/api/* /root/www/API
 nohup dotnet MessageSilo.API.dll --urls "https://*:443" &
 cat nohup.out
+
+----
+
+git tag v1.0.XX-beta
+git push origin --tags
