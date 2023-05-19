@@ -34,6 +34,7 @@ namespace MessageSilo.Features.Connection
         public override async Task OnActivateAsync()
         {
             this.persistence.State.Status = Status.Created;
+            this.persistence.State.InitializationError = null;
 
             if (this.persistence.RecordExists)
                 await reInit();
@@ -125,10 +126,12 @@ namespace MessageSilo.Features.Connection
                 await messagePlatformConnection.Init();
 
                 persistence.State.Status = Status.Connected;
+                persistence.State.InitializationError = null;
             }
             catch (Exception ex)
             {
                 persistence.State.Status = Status.Error;
+                persistence.State.InitializationError = ex.Message;
                 logger.LogError(ex.Message);
             }
         }

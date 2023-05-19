@@ -2,7 +2,7 @@
   "profiles": {
     "MessageSilo.SiloCTL": {
       "commandName": "Project",
-      "commandLineArgs": "config"
+      "commandLineArgs": "-it"
     }
   }
 }

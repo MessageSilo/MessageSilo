@@ -19,29 +19,37 @@ namespace MessageSilo.SiloCTL
             var config = new CTLConfig();
             config.CreateIfNotExist();
 
-            Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions, DeleteOptions, LogoutOptions>(args)
-                       .WithParsed<ShowOptions>(o =>
-                       {
-                           o.Show();
-                       })
-                       .WithParsed<ApplyOptions>(o =>
-                       {
-                           var targets = o.InitTargets();
-                           o.InitEnrichers();
-                           o.InitConnections(targets);
-                       })
-                       .WithParsed<ConfigOptions>(o =>
-                       {
-                           o.Show();
-                       })
-                       .WithParsed<DeleteOptions>(o =>
-                       {
-                           o.Delete();
-                       })
-                       .WithParsed<LogoutOptions>(o =>
-                       {
-                           o.Logout();
-                       });
+            var interactiveMode = args.Any(p => p == "-it");
+
+            do
+            {
+                if (interactiveMode)
+                    args = Console.ReadLine()!.Split();
+
+                Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions, DeleteOptions, LogoutOptions>(args)
+                           .WithParsed<ShowOptions>(o =>
+                           {
+                               o.Show();
+                           })
+                           .WithParsed<ApplyOptions>(o =>
+                           {
+                               var targets = o.InitTargets();
+                               o.InitEnrichers();
+                               o.InitConnections(targets);
+                           })
+                           .WithParsed<ConfigOptions>(o =>
+                           {
+                               o.Show();
+                           })
+                           .WithParsed<DeleteOptions>(o =>
+                           {
+                               o.Delete();
+                           })
+                           .WithParsed<LogoutOptions>(o =>
+                           {
+                               o.Logout();
+                           });
+            } while (interactiveMode);
         }
     }
 }

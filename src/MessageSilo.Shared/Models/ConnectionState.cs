@@ -14,6 +14,8 @@ namespace MessageSilo.Shared.Models
 
         public Status Status { get; set; }
 
+        public string? InitializationError { get; set; }
+
         public override string ToString()
         {
             return YamlConverter.Serialize(this);
