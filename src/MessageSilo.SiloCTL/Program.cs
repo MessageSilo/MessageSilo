@@ -16,13 +16,13 @@ namespace MessageSilo.SiloCTL
     {
         static void Main(string[] args)
         {
-            var config = new CTLConfig();
-            config.CreateIfNotExist();
-
             var interactiveMode = args.Any(p => p == "-it");
 
             do
             {
+                var config = new CTLConfig();
+                config.CreateIfNotExist();
+
                 if (interactiveMode)
                     args = Console.ReadLine()!.Split();
 
