@@ -41,7 +41,7 @@ namespace MessageSilo.Features.Enricher
             await base.OnActivateAsync();
         }
 
-        public async Task Update(EnricherDTO e)
+        public async Task Update(EnricherDTO e, string secKey)
         {
             persistence.State = e;
             await persistence.WriteStateAsync();

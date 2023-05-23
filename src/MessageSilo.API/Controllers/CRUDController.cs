@@ -97,7 +97,7 @@ namespace MessageSilo.API.Controllers
             );
 
             var entity = client!.GetGrain<GRAIN>(dto.Id);
-            await entity.Update(dto);
+            await entity.Update(dto, secKey);
 
             return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK, data: await entity.GetState()));
         }

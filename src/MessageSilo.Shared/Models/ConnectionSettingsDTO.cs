@@ -44,5 +44,29 @@ namespace MessageSilo.Shared.Models
         {
             Kind = EntityKind.Connection;
         }
+
+        public async Task Encrypt(string password)
+        {
+            if (ConnectionString is not null)
+                ConnectionString = await encryptAsync(ConnectionString, password);
+
+            if (AccessKey is not null)
+                AccessKey = await encryptAsync(AccessKey, password);
+
+            if (SecretAccessKey is not null)
+                SecretAccessKey = await encryptAsync(SecretAccessKey, password);
+        }
+
+        public async Task Decrypt(string password)
+        {
+            if (ConnectionString is not null)
+                ConnectionString = await decryptAsync(ConnectionString, password);
+
+            if (AccessKey is not null)
+                AccessKey = await decryptAsync(AccessKey, password);
+
+            if (SecretAccessKey is not null)
+                SecretAccessKey = await decryptAsync(SecretAccessKey, password);
+        }
     }
 }
