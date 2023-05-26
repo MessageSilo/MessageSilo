@@ -1,0 +1,73 @@
+name: Build and deploy .NET application to container app message-silo-prd-ca-silo
+
+on: workflow_dispatch
+
+env:
+  CONTAINER_APP_CONTAINER_NAME: silo-container
+  CONTAINER_APP_NAME: message-silo-prd-ca-silo
+  CONTAINER_APP_RESOURCE_GROUP_NAME: message-silo-prd-rg-sponsor
+  CONTAINER_REGISTRY_LOGIN_SERVER: messagesiloprdcrsponsor.azurecr.io
+  DOTNET_CORE_VERSION: 6.0.x
+  PROJECT_NAME_FOR_DOCKER: messagesilo.silo
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout to the branch
+      uses: actions/checkout@v3
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v1.8.0
+      with:
+        include-prerelease: True
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+
+    - name: Transform appsettings
+      uses: cschleiden/replace-tokens@v1
+      with:
+        tokenPrefix: '$('
+        tokenSuffix: ')'
+        files: '["**/appsettings.json"]'
+      env:
+        ConnectionStrings.AI: ${{ secrets.CONNECTIONSTRINGS_AI }}
+        ConnectionStrings.GrainStateStorage: ${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}
+
+    - name: Log in to container registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.CONTAINER_REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.ACR_USER }}
+        password: ${{ secrets.ACR_PASS }}
+
+    - name: Build and push container image to registry
+      run: dotnet publish -c Release -r linux-x64 -p:PublishProfile=DefaultContainer -p:ContainerImageTag=${{ github.sha }} --no-self-contained -p:ContainerRegistry=${{ env.CONTAINER_REGISTRY_LOGIN_SERVER }} -bl
+
+    - name: Upload binlog for investigation
+      uses: actions/upload-artifact@v3
+      with:
+        if-no-files-found: error
+        name: binlog
+        path: msbuild.binlog
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy to containerapp
+      uses: azure/CLI@v1
+      with:
+        inlineScript: >
+          az config set extension.use_dynamic_install=yes_without_prompt
+
+          az containerapp registry set --name ${{ env.CONTAINER_APP_NAME }} --resource-group ${{ env.CONTAINER_APP_RESOURCE_GROUP_NAME }} --server ${{ env.CONTAINER_REGISTRY_LOGIN_SERVER }} --username ${{ secrets.ACR_USER }} --password ${{ secrets.ACR_PASS }}
+
+          az containerapp update --name ${{ env.CONTAINER_APP_NAME }} --container-name ${{ env.CONTAINER_APP_CONTAINER_NAME }} --resource-group ${{ env.CONTAINER_APP_RESOURCE_GROUP_NAME }} --image ${{ env.CONTAINER_REGISTRY_LOGIN_SERVER }}/${{ env.PROJECT_NAME_FOR_DOCKER }}:${{ github.sha }}
+
+    - name: logout
+      run: >
+        az logout
