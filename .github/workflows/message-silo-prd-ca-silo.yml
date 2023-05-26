@@ -39,15 +39,15 @@ jobs:
         username: ${{ secrets.ACR_USER }}
         password: ${{ secrets.ACR_PASS }}
 
-    - name: Build and push container image to registry
-      run: dotnet publish -c Release -r linux-x64 -p:PublishProfile=DefaultContainer -p:ContainerImageTag=${{ github.sha }} --no-self-contained -p:ContainerRegistry=${{ env.CONTAINER_REGISTRY_LOGIN_SERVER }} -bl
+    - name: Prepare Docker buildx
+      uses: docker/setup-buildx-action@v1
 
-    - name: Upload binlog for investigation
-      uses: actions/upload-artifact@v3
+    - name: Build and push image to registry
+      uses: docker/build-push-action@v2
       with:
-        if-no-files-found: error
-        name: binlog
-        path: msbuild.binlog
+        push: true
+        tags: ${{ env.CONTAINER_REGISTRY_LOGIN_SERVER }}/${{ env.PROJECT_NAME_FOR_DOCKER }}:${{ github.sha }}
+        file: Silo/Dockerfile 
 
   deploy:
     runs-on: ubuntu-latest
