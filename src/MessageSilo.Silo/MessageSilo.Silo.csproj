@@ -1,5 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <Target Name="ZipPublishOutput" AfterTargets="Publish">
+    <Delete Files="$(ProjectDir)\..\silo.zip" />
+    <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(ProjectDir)\..\silo.zip" />
+  </Target>
+
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>

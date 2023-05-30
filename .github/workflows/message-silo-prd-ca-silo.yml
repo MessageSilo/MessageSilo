@@ -7,7 +7,6 @@ env:
   CONTAINER_APP_NAME: message-silo-prd-ca-silo
   CONTAINER_APP_RESOURCE_GROUP_NAME: message-silo-prd-rg-sponsor
   CONTAINER_REGISTRY_LOGIN_SERVER: messagesiloprdcrsponsor.azurecr.io
-  DOTNET_CORE_VERSION: 6.0.x
   PROJECT_NAME_FOR_DOCKER: messagesilo.silo
 jobs:
   build:
@@ -17,11 +16,10 @@ jobs:
     - name: Checkout to the branch
       uses: actions/checkout@v3
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v1.8.0
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
       with:
-        include-prerelease: True
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+        dotnet-version: 6.0.x
 
     - name: Transform appsettings
       uses: cschleiden/replace-tokens@v1
@@ -32,6 +30,14 @@ jobs:
       env:
         ConnectionStrings.AI: ${{ secrets.CONNECTIONSTRINGS_AI }}
         ConnectionStrings.GrainStateStorage: ${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}
+        
+    - name: Build
+      working-directory: ./src/MessageSilo.Silo
+      run: dotnet build
+
+    - name: Publish
+      working-directory: ./src/MessageSilo.Silo
+      run: dotnet publish -c Release
 
     - name: Log in to container registry
       uses: azure/docker-login@v1
