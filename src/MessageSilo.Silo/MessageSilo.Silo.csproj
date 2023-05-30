@@ -1,18 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
-  <Target Name="ZipPublishOutput" AfterTargets="Publish">
-    <Delete Files="$(ProjectDir)\..\silo.zip" />
-    <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(ProjectDir)\..\silo.zip" />
-  </Target>
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>9499a9c8-d0ef-44f8-8a96-4e22f8256f93</UserSecretsId>
-    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
   
   <ItemGroup>

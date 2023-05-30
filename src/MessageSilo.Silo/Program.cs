@@ -13,7 +13,6 @@ using System.Net;
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false, true)
     .AddJsonFile("appsettings.Development.json", true, true)
-    .AddEnvironmentVariables()
     .Build();
 
 var siloIP = IPAddress.Parse(configuration["Orleans:PrimarySiloAddress"]);
