@@ -32,7 +32,7 @@ jobs:
         ConnectionStrings.GrainStateStorage: ${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}
 
     - name: Display
-      run: echo ${{ secrets.CONNECTIONSTRINGS_AI }}
+      run: echo "${{ secrets.CONNECTIONSTRINGS_AI }}"
 
     - name: Publish
       run: dotnet publish ./src/MessageSilo.Silo/MessageSilo.Silo.csproj --configuration Release
