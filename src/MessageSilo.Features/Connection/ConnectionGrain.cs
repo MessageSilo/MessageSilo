@@ -47,10 +47,10 @@ namespace MessageSilo.Features.Connection
 
         public async Task Update(ConnectionSettingsDTO s, string secKey)
         {
-            await s.Encrypt(secKey);
+            //await s.Encrypt(secKey);
             persistence.State.ConnectionSettings = s;
             await persistence.WriteStateAsync();
-            await s.Decrypt(secKey);
+            //await s.Decrypt(secKey);
             await reInit();
         }
 

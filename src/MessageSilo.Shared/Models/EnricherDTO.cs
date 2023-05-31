@@ -1,5 +1,6 @@
 ﻿using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Serialization;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace MessageSilo.Shared.Models
 
         //API
         public string Url { get; set; }
+
+        public Method? Method { get; set; }
 
         public EnricherDTO()
         {

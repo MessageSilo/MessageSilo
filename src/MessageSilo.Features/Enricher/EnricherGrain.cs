@@ -21,13 +21,13 @@ namespace MessageSilo.Features.Enricher
 {
     public class EnricherGrain : Grain, IEnricherGrain
     {
-        private readonly ILogger<TargetGrain> logger;
+        private readonly ILogger<EnricherGrain> logger;
 
         private IPersistentState<EnricherDTO> persistence { get; set; }
 
         private IEnricher enricher;
 
-        public EnricherGrain([PersistentState("EnricherState")] IPersistentState<EnricherDTO> state, ILogger<TargetGrain> logger)
+        public EnricherGrain([PersistentState("EnricherState")] IPersistentState<EnricherDTO> state, ILogger<EnricherGrain> logger)
         {
             this.persistence = state;
             this.logger = logger;
@@ -70,7 +70,7 @@ namespace MessageSilo.Features.Enricher
                     enricher = new InlineEnricher(settings.Function);
                     break;
                 case EnricherType.API:
-                    enricher = new APIEnricher(settings.Url);
+                    enricher = new APIEnricher(settings.Url, settings.Method ?? Method.Post);
                     break;
             }
         }

@@ -60,7 +60,7 @@ namespace MessageSilo.Shared.Validators
 
         private bool isUnique(IEnumerable<Entity> entities, ConnectionSettingsDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);
 
-        private bool isTargetExist(IEnumerable<Entity> entities, string targetName) => entities.Any(p => p.Kind == EntityKind.Target && p.RowKey == targetName);
+        private bool isTargetExist(IEnumerable<Entity> entities, string targetName) => entities.Any(p => (p.Kind == EntityKind.Target || p.Kind == EntityKind.Connection) && p.RowKey == targetName);
 
         private bool isEnricherExist(IEnumerable<Entity> entities, string enricherName) => entities.Any(p => p.Kind == EntityKind.Enricher && p.RowKey == enricherName);
     }

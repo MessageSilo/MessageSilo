@@ -36,7 +36,7 @@ namespace MessageSilo.SiloCTL.Options
                 connectionSettings.Add(parsed);
             }
 
-            foreach (var conn in connectionSettings)
+            foreach (var conn in connectionSettings.OrderBy(p => p.Target))
             {
                 var result = api.Update<ConnectionSettingsDTO, ConnectionState>("Connections", conn);
                 displayResult(conn, result);

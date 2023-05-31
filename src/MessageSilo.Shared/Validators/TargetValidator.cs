@@ -19,7 +19,7 @@ namespace MessageSilo.Shared.Validators
                 .NotEmpty()
                 .MaximumLength(20)
                 .Matches("^[a-zA-Z0-9$_-]+$")
-                .Must((e, x) => IsUnique(entities, e)).WithMessage(p => $"Entity with name '{p.RowKey}' already exist")
+                .Must((e, x) => isUnique(entities, e)).WithMessage(p => $"Entity with name '{p.RowKey}' already exist")
                 .WithName("Name");
 
             RuleFor(p => p.Type).NotEmpty();
@@ -27,6 +27,6 @@ namespace MessageSilo.Shared.Validators
             RuleFor(p => p.Url).NotEmpty();
         }
 
-        private bool IsUnique(IEnumerable<Entity> entities, TargetDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);
+        private bool isUnique(IEnumerable<Entity> entities, TargetDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);
     }
 }
