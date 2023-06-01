@@ -18,8 +18,6 @@ namespace MessageSilo.API.Controllers
 
         protected readonly string loggedInUserId;
 
-        protected readonly string secKey;
-
         protected readonly IEntityManagerGrain entityManagerGrain;
 
         public MessageSiloControllerBase(
@@ -32,9 +30,7 @@ namespace MessageSilo.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
 
             var user = httpContextAccessor?.HttpContext?.User;
-
             loggedInUserId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-            secKey = user?.FindFirst("sec_key_v1")?.Value!;
             this.entityManagerGrain = client.GetGrain<IEntityManagerGrain>(loggedInUserId);
         }
     }

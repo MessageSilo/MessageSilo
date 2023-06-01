@@ -43,7 +43,7 @@ namespace MessageSilo.Features.Target
             }
         }
 
-        public async Task Update(TargetDTO t, string secKey)
+        public async Task Update(TargetDTO t)
         {
             persistence.State = t;
             await persistence.WriteStateAsync();

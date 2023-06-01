@@ -5,6 +5,7 @@ using MessageSilo.Features.RabbitMQ;
 using MessageSilo.Features.Target;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
@@ -17,6 +18,8 @@ namespace MessageSilo.Features.Connection
 
         private readonly IGrainFactory grainFactory;
 
+        private readonly IConfiguration configuration;
+
         private IMessagePlatformConnection messagePlatformConnection;
         private IPersistentState<ConnectionState> persistence { get; set; }
 
@@ -24,11 +27,12 @@ namespace MessageSilo.Features.Connection
 
         private IMessageSenderGrain? target;
 
-        public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory)
+        public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory, IConfiguration configuration)
         {
             this.persistence = state;
             this.logger = logger;
             this.grainFactory = grainFactory;
+            this.configuration = configuration;
         }
 
         public override async Task OnActivateAsync()
@@ -45,12 +49,11 @@ namespace MessageSilo.Features.Connection
             await base.OnActivateAsync();
         }
 
-        public async Task Update(ConnectionSettingsDTO s, string secKey)
+        public async Task Update(ConnectionSettingsDTO s)
         {
-            //await s.Encrypt(secKey);
+            await s.Encrypt(configuration["Orleans:StateUnlockerKey"]);
             persistence.State.ConnectionSettings = s;
             await persistence.WriteStateAsync();
-            //await s.Decrypt(secKey);
             await reInit();
         }
 
@@ -95,6 +98,7 @@ namespace MessageSilo.Features.Connection
             try
             {
                 var settings = persistence.State.ConnectionSettings;
+                await settings.Decrypt(configuration["Orleans:StateUnlockerKey"]);
 
                 if (settings.TargetId is not null)
                     switch (settings.TargetKind)

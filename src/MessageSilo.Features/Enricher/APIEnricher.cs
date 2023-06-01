@@ -38,13 +38,8 @@ namespace MessageSilo.Features.Enricher
             else
             {
                 var matches = rg.Matches(url);
-                //VIP
                 var replacedURL = url;
-                var jsonReader = new JsonTextReader(new StringReader(message));
-                jsonReader.FloatParseHandling = FloatParseHandling.Decimal;
-                jsonReader.Culture = new CultureInfo("en-US");
-
-                var messageObj = JObject.Load(jsonReader);
+                var messageObj = JObject.Parse(message);
 
                 foreach (Match match in matches)
                 {
@@ -52,8 +47,10 @@ namespace MessageSilo.Features.Enricher
                     var prop = messageObj.SelectToken(propPath);
 
                     if (prop is not null)
-                        replacedURL = replacedURL.Replace(match.Value, prop.ToString());
+                        replacedURL = replacedURL.Replace(match.Value, prop.Value<string>());
                 }
+
+                request = new RestRequest(replacedURL, method);
             }
 
             var response = await client.ExecuteAsync(request);

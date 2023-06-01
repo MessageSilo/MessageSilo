@@ -27,6 +27,7 @@ jobs:
         env:
           ConnectionStrings.AI: ${{ secrets.CONNECTIONSTRINGS_AI }}
           ConnectionStrings.GrainStateStorage: ${{ secrets.CONNECTIONSTRINGS_GRAINSTATESTORAGE }}
+          Orleans.StateUnlockerKey: ${{ secrets.ORLEANS_STATEUNLOCKERKEY }}
 
       - name: Build
         working-directory: ./src/MessageSilo.Silo
