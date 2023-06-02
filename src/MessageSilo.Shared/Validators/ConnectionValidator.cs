@@ -25,6 +25,8 @@ namespace MessageSilo.Shared.Validators
 
             RuleFor(p => p.Type).NotEmpty();
 
+            RuleFor(p => p.ReceiveMode).NotEmpty();
+
             RuleFor(p => p.Target)
                 .Must(x => isTargetExist(entities, x)).WithMessage(p => $"No Target with name '{p.Target}' found")
                 .When(p => !string.IsNullOrEmpty(p.Target));

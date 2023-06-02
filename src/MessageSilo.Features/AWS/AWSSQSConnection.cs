@@ -1,5 +1,6 @@
 ﻿using Amazon.SQS;
 using Amazon.SQS.Model;
+using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Azure.Amqp.Framing;
 using Microsoft.Extensions.Logging;
@@ -28,13 +29,13 @@ namespace MessageSilo.Features.AWS
 
         public string SecretAccessKey { get; }
 
-        public AWSSQSConnection(string queueName, string region, string accessKey, string secretAccessKey, bool autoAck, ILogger logger)
+        public AWSSQSConnection(string queueName, string region, string accessKey, string secretAccessKey, ReceiveMode rm, ILogger logger)
         {
             QueueName = queueName;
             Region = region;
             AccessKey = accessKey;
             SecretAccessKey = secretAccessKey;
-            AutoAck = autoAck;
+            ReceiveMode = rm;
             this.logger = logger;
         }
 
@@ -61,7 +62,8 @@ namespace MessageSilo.Features.AWS
 
             queueUrl = (await client.GetQueueUrlAsync(QueueName)).QueueUrl;
 
-            processMessageAsync();
+            if (ReceiveMode != ReceiveMode.None)
+                processMessageAsync();
 
             await Task.CompletedTask;
         }
@@ -79,7 +81,7 @@ namespace MessageSilo.Features.AWS
 
                 OnMessageReceived(new MessageReceivedEventArgs(new Shared.Models.Message(msg.MessageId, msg.Body)));
 
-                if (AutoAck)
+                if (autoAck)
                     await client.DeleteMessageAsync(queueUrl, msg.ReceiptHandle);
             }
         }

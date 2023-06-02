@@ -114,16 +114,16 @@ namespace MessageSilo.Features.Connection
                 switch (settings.Type)
                 {
                     case MessagePlatformType.Azure_Queue:
-                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.QueueName, settings.SubQueue, settings.AutoAck, logger);
+                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.QueueName, settings.SubQueue, settings.ReceiveMode!.Value, logger);
                         break;
                     case MessagePlatformType.Azure_Topic:
-                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.TopicName, settings.SubscriptionName, settings.SubQueue, settings.AutoAck, logger);
+                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.TopicName, settings.SubscriptionName, settings.SubQueue, settings.ReceiveMode!.Value, logger);
                         break;
                     case MessagePlatformType.RabbitMQ:
-                        messagePlatformConnection = new RabbitMQConnection(settings.ConnectionString, settings.QueueName, settings.ExchangeName, settings.AutoAck, logger);
+                        messagePlatformConnection = new RabbitMQConnection(settings.ConnectionString, settings.QueueName, settings.ExchangeName, settings.ReceiveMode!.Value, logger);
                         break;
                     case MessagePlatformType.AWS_SQS:
-                        messagePlatformConnection = new AWSSQSConnection(settings.QueueName, settings.Region, settings.AccessKey, settings.SecretAccessKey, settings.AutoAck, logger);
+                        messagePlatformConnection = new AWSSQSConnection(settings.QueueName, settings.Region, settings.AccessKey, settings.SecretAccessKey, settings.ReceiveMode!.Value, logger);
                         break;
                 }
 

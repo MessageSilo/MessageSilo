@@ -2,7 +2,6 @@
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
-using RM = Azure.Messaging.ServiceBus.ServiceBusReceiveMode;
 using SQ = Azure.Messaging.ServiceBus.SubQueue;
 
 namespace MessageSilo.Features.Azure
@@ -27,26 +26,24 @@ namespace MessageSilo.Features.Azure
 
         private SQ sq => SubQueue == "DeadLetter" ? SQ.DeadLetter : SQ.None;
 
-        private RM rm => AutoAck ? RM.ReceiveAndDelete : RM.PeekLock;
-
-        public AzureServiceBusConnection(string connectionString, string queueName, string subQueue, bool autoAck, ILogger logger)
+        public AzureServiceBusConnection(string connectionString, string queueName, string subQueue, ReceiveMode rm, ILogger logger)
         {
             ConnectionString = connectionString;
             QueueName = queueName;
             SubQueue = subQueue;
             Type = MessagePlatformType.Azure_Queue;
-            AutoAck = autoAck;
+            ReceiveMode = rm;
             this.logger = logger;
         }
 
-        public AzureServiceBusConnection(string connectionString, string topicName, string subscriptionName, string subQueue, bool autoAck, ILogger logger)
+        public AzureServiceBusConnection(string connectionString, string topicName, string subscriptionName, string subQueue, ReceiveMode rm, ILogger logger)
         {
             ConnectionString = connectionString;
             TopicName = topicName;
             SubscriptionName = subscriptionName;
             SubQueue = subQueue;
             Type = MessagePlatformType.Azure_Topic;
-            AutoAck = autoAck;
+            ReceiveMode = rm;
             this.logger = logger;
         }
 
@@ -54,21 +51,26 @@ namespace MessageSilo.Features.Azure
         {
             client = new ServiceBusClient(ConnectionString);
 
+            var sbrm = ReceiveMode == ReceiveMode.ReceiveAndDelete ? ServiceBusReceiveMode.ReceiveAndDelete : ServiceBusReceiveMode.PeekLock;
+
             switch (Type)
             {
                 case MessagePlatformType.Azure_Queue:
-                    processor = client.CreateProcessor(QueueName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = rm, AutoCompleteMessages = AutoAck });
+                    processor = client.CreateProcessor(QueueName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = sbrm, AutoCompleteMessages = autoAck });
                     sender = client.CreateSender(QueueName);
                     break;
                 case MessagePlatformType.Azure_Topic:
-                    processor = client.CreateProcessor(TopicName, SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = rm, AutoCompleteMessages = AutoAck });
+                    processor = client.CreateProcessor(TopicName, SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = sbrm, AutoCompleteMessages = autoAck });
                     sender = client.CreateSender(TopicName);
                     break;
             }
 
-            processor.ProcessMessageAsync += processMessageAsync;
-            processor.ProcessErrorAsync += processErrorAsync;
-            await processor.StartProcessingAsync();
+            if (ReceiveMode != ReceiveMode.None)
+            {
+                processor.ProcessMessageAsync += processMessageAsync;
+                processor.ProcessErrorAsync += processErrorAsync;
+                await processor.StartProcessingAsync();
+            }
         }
 
         private Task processErrorAsync(ProcessErrorEventArgs arg)

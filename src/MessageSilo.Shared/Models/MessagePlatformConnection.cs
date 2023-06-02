@@ -10,9 +10,11 @@ namespace MessageSilo.Shared.Models
 
         public MessagePlatformType Type { get; protected set; }
 
-        public bool AutoAck { get; protected set; }
+        public ReceiveMode ReceiveMode { get; protected set; }
 
         public event EventHandler MessageReceived;
+
+        protected bool autoAck => ReceiveMode == ReceiveMode.ReceiveAndDelete;
 
         protected virtual void OnMessageReceived(MessageReceivedEventArgs e)
         {

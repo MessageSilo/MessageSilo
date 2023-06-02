@@ -18,7 +18,7 @@ namespace MessageSilo.Shared.Models
 
         public EntityKind TargetKind { get; set; }
 
-        public bool AutoAck { get; set; }
+        public ReceiveMode? ReceiveMode { get; set; }
 
         //Azure
 

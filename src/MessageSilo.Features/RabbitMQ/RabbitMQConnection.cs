@@ -24,12 +24,12 @@ namespace MessageSilo.Features.RabbitMQ
 
         public string ExchangeName { get; }
 
-        public RabbitMQConnection(string connectionString, string queueName, string exchangeName, bool autoAck, ILogger logger)
+        public RabbitMQConnection(string connectionString, string queueName, string exchangeName, ReceiveMode rm, ILogger logger)
         {
             ConnectionString = connectionString;
             QueueName = queueName;
             ExchangeName = exchangeName;
-            AutoAck = autoAck;
+            ReceiveMode = rm;
             this.logger = logger;
         }
 
@@ -60,19 +60,23 @@ namespace MessageSilo.Features.RabbitMQ
             connection = factory.CreateConnection();
             channel = connection.CreateModel();
 
-            var consumer = new EventingBasicConsumer(channel);
-
-            consumer.Received += (model, ea) =>
+            if (ReceiveMode != ReceiveMode.None)
             {
-                string body = Encoding.UTF8.GetString(ea.Body.ToArray());
-                var messageId = ea.BasicProperties.MessageId ?? Guid.NewGuid().ToString();
+                var consumer = new EventingBasicConsumer(channel);
 
-                OnMessageReceived(new MessageReceivedEventArgs(new Message(messageId, body)));
-            };
+                consumer.Received += (model, ea) =>
+                {
+                    string body = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    var messageId = ea.BasicProperties.MessageId ?? Guid.NewGuid().ToString();
 
-            channel.BasicConsume(queue: QueueName,
-                                 autoAck: AutoAck,
-                                 consumer: consumer);
+                    OnMessageReceived(new MessageReceivedEventArgs(new Message(messageId, body)));
+                };
+
+                channel.BasicConsume(queue: QueueName,
+                                     autoAck: autoAck,
+                                     consumer: consumer);
+
+            }
 
             await Task.CompletedTask;
         }
