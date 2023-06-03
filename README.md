@@ -16,17 +16,13 @@ Azure Service Bus, AWS SQS, RabbitMQ, and more...
 - [Check the Docs](https://github.com/MessageSilo/MessageSilo/wiki)
 - [Download siloctl](https://github.com/MessageSilo/MessageSilo/wiki/01.-Getting-Started)
 
-## Build & Run
 
-```bash
-cd MessageSilo.Silo
-dotnet run
 
-cd MessageSilo.API
-dotnet run
-```
 
-API listening on: https://localhost:5000
+
+
+
+
 
 ## Contribution
 If you are interested in contributing to the project, please open an issue or submit a pull request.
