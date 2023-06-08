@@ -1,14 +1,5 @@
 ﻿using CommandLine;
-using ConsoleTables;
-using InfluxDB.Client.Api.Domain;
-using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Models;
-using MessageSilo.Shared.Serialization;
-using MessageSilo.SiloCTL;
 using MessageSilo.SiloCTL.Options;
-using RestSharp;
-using RestSharp.Authenticators;
-using System.Diagnostics;
 
 namespace MessageSilo.SiloCTL
 {
@@ -22,6 +13,8 @@ namespace MessageSilo.SiloCTL
             {
                 var config = new CTLConfig();
                 config.CreateIfNotExist();
+
+                new VersionChecker().CheckLatestVersion(config.LatestVersionInfoUrl);
 
                 if (interactiveMode)
                     args = Console.ReadLine()!.Split();

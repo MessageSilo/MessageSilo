@@ -1,14 +1,8 @@
 ﻿using Azure;
 using Azure.Data.Tables;
-using InfluxDB.Client.Api.Domain;
 using MessageSilo.Shared.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 
 namespace MessageSilo.Shared.Models
