@@ -1,13 +1,6 @@
-﻿using Amazon.Util;
+﻿using RestSharp;
 using RestSharp.Authenticators;
-using RestSharp;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using InfluxDB.Client.Api.Domain;
 using System.Net;
 
 namespace MessageSilo.SiloCTL.Options

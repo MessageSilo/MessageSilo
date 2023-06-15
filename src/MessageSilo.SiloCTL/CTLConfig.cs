@@ -17,6 +17,8 @@ namespace MessageSilo.SiloCTL
 
         public string Auth0Audiance { get; private set; } = "https://api.message-silo.dev";
 
+        public string LatestVersionInfoUrl { get; private set; } = "https://api.github.com/repos/MessageSilo/MessageSilo/releases/latest";
+
         public string Id { get; set; }
 
         public string Token { get; set; }
