@@ -20,7 +20,7 @@ namespace MessageSilo.SiloCTL
 
             var data = JsonSerializer.Deserialize<JsonNode>(response.Content!);
 
-            var latestVersion = data["tag_name"].GetValue<string>();
+            var latestVersion = data["tag_name"].GetValue<string>().TrimStart('v');
 
             if (currentVersion != latestVersion)
                 Console.WriteLine($"New version available! Please update siloctl! Latest version: {latestVersion}");
