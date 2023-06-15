@@ -27,6 +27,8 @@ namespace MessageSilo.Features.Connection
 
         private IMessageSenderGrain? target;
 
+        private LastMessage lastMessage;
+
         public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory, IConfiguration configuration)
         {
             this.persistence = state;
@@ -73,6 +75,11 @@ namespace MessageSilo.Features.Connection
             return await Task.FromResult(persistence.State);
         }
 
+        public async Task<LastMessage> GetLastMessage()
+        {
+            return await Task.FromResult(lastMessage);
+        }
+
         public async Task Send(Message message)
         {
             await messagePlatformConnection.Enqueue(message);
@@ -87,7 +94,12 @@ namespace MessageSilo.Features.Connection
                 var enricherGrain = grainFactory.GetGrain<IEnricherGrain>($"{settings.PartitionKey}|{enricherName}");
 
                 message = await enricherGrain.Enrich(message);
+
+                if (message is null)
+                    break;
             }
+
+            lastMessage.SetOutput(message, null);
 
             if (target is not null)
                 target.InvokeOneWay(p => p.Send(message));
@@ -147,6 +159,8 @@ namespace MessageSilo.Features.Connection
             var msg = (e as MessageReceivedEventArgs)!.Message;
 
             logger.Debug($"Connection: {this.GetPrimaryKeyString()} received a messsage: {msg.Id}.");
+
+            lastMessage = new LastMessage(msg);
 
             grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString()).InvokeOneWay(p => p.TransformAndSend(msg));
         }

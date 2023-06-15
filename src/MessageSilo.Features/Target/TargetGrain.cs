@@ -1,4 +1,5 @@
 ﻿using Amazon.Util;
+using Azure;
 using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
@@ -23,6 +24,8 @@ namespace MessageSilo.Features.Target
 
         private IRestClient client = new RestClient();
 
+        private LastMessage lastMessage;
+
         public TargetGrain([PersistentState("TargetState")] IPersistentState<TargetDTO> state, ILogger<TargetGrain> logger, IGrainFactory grainFactory)
         {
             this.persistence = state;
@@ -32,14 +35,24 @@ namespace MessageSilo.Features.Target
 
         public async Task Send(Message message)
         {
-            var request = new RestRequest(persistence.State.Url, Method.Post);
-            request.AddBody(message.Body, contentType: ContentType.Json);
+            lastMessage = new LastMessage(message);
 
-            var response = await client.ExecutePostAsync(request);
-
-            if (!response.IsSuccessful)
+            try
             {
-                logger.LogError(response.ErrorMessage);
+                var request = new RestRequest(persistence.State.Url, Method.Post);
+                request.AddBody(message.Body, contentType: ContentType.Json);
+
+                var response = await client.ExecutePostAsync(request);
+
+                if (!response.IsSuccessful)
+                    throw response.ErrorException;
+
+                lastMessage.SetOutput(null, null);
+            }
+            catch (Exception ex)
+            {
+                lastMessage.SetOutput(null, ex.Message);
+                logger.LogError(ex.Message);
             }
         }
 
@@ -52,6 +65,11 @@ namespace MessageSilo.Features.Target
         public async Task<TargetDTO> GetState()
         {
             return await Task.FromResult(persistence.State);
+        }
+
+        public async Task<LastMessage> GetLastMessage()
+        {
+            return await Task.FromResult(lastMessage);
         }
 
         public async Task Delete()

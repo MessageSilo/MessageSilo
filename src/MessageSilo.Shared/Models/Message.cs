@@ -16,5 +16,14 @@
             Id = id;
             Body = body;
         }
+
+        public Message GetCopy()
+        {
+            return new Message
+            {
+                Id = Id,
+                Body = Body
+            };
+        }
     }
 }
