@@ -33,21 +33,6 @@ namespace MessageSilo.Shared.Models
         public override string ToString()
         {
             return YamlConverter.Serialize(this);
-            //StringBuilder sb = new StringBuilder();
-
-            //sb.AppendLine("Last message\n");
-
-            //sb.AppendLine("Input:");
-            //sb.AppendLine(Input?.ToString());
-
-            //sb.AppendLine("Output:");
-            //sb.AppendLine("Output:");
-            //sb.AppendLine(Output?.ToString());
-
-            //sb.AppendLine("Error:");
-            //sb.AppendLine(Error?.ToString());
-
-            //return sb.ToString();
         }
     }
 }
