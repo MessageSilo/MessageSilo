@@ -77,6 +77,22 @@ namespace MessageSilo.API.Controllers
             return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK, data: await entity.GetState()));
         }
 
+        [HttpGet(template: "{name}/last-message")]
+        public async Task<ApiContract<LastMessage>> ShowLastMessage(string name)
+        {
+            var id = $"{loggedInUserId}|{name}";
+            var entities = await repo.Query(GetKind(), loggedInUserId);
+
+            if (!entities.Any(p => p.Id == id))
+            {
+                return await Task.FromResult(new ApiContract<LastMessage>(httpContextAccessor, StatusCodes.Status404NotFound));
+            }
+
+            var entity = client!.GetGrain<GRAIN>(id);
+            var ads = await entity.GetLastMessage();
+            return await Task.FromResult(new ApiContract<LastMessage>(httpContextAccessor, StatusCodes.Status200OK, data: ads));
+        }
+
         [HttpPut(template: "{name}")]
         public async Task<ApiContract<STATE>> Update(string name, [FromBody] DTO dto)
         {
