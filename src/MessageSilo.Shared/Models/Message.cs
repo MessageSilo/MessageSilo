@@ -1,4 +1,8 @@
-﻿namespace MessageSilo.Shared.Models
+﻿using Newtonsoft.Json;
+using System.Text;
+using System.Text.Json;
+
+namespace MessageSilo.Shared.Models
 {
     public class Message
     {
@@ -15,6 +19,15 @@
         {
             Id = id;
             Body = body;
+        }
+
+        public Message GetCopy()
+        {
+            return new Message
+            {
+                Id = Id,
+                Body = Body
+            };
         }
     }
 }

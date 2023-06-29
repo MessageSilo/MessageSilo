@@ -24,6 +24,12 @@ namespace MessageSilo.SiloCTL
             return result!;
         }
 
+        public ApiContract<LastMessage> GetLastMessage(string controller, string name)
+        {
+            var result = httpClient.GetJson<ApiContract<LastMessage>>($"{controller}/{name}/last-message");
+            return result!;
+        }
+
         public ApiContract<R> Get<R>(string controller, string name) where R : class
         {
             var result = httpClient.GetJson<ApiContract<R>>($"{controller}/{name}");

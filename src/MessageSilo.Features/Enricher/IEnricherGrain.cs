@@ -10,6 +10,6 @@ namespace MessageSilo.Features.Enricher
 {
     public interface IEnricherGrain : IEntityGrain<EnricherDTO, EnricherDTO>
     {
-        Task<Message> Enrich(Message message);
+        Task<Message?> Enrich(Message message);
     }
 }
