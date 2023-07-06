@@ -1,0 +1,53 @@
+﻿@using Blazorise.Localization
+
+<Bar Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light">
+    <BarBrand>
+        <BarItem>
+            <BarLink To="">
+                Message Silo
+            </BarLink>
+        </BarItem>
+    </BarBrand>
+    <BarToggler />
+    <BarMenu>
+        <BarStart>
+            <BarItem>
+                <BarLink To="/">
+                    <BarIcon Margin="Margin.Is2.FromEnd" IconName="IconName.Fire" />
+                    Try It!
+                    </BarLink>
+            </BarItem>
+        </BarStart>
+        <BarEnd>
+            <BarItem>
+                <BarLink To="https://github.com/MessageSilo/MessageSilo/wiki">
+                    <BarIcon Margin="Margin.Is2.FromEnd" IconName="IconName.Book" />
+                    Documentation
+                </BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="https://github.com/MessageSilo/MessageSilo">
+                    <BarIcon Margin="Margin.Is2.FromEnd" IconName="IconName.Code" />
+                    GitHub
+                </BarLink>
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await SelectCulture("en-US");
+
+        await base.OnInitializedAsync();
+    }
+
+    Task SelectCulture(string name)
+    {
+        LocalizationService.ChangeLanguage(name);
+
+        return Task.CompletedTask;
+    }
+
+    [Inject] protected ITextLocalizerService LocalizationService { get; set; }
+}

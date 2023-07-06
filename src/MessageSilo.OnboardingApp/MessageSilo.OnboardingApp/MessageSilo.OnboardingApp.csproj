@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Version>1.1</Version>
+		<Authors>Megabit</Authors>
+		<Company>Megabit</Company>
+		<Description>
+			This is a Blazorise Template for a Blazor Server Application.
+			Blazorise is a component library built on top of Blazor and CSS frameworks like Bootstrap, Bulma and Material.
+		</Description>
+		<Copyright>Copyright 2018-2022 Megabit</Copyright>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Blazorise" Version="1.1.*" />
+		<PackageReference Include="Blazorise.Bootstrap5" Version="1.1.*" />
+		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.1.*" />
+	</ItemGroup>
+
+</Project>

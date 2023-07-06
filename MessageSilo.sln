@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.Shared", "src\M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.SiloCTL", "src\MessageSilo.SiloCTL\MessageSilo.SiloCTL.csproj", "{A664DD31-8351-47CC-923C-EE5E39030D19}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSilo.OnboardingApp", "src\MessageSilo.OnboardingApp\MessageSilo.OnboardingApp\MessageSilo.OnboardingApp.csproj", "{08B598DA-3703-45C8-89A0-A847750F284D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		{A664DD31-8351-47CC-923C-EE5E39030D19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A664DD31-8351-47CC-923C-EE5E39030D19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A664DD31-8351-47CC-923C-EE5E39030D19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08B598DA-3703-45C8-89A0-A847750F284D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08B598DA-3703-45C8-89A0-A847750F284D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08B598DA-3703-45C8-89A0-A847750F284D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08B598DA-3703-45C8-89A0-A847750F284D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
