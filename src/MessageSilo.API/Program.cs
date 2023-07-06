@@ -4,7 +4,9 @@ using MessageSilo.API.HealthChecks;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Validators;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Orleans;
@@ -26,7 +28,12 @@ builder.Services.AddSingleton<IClusterClient>(sp => sp.GetService<ClusterClientH
 builder.Services.AddSingleton<IGrainFactory>(sp => sp.GetService<ClusterClientHostedService>()!.Client);
 builder.Services.AddSingleton<IEntityRepository, EntityRepository>();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication()
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/api/v1/auth/unauthorized";
+            options.AccessDeniedPath = "/api/v1/auth/forbidden";
+        })
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
         {
             c.Authority = $"{builder.Configuration["Auth0:Domain"]}";
@@ -36,6 +43,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 ValidIssuer = $"{builder.Configuration["Auth0:Domain"]}"
             };
         });
+
+builder.Services.AddAuthorization(options =>
+{
+    var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
+        JwtBearerDefaults.AuthenticationScheme,
+        CookieAuthenticationDefaults.AuthenticationScheme);
+    defaultAuthorizationPolicyBuilder = defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
+    options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
+});
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
