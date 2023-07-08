@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using MessageSilo.Features.Connection;
 using MessageSilo.Features.EntityManager;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Orleans;
+using System.Security.Claims;
 
 namespace MessageSilo.API.Controllers
 {
@@ -19,6 +21,17 @@ namespace MessageSilo.API.Controllers
             IEntityRepository repo) :
             base(logger, client, httpContextAccessor, repo)
         {
+        }
+
+        protected override Task<List<ValidationFailure>?> update(ConnectionSettingsDTO dto)
+        {
+            var user = httpContextAccessor?.HttpContext?.User;
+            var role = user?.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (role is not null && role == "obapp-user")
+                dto.IsTemporary = true;
+
+            return base.update(dto);
         }
     }
 }

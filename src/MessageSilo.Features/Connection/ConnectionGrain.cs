@@ -23,8 +23,6 @@ namespace MessageSilo.Features.Connection
         private IMessagePlatformConnection messagePlatformConnection;
         private IPersistentState<ConnectionState> persistence { get; set; }
 
-        private IDisposable healthTimer;
-
         private IMessageSenderGrain? target;
 
         private LastMessage lastMessage;
@@ -45,10 +43,21 @@ namespace MessageSilo.Features.Connection
             if (this.persistence.RecordExists)
                 await reInit();
 
-            if (healthTimer is null)
-                healthTimer = RegisterTimer(healthCheck, null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(10));
-
             await base.OnActivateAsync();
+        }
+
+        public override async Task OnDeactivateAsync()
+        {
+            if (persistence.State.ConnectionSettings.IsTemporary)
+            {
+                await Delete();
+                await base.OnDeactivateAsync();
+                return;
+            }
+
+            var grain = grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString());
+
+            await grain.GetState();
         }
 
         public async Task Update(ConnectionSettingsDTO s)
@@ -63,9 +72,6 @@ namespace MessageSilo.Features.Connection
         {
             if (messagePlatformConnection is not null)
                 await messagePlatformConnection.DisposeAsync();
-
-            if (healthTimer is not null)
-                healthTimer.Dispose();
 
             await this.persistence.ClearStateAsync();
         }
@@ -163,12 +169,6 @@ namespace MessageSilo.Features.Connection
             lastMessage = new LastMessage(msg);
 
             grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString()).InvokeOneWay(p => p.TransformAndSend(msg));
-        }
-
-        private Task healthCheck(object state)
-        {
-            logger.Info($"Connection: {this.GetPrimaryKeyString()} is healthy.");
-            return Task.CompletedTask;
         }
     }
 }

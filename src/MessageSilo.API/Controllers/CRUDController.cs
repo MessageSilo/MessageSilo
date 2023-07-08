@@ -98,7 +98,7 @@ namespace MessageSilo.API.Controllers
         {
             dto.PartitionKey = loggedInUserId;
 
-            var validationResults = await entityManagerGrain.Upsert(dto);
+            var validationResults = await update(dto);
 
             if (validationResults is not null)
                 return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status400BadRequest, errors: validationResults));
@@ -116,6 +116,11 @@ namespace MessageSilo.API.Controllers
             await entity.Update(dto);
 
             return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK, data: await entity.GetState()));
+        }
+
+        protected virtual async Task<List<ValidationFailure>?> update(DTO dto)
+        {
+            return await entityManagerGrain.Upsert(dto);
         }
     }
 }
