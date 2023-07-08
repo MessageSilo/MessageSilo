@@ -20,6 +20,8 @@ namespace MessageSilo.Shared.Models
 
         public ReceiveMode? ReceiveMode { get; set; }
 
+        public bool IsTemporary { get; set; }
+
         //Azure
 
         public string TopicName { get; set; }

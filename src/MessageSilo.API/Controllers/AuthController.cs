@@ -12,7 +12,8 @@ namespace MessageSilo.API.Controllers
         public async Task<IActionResult> Login([FromBody] Guid userId)
         {
             var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.NameIdentifier, ClaimTypes.Role);
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, $"app-{userId.ToString()}"));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, $"obapp-{userId.ToString()}"));
+            identity.AddClaim(new Claim(ClaimTypes.Role, "obapp-user"));
             var principal = new ClaimsPrincipal(identity);
 
             await HttpContext.SignInAsync(
