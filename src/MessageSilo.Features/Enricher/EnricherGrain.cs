@@ -1,5 +1,6 @@
 ﻿using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
@@ -11,16 +12,19 @@ namespace MessageSilo.Features.Enricher
     {
         private readonly ILogger<EnricherGrain> logger;
 
+        private readonly IConfiguration configuration;
+
         private IPersistentState<EnricherDTO> persistence { get; set; }
 
         private IEnricher enricher;
 
         private LastMessage lastMessage;
 
-        public EnricherGrain([PersistentState("EnricherState")] IPersistentState<EnricherDTO> state, ILogger<EnricherGrain> logger)
+        public EnricherGrain([PersistentState("EnricherState")] IPersistentState<EnricherDTO> state, ILogger<EnricherGrain> logger, IConfiguration configuration)
         {
             this.persistence = state;
             this.logger = logger;
+            this.configuration = configuration;
         }
 
         public override async Task OnActivateAsync()
@@ -78,6 +82,12 @@ namespace MessageSilo.Features.Enricher
                 case EnricherType.API:
                     enricher = new APIEnricher(settings.Url, settings.Method ?? Method.Post);
                     break;
+                case EnricherType.AI:
+                    {
+                        var apiKey = settings.ApiKey ?? configuration["AI:ApiKey"];
+                        enricher = new AIEnricher(apiKey, settings.Command);
+                        break;
+                    }
             }
         }
 
