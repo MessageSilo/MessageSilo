@@ -17,6 +17,11 @@ namespace MessageSilo.Shared.Models
 
         public Method? Method { get; set; }
 
+        //AI
+        public string ApiKey { get; set; }
+
+        public string Command { get; set; }
+
         public EnricherDTO()
         {
             Kind = EntityKind.Enricher;

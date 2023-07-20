@@ -14,12 +14,13 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration
+var configuration = builder.Configuration
     .AddJsonFile("appsettings.json", false, true)
-    .AddJsonFile("appsettings.Development.json", true, true);
+    .AddJsonFile("appsettings.Development.json", true, true)
+    .Build();
 
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
+    .ReadFrom.Configuration(configuration)
     .CreateLogger();
 
 builder.Services.AddSingleton<ClusterClientHostedService>();
@@ -36,11 +37,11 @@ builder.Services.AddAuthentication()
         })
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
         {
-            c.Authority = $"{builder.Configuration["Auth0:Domain"]}";
+            c.Authority = $"{configuration["Auth0:Domain"]}";
             c.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidAudience = builder.Configuration["Auth0:Audience"],
-                ValidIssuer = $"{builder.Configuration["Auth0:Domain"]}"
+                ValidAudience = configuration["Auth0:Audience"],
+                ValidIssuer = $"{configuration["Auth0:Domain"]}"
             };
         });
 
