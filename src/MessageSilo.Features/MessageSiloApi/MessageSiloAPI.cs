@@ -1,13 +1,18 @@
 ﻿using MessageSilo.Shared.Models;
 using RestSharp;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace MessageSilo.SiloCTL
+namespace MessageSilo.Features.MessageSiloApi
 {
-    public class MessageSiloAPIService
+    public class MessageSiloAPI : IMessageSiloAPI
     {
         private readonly RestClient httpClient;
 
-        public MessageSiloAPIService(RestClient httpClient)
+        public MessageSiloAPI(RestClient httpClient)
         {
             this.httpClient = httpClient;
         }

@@ -1,4 +1,5 @@
-﻿using RestSharp;
+﻿using MessageSilo.Features.MessageSiloApi;
+using RestSharp;
 using RestSharp.Authenticators;
 using System.Diagnostics;
 using System.Net;
@@ -9,7 +10,7 @@ namespace MessageSilo.SiloCTL.Options
     {
         protected readonly AuthAPIService authApi;
 
-        protected readonly MessageSiloAPIService api;
+        protected readonly IMessageSiloAPI api;
 
         public AuthorizedOptions() : base()
         {
@@ -37,7 +38,7 @@ namespace MessageSilo.SiloCTL.Options
                 ? ResponseStatus.Completed : ResponseStatus.Error
             };
 
-            api = new MessageSiloAPIService(new RestClient(restOptions));
+            api = new MessageSiloAPI(new RestClient(restOptions));
         }
     }
 }
