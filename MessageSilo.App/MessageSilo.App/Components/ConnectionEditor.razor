@@ -1,0 +1,53 @@
+﻿@inject IDashboardState State
+
+<Button Color="Color.Primary" Block Clicked="@ShowModal">Edit</Button>
+
+<CodeBlock>
+    @State.Queue.ToString()
+</CodeBlock>
+
+<Modal @ref="modal">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Edit Connection</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Type</FieldLabel>
+                <Select TValue="MessagePlatformType" @bind-SelectedValue="selectedType">
+                    <SelectItem Value="MessagePlatformType.Azure_Queue">Azure - Queue</SelectItem>
+                    <SelectItem Value="MessagePlatformType.AWS_SQS">AWS - SQS</SelectItem>
+                </Select>
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Primary" Clicked="@Save">Save Changes</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code {
+    [Inject] private IJSRuntime _js { get; set; }
+
+    private Modal modal;
+
+    private MessagePlatformType selectedType;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await State.Init();
+        await base.OnInitializedAsync();
+    }
+
+    private Task ShowModal()
+    {
+        return modal.Show();
+    }
+
+    private async Task Save()
+    {
+        State.Queue.Type = selectedType;
+        await modal.Close(CloseReason.UserClosing);
+    }
+}

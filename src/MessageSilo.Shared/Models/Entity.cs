@@ -17,10 +17,13 @@ namespace MessageSilo.Shared.Models
 
         public EntityKind Kind { get; set; }
 
+        [YamlIgnore]
         public string Id => $"{PartitionKey}|{RowKey}";
 
+        [YamlIgnore]
         public DateTimeOffset? Timestamp { get; set; }
 
+        [YamlIgnore]
         public ETag ETag { get; set; }
 
         private byte[] IV =

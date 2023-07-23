@@ -1,7 +1,9 @@
-﻿using Blazorise;
+﻿using Blazored.LocalStorage;
+using Blazorise;
 using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
 using MessageSilo.App;
+using MessageSilo.App.States;
 using MessageSilo.Features.MessageSiloApi;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -11,6 +13,9 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped<IMessageSiloAPI, MessageSiloAPI>();
+builder.Services.AddScoped<IDashboardState, DashboardState>();
+
+builder.Services.AddBlazoredLocalStorage();
 
 AddBlazorise(builder.Services);
 

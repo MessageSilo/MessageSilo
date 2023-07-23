@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.Shared", "src\M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.SiloCTL", "src\MessageSilo.SiloCTL\MessageSilo.SiloCTL.csproj", "{A664DD31-8351-47CC-923C-EE5E39030D19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSilo.App", "MessageSilo.App\MessageSilo.App\MessageSilo.App.csproj", "{3FA45182-28D4-4E43-82D7-BAB02F37DDEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.App", "MessageSilo.App\MessageSilo.App\MessageSilo.App.csproj", "{3FA45182-28D4-4E43-82D7-BAB02F37DDEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

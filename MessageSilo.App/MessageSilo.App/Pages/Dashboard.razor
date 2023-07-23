@@ -1,31 +1,43 @@
 ﻿@page "/"
+
 @inject IVersionProvider VersionProvider
-<Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Blazorise</Heading>
+@inject ILocalStorageService LocalStorage
 
-<Paragraph>
-    Blazorise is a component library built on top of Blazor and CSS frameworks like <Anchor To="https://getbootstrap.com/" Target="Target.Blank">Bootstrap</Anchor>, <Anchor To="https://bulma.io/" Target="Target.Blank">Bulma</Anchor>, <Anchor To="https://ant.design/" Target="Target.Blank">Ant Design</Anchor>, and <Anchor To="http://daemonite.github.io/material/" Target="Target.Blank">Material</Anchor>. It can be used to build responsive, single-page web applications.
-</Paragraph>
+<Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Experiment with Message Silo!</Heading>
 
-<Alert Color="Color.Info" Visible>
-    <Paragraph>
-        This is a Blazorise Starting Template allowing you to quickly get started building your project!
-    </Paragraph>
+<Row>
+    @*Connection - Input*@
+    <Column ColumnSize="ColumnSize.Is4">
+        <Row>
+            <Column ColumnSize="ColumnSize.Is12">
+                <ConnectionEditor></ConnectionEditor>
+            </Column>
+        </Row>
+        <Row>
+            <Column ColumnSize="ColumnSize.Is6">A1</Column>
+            <Column ColumnSize="ColumnSize.Is6">A2</Column>
+        </Row>
+    </Column>
 
-    <Paragraph>
-        The bare minimum has been installed for you:
-        <ul>
-            <li>Blazorise @($"v{VersionProvider.MilestoneVersion}")</li>
-            <li>The Blazorise Provider you have selected</li>
-            <li>The corresponding icon provider</li>
-        </ul>
-        However Blazorise has many more extensions at your disposal.
-        You can find them <Anchor To="https://blazorise.com/docs/extensions" Target="Target.Blank">here</Anchor>.
-    </Paragraph>
+    @*Enricher*@
+    <Column ColumnSize="ColumnSize.Is4">
+        <Row>
+            <Column ColumnSize="ColumnSize.Is12">B</Column>
+        </Row>
+        <Row>
+            <Column ColumnSize="ColumnSize.Is6">B1</Column>
+            <Column ColumnSize="ColumnSize.Is6">B2</Column>
+        </Row>
+    </Column>
 
-    <Paragraph>
-        Please visit the official <Anchor To="https://bootstrapdemo.blazorise.com/" Target="Target.Blank">Blazorise Demo</Anchor> for component examples.
-    </Paragraph>
-    <Paragraph>
-        Please visit the official <Anchor To="https://blazorise.com/docs/" Target="Target.Blank">Blazorise Documentation</Anchor> to learn more about the available components.
-    </Paragraph>
-</Alert>
+    @*Connection - Target*@
+    <Column ColumnSize="ColumnSize.Is4">
+        <Row>
+            <Column ColumnSize="ColumnSize.Is12">C</Column>
+        </Row>
+        <Row>
+            <Column ColumnSize="ColumnSize.Is6">C1</Column>
+            <Column ColumnSize="ColumnSize.Is6">C2</Column>
+        </Row>
+    </Column>
+</Row>
