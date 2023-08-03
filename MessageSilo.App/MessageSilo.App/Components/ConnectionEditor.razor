@@ -1,4 +1,5 @@
-﻿@inject IDashboardState State
+﻿@using FluentValidation.Results;
+@inject IDashboardState State
 
 <Button Color="Color.Primary" Block Clicked="@ShowModal">Edit</Button>
 
@@ -13,13 +14,80 @@
             <CloseButton />
         </ModalHeader>
         <ModalBody>
-            <Field>
-                <FieldLabel>Type</FieldLabel>
-                <Select TValue="MessagePlatformType" @bind-SelectedValue="selectedType">
-                    <SelectItem Value="MessagePlatformType.Azure_Queue">Azure - Queue</SelectItem>
-                    <SelectItem Value="MessagePlatformType.AWS_SQS">AWS - SQS</SelectItem>
-                </Select>
-            </Field>
+            @if (queue != null)
+            {
+                <Field>
+                    <FieldLabel>Type</FieldLabel>
+                    <Select TValue="MessagePlatformType?" @bind-SelectedValue="queue.Type">
+                        <SelectItem Value="MessagePlatformType.Azure_Queue">Azure - Queue</SelectItem>
+                        <SelectItem Value="MessagePlatformType.Azure_Queue">Azure - Topic</SelectItem>
+                        <SelectItem Value="MessagePlatformType.AWS_SQS">AWS - SQS</SelectItem>
+                    </Select>
+                </Field>
+                @if (queue.Type == MessagePlatformType.Azure_Queue)
+                {
+                    <Field>
+                        <FieldLabel>Queue Name</FieldLabel>
+                        <TextEdit @bind-Text="queue.QueueName"></TextEdit>
+                    </Field>
+                    <Field>
+                        <FieldLabel>Connection String</FieldLabel>
+                        <TextEdit Role="TextRole.Password" @bind-Text="queue.ConnectionString"></TextEdit>
+                    </Field>
+                    queue.TopicName = null;
+                    queue.SubscriptionName = null;
+                    queue.Region = null;
+                    queue.AccessKey = null;
+                    queue.SecretAccessKey = null;
+                }
+                @if (queue.Type == MessagePlatformType.Azure_Topic)
+                {
+                    <Field>
+                        <FieldLabel>Topic Name</FieldLabel>
+                        <TextEdit @bind-Text="queue.TopicName"></TextEdit>
+                    </Field>
+                    <Field>
+                        <FieldLabel>Subscription Name</FieldLabel>
+                        <TextEdit @bind-Text="queue.SubscriptionName"></TextEdit>
+                    </Field>
+                    <Field>
+                        <FieldLabel>Connection String</FieldLabel>
+                        <TextEdit Role="TextRole.Password" @bind-Text="queue.ConnectionString"></TextEdit>
+                    </Field>
+                    queue.QueueName = null;
+                    queue.Region = null;
+                    queue.AccessKey = null;
+                    queue.SecretAccessKey = null;
+                }
+                @if (queue.Type == MessagePlatformType.AWS_SQS)
+                {
+                    <Field>
+                        <FieldLabel>Queue Name</FieldLabel>
+                        <TextEdit @bind-Text="queue.QueueName"></TextEdit>
+                    </Field>
+                    <Field>
+                        <FieldLabel>Region</FieldLabel>
+                        <TextEdit @bind-Text="queue.Region"></TextEdit>
+                    </Field>
+                    <Field>
+                        <FieldLabel>Access Key</FieldLabel>
+                        <TextEdit Role="TextRole.Password" @bind-Text="queue.AccessKey"></TextEdit>
+                    </Field>
+                    <Field>
+                        <FieldLabel>Secret Access Key</FieldLabel>
+                        <TextEdit Role="TextRole.Password" @bind-Text="queue.SecretAccessKey"></TextEdit>
+                    </Field>
+                    queue.TopicName = null;
+                    queue.SubscriptionName = null;
+                    queue.ConnectionString = null;
+                }
+                <UnorderedList>
+                    @foreach (var error in errors)
+                    {
+                        <UnorderedListItem TextColor="TextColor.Danger">@error.ErrorMessage</UnorderedListItem>
+                    }
+                </UnorderedList>
+            }
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Primary" Clicked="@Save">Save Changes</Button>
@@ -28,26 +96,26 @@
 </Modal>
 
 @code {
-    [Inject] private IJSRuntime _js { get; set; }
-
     private Modal modal;
 
-    private MessagePlatformType selectedType;
+    private ConnectionSettingsDTO queue;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await State.Init();
-        await base.OnInitializedAsync();
-    }
+    private IEnumerable<ValidationFailure> errors = new List<ValidationFailure>();
 
     private Task ShowModal()
     {
+        queue = State.Queue.ConnectionSettings.GetCopy();
+
         return modal.Show();
     }
 
     private async Task Save()
     {
-        State.Queue.Type = selectedType;
+        errors = await State.SaveQueueChanges(queue);
+
+        if (errors.Count() != 0)
+            return;
+
         await modal.Close(CloseReason.UserClosing);
     }
 }

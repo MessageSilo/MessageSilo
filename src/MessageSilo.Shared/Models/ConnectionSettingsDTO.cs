@@ -80,5 +80,11 @@ namespace MessageSilo.Shared.Models
             if (SecretAccessKey is not null)
                 SecretAccessKey = await decryptAsync(SecretAccessKey, password);
         }
+
+        public ConnectionSettingsDTO GetCopy()
+        {
+            var yaml = ToString();
+            return YamlConverter.Deserialize<ConnectionSettingsDTO>(yaml);
+        }
     }
 }

@@ -35,7 +35,7 @@ namespace MessageSilo.SiloCTL.Options
             {
                 var entities = api.GetEntities();
 
-                var entity = entities.Data!.FirstOrDefault(p => p.RowKey == Name);
+                var entity = entities.Data?.FirstOrDefault(p => p.RowKey == Name);
 
                 if (entity is not null)
                 {

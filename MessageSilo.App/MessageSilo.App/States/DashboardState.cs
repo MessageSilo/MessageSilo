@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using FluentValidation.Results;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 
@@ -7,34 +8,57 @@ namespace MessageSilo.App.States
     public class DashboardState : IDashboardState
     {
         private readonly ILocalStorageService localStorage;
+        private readonly MessageSiloAPI messageSiloAPI;
 
-        public Guid UserId { get; set; }
+        public Guid UserId { get; private set; }
 
-        public ConnectionSettingsDTO Queue { get; set; } = new ConnectionSettingsDTO()
+        public ConnectionState Queue { get; private set; } = new ConnectionState()
         {
-            RowKey = "test_conn",
-            Enrichers = new[] { "test_enricher" },
-            ReceiveMode = ReceiveMode.ReceiveAndDelete
+            ConnectionSettings = new ConnectionSettingsDTO()
+            {
+                RowKey = "test_conn",
+                Enrichers = new[] { "test_enricher" },
+                ReceiveMode = ReceiveMode.ReceiveAndDelete,
+                Type = MessagePlatformType.Azure_Queue
+            }
         };
 
-        public EnricherDTO Enricher { get; set; } = new EnricherDTO()
+        public EnricherDTO Enricher { get; private set; } = new EnricherDTO()
         {
-            RowKey = "test_enricher"
+            RowKey = "test_enricher",
+            Type = EnricherType.Inline,
+            Function = "(x) => { return { ...x, myNewProp: 'test' }; }"
         };
 
-        public Message Output { get; set; } = new Message();
+        public Message Output { get; private set; } = new Message();
 
-        public DashboardState(ILocalStorageService localStorage)
+        public DashboardState(ILocalStorageService localStorage, MessageSiloAPI messageSiloAPI)
         {
             this.localStorage = localStorage;
+            this.messageSiloAPI = messageSiloAPI;
         }
 
         public async Task Init()
         {
-            if (!(await localStorage.ContainKeyAsync("userId")))
-                await localStorage.SetItemAsync<Guid>("userId", Guid.NewGuid());
+            var entities = await messageSiloAPI.GetEntities();
 
-            UserId = await localStorage.GetItemAsync<Guid>("userId");
+            if (entities.Data is not null)
+            {
+                if (entities.Data.Any(p => p.RowKey == "test_enricher"))
+                    Enricher = (await messageSiloAPI.Get<EnricherDTO>("Enrichers", "test_enricher")).Data!;
+                else
+                    await messageSiloAPI.Update<EnricherDTO, EnricherDTO>("Enrichers", Enricher);
+
+                if (entities.Data.Any(p => p.RowKey == "test_conn"))
+                    Queue = (await messageSiloAPI.Get<ConnectionState>("Connections", "test_conn")).Data!;
+            }
+        }
+
+        public async Task<IEnumerable<ValidationFailure>> SaveQueueChanges(ConnectionSettingsDTO queue)
+        {
+            Queue.ConnectionSettings = queue.GetCopy();
+            var response = await messageSiloAPI.Update<ConnectionSettingsDTO, ConnectionState>("Connections", Queue.ConnectionSettings);
+            return response.Errors;
         }
     }
 }

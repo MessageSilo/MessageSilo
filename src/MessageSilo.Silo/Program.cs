@@ -54,11 +54,6 @@ var builder = Host.CreateDefaultBuilder(args)
                 options.UseJson = true;
                 options.DeleteStateOnClear = true;
             });
-
-            siloBuilder = siloBuilder.Configure<GrainCollectionOptions>(options =>
-            {
-                options.CollectionAge = TimeSpan.FromMinutes(60);
-            });
         });
 
 builder.UseSerilog(Log.Logger);

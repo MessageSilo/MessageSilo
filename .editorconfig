@@ -1,4 +1,4 @@
-﻿[*.cs]
+﻿[ "*.cs" ]
 
 # Default severity for all analyzer diagnostics
 dotnet_analyzer_diagnostic.severity = none
@@ -76,3 +76,6 @@ dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_null_propagation = true:suggestion
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
 dotnet_style_prefer_auto_properties = true:silent
+
+[*.{cs,vb}]
+dotnet_diagnostic.CS8603.severity = none

@@ -1,5 +1,6 @@
 using FluentValidation;
 using MessageSilo.API;
+using MessageSilo.API.Auth;
 using MessageSilo.API.HealthChecks;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Models;
@@ -24,17 +25,13 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Services.AddSingleton<ClusterClientHostedService>();
-builder.Services.AddSingleton<IHostedService>(sp => sp.GetService<ClusterClientHostedService>()!);
+builder.Services.AddSingleton<IHostedService>(sp => sp.GetService<ClusterClientHostedService>());
 builder.Services.AddSingleton<IClusterClient>(sp => sp.GetService<ClusterClientHostedService>()!.Client);
 builder.Services.AddSingleton<IGrainFactory>(sp => sp.GetService<ClusterClientHostedService>()!.Client);
 builder.Services.AddSingleton<IEntityRepository, EntityRepository>();
 
 builder.Services.AddAuthentication()
-        .AddCookie(options =>
-        {
-            options.LoginPath = "/api/v1/auth/unauthorized";
-            options.AccessDeniedPath = "/api/v1/auth/forbidden";
-        })
+        .AddScheme<OnboardingAuthSchemeOptions, OnboardingAuthHandler>("OnboardingAuthScheme", options => { })
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
         {
             c.Authority = $"{configuration["Auth0:Domain"]}";
@@ -49,7 +46,7 @@ builder.Services.AddAuthorization(options =>
 {
     var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
         JwtBearerDefaults.AuthenticationScheme,
-        CookieAuthenticationDefaults.AuthenticationScheme);
+        "OnboardingAuthScheme");
     defaultAuthorizationPolicyBuilder = defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
     options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
 });
