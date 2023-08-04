@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   build-and-publish:
-    name: siloctl-1.0.42
+    name: siloctl-1.0.44
     runs-on: ubuntu-latest
 
     steps:
