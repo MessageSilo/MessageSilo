@@ -9,7 +9,7 @@ namespace MessageSilo.SiloCTL.Options
     {
         protected readonly AuthAPIService authApi;
 
-        protected readonly MessageSiloAPIService api;
+        protected readonly MessageSiloAPI api;
 
         public AuthorizedOptions() : base()
         {
@@ -37,7 +37,7 @@ namespace MessageSilo.SiloCTL.Options
                 ? ResponseStatus.Completed : ResponseStatus.Error
             };
 
-            api = new MessageSiloAPIService(new RestClient(restOptions));
+            api = new MessageSiloAPI(new RestClient(restOptions));
         }
     }
 }

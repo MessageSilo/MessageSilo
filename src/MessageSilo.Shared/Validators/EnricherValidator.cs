@@ -29,6 +29,9 @@ namespace MessageSilo.Shared.Validators
 
             RuleFor(p => p.Url).NotEmpty()
                 .When(p => p.Type == EnricherType.API);
+
+            RuleFor(p => p.Command).NotEmpty()
+                .When(p => p.Type == EnricherType.AI);
         }
 
         private bool isUnique(IEnumerable<Entity> entities, EnricherDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);

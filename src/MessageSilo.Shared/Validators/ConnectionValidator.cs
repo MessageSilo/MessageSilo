@@ -37,7 +37,8 @@ namespace MessageSilo.Shared.Validators
 
             RuleFor(p => p.QueueName).NotEmpty()
                 .When(p => p.Type == MessagePlatformType.Azure_Queue ||
-                           p.Type == MessagePlatformType.RabbitMQ);
+                           p.Type == MessagePlatformType.RabbitMQ ||
+                           p.Type == MessagePlatformType.AWS_SQS);
 
             RuleFor(p => p.ConnectionString).NotEmpty()
                 .When(p => p.Type == MessagePlatformType.Azure_Queue ||

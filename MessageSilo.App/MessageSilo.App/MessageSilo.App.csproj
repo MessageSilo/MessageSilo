@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Version>1.1</Version>
+		<Authors>Megabit</Authors>
+		<Company>Megabit</Company>
+		<Description>
+			This is a Blazorise Template for a Blazor Server Application.
+			Blazorise is a component library built on top of Blazor and CSS frameworks like Bootstrap, Bulma and Material.
+		</Description>
+		<Copyright>Copyright 2018-2022 Megabit</Copyright>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+		<PackageReference Include="Blazorise.LoadingIndicator" Version="1.2.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.*" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.*" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Blazorise" Version="1.2.4" />
+		<PackageReference Include="Blazorise.Bootstrap5" Version="1.2.4" />
+		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.2.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\MessageSilo.Features\MessageSilo.Features.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="wwwroot\appsettings.Development.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="wwwroot\appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+</Project>

@@ -1,4 +1,6 @@
 ﻿using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Serialization;
+using YamlDotNet.Serialization;
 
 namespace MessageSilo.Shared.Models
 {
@@ -14,13 +16,13 @@ namespace MessageSilo.Shared.Models
 
         public string Target { get; set; }
 
+        [YamlIgnore]
         public string TargetId => string.IsNullOrEmpty(Target) ? null! : $"{PartitionKey}|{Target}";
 
+        [YamlIgnore]
         public EntityKind TargetKind { get; set; }
 
         public ReceiveMode? ReceiveMode { get; set; }
-
-        public bool IsTemporary { get; set; }
 
         //Azure
 
@@ -47,6 +49,11 @@ namespace MessageSilo.Shared.Models
             Kind = EntityKind.Connection;
         }
 
+        public override string ToString()
+        {
+            return YamlConverter.Serialize(this);
+        }
+
         public async Task Encrypt(string password)
         {
             if (ConnectionString is not null)
@@ -69,6 +76,12 @@ namespace MessageSilo.Shared.Models
 
             if (SecretAccessKey is not null)
                 SecretAccessKey = await decryptAsync(SecretAccessKey, password);
+        }
+
+        public ConnectionSettingsDTO GetCopy()
+        {
+            var yaml = ToString();
+            return YamlConverter.Deserialize<ConnectionSettingsDTO>(yaml);
         }
     }
 }
