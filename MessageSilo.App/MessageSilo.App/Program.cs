@@ -45,9 +45,6 @@ builder.Services.AddScoped(p =>
     return client;
 });
 
-var state = builder.Services.BuildServiceProvider().CreateScope().ServiceProvider.GetRequiredService<IDashboardState>();
-await state.Init();
-
 await builder.Build().RunAsync();
 
 void AddBlazorise(IServiceCollection services)

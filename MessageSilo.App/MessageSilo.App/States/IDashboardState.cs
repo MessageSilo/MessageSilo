@@ -5,14 +5,18 @@ namespace MessageSilo.App.States
 {
     public interface IDashboardState
     {
-        ConnectionState Queue { get; }
+        ConnectionState Queue { get; set; }
 
-        EnricherDTO Enricher { get; }
+        EnricherDTO Enricher { get; set; }
 
-        Message Output { get; }
+        Message QueueOutput { get; set; }
+
+        Message EnricherOutput { get; set; }
 
         Task Init();
 
         Task<IEnumerable<ValidationFailure>> SaveQueueChanges(ConnectionSettingsDTO queue);
+
+        Task<IEnumerable<ValidationFailure>> SaveEnricherChanges(EnricherDTO enricher);
     }
 }

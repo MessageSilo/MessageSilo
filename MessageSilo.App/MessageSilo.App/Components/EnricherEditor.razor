@@ -1,0 +1,122 @@
+﻿@using FluentValidation.Results;
+@using RestSharp;
+@inject IDashboardState State
+
+<LoadingIndicator @ref="loadingIndicator" Visible=true>
+
+    <Button Color="Color.Primary" Block Clicked="@ShowModal">Edit</Button>
+
+    <CodeBlock>
+        @Enricher?.ToString()
+    </CodeBlock>
+
+    <Modal @ref="modal">
+        <ModalContent Centered>
+            <ModalHeader>
+                <ModalTitle>Edit Enricher</ModalTitle>
+                <CloseButton />
+            </ModalHeader>
+            <ModalBody>
+                @if (enricher != null)
+                {
+                    <Field>
+                        <FieldLabel>Type</FieldLabel>
+                        <Select TValue="EnricherType?" @bind-SelectedValue="enricher.Type">
+                            <SelectItem Value="EnricherType.Inline">Inline</SelectItem>
+                            <SelectItem Value="EnricherType.API">REST API</SelectItem>
+                            <SelectItem Value="EnricherType.AI">AI</SelectItem>
+                        </Select>
+                    </Field>
+                    @if (enricher.Type == EnricherType.Inline)
+                    {
+                        <Field>
+                            <FieldLabel>Function</FieldLabel>
+                            <MemoEdit Rows="5" @bind-Text="enricher.Function"></MemoEdit>
+                        </Field>
+                        enricher.Method = null;
+                        enricher.Url = null;
+                        enricher.Command = null;
+                    }
+                    @if (enricher.Type == EnricherType.API)
+                    {
+                        <Field>
+                            <FieldLabel>HTTP Method</FieldLabel>
+                            <Select TValue="Method?" @bind-SelectedValue="enricher.Method">
+                                <SelectItem Value="Method.Get">GET</SelectItem>
+                                <SelectItem Value="Method.Post">POST</SelectItem>
+                                <SelectItem Value="Method.Put">PUT</SelectItem>
+                            </Select>
+                        </Field>
+                        <Field>
+                            <FieldLabel>URL</FieldLabel>
+                            <TextEdit @bind-Text="enricher.Url"></TextEdit>
+                        </Field>
+                        enricher.Function = null;
+                        enricher.Command = null;
+                    }
+                    @if (enricher.Type == EnricherType.AI)
+                    {
+                        <Field>
+                            <FieldLabel>Command</FieldLabel>
+                            <MemoEdit Rows="5" @bind-Text="enricher.Command"></MemoEdit>
+                        </Field>
+                        enricher.Method = null;
+                        enricher.Url = null;
+                        enricher.Function = null;
+                    }
+                    <UnorderedList>
+                        @foreach (var error in errors)
+                        {
+                            <UnorderedListItem TextColor="TextColor.Danger">@error.ErrorMessage</UnorderedListItem>
+                        }
+                    </UnorderedList>
+                }
+            </ModalBody>
+            <ModalFooter>
+                <Button Color="Color.Primary" Clicked="@Save">Save Changes</Button>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+
+</LoadingIndicator>
+
+@code {
+    [Parameter] public EnricherDTO Enricher { get; set; }
+
+    private LoadingIndicator loadingIndicator;
+
+    private Modal modal;
+
+    private EnricherDTO enricher;
+
+    private IEnumerable<ValidationFailure> errors = new List<ValidationFailure>();
+
+    private Task ShowModal()
+    {
+        enricher = Enricher.GetCopy();
+
+        return modal.Show();
+    }
+
+    private async Task Save()
+    {
+        await loadingIndicator.Show();
+
+        errors = await State.SaveEnricherChanges(enricher);
+
+        await loadingIndicator.Hide();
+
+        if (errors.Count() != 0)
+            return;
+
+        Enricher = enricher.GetCopy();
+        await modal.Close(CloseReason.UserClosing);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (loadingIndicator != null)
+            await loadingIndicator.Hide();
+        await base.OnParametersSetAsync();
+    }
+}

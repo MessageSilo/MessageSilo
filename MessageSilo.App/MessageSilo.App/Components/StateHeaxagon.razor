@@ -1,0 +1,25 @@
+﻿@using System.Text;
+
+<Tooltip Text="@InitializationError">
+    <Div Class="@("hexa " + HexaType)"></Div>
+</Tooltip>
+
+@code {
+    [Parameter] public Status? State { get; set; }
+
+    [Parameter] public string? InitializationError { get; set; }
+
+    public string HexaType
+    {
+        get
+        {
+            return State switch
+            {
+                Status.Created => "hexa-green",
+                Status.Connected => "hexa-green",
+                Status.Error => "hexa-red",
+                _ => "hexa-gray"
+            };
+        }
+    }
+}

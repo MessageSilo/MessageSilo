@@ -31,5 +31,11 @@ namespace MessageSilo.Shared.Models
         {
             return YamlConverter.Serialize(this);
         }
+
+        public EnricherDTO GetCopy()
+        {
+            var yaml = ToString();
+            return YamlConverter.Deserialize<EnricherDTO>(yaml);
+        }
     }
 }

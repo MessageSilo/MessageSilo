@@ -1,43 +1,63 @@
 ﻿@page "/"
-
-@inject IVersionProvider VersionProvider
-@inject ILocalStorageService LocalStorage
+@inject IDashboardState State
 
 <Heading Size="HeadingSize.Is1" Margin="Margin.Is3.FromBottom">Experiment with Message Silo!</Heading>
 
 <Row>
     @*Connection - Input*@
-    <Column ColumnSize="ColumnSize.Is4">
+    <Column ColumnSize="ColumnSize.Is5">
         <Row>
             <Column ColumnSize="ColumnSize.Is12">
-                <ConnectionEditor></ConnectionEditor>
+                <ConnectionEditor Queue="State?.Queue?.ConnectionSettings"></ConnectionEditor>
             </Column>
         </Row>
         <Row>
-            <Column ColumnSize="ColumnSize.Is6">A1</Column>
-            <Column ColumnSize="ColumnSize.Is6">A2</Column>
+            <Column ColumnSize="ColumnSize.Is4">
+                <StateHeaxagon State="State?.Queue?.Status" InitializationError="@State?.Queue?.InitializationError"></StateHeaxagon>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is8">
+                <CodeBlock>@State?.QueueOutput?.Body</CodeBlock>
+            </Column>
+        </Row>
+    </Column>
+
+    <Column ColumnSize="ColumnSize.Is2">
+        <Row>
+            <Column ColumnSize="ColumnSize.Is12"></Column>
+        </Row>
+        <Row>
+            <Column ColumnSize="ColumnSize.Is12">
+                <div class="arrow">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </Column>
         </Row>
     </Column>
 
     @*Enricher*@
-    <Column ColumnSize="ColumnSize.Is4">
+    <Column ColumnSize="ColumnSize.Is5">
         <Row>
-            <Column ColumnSize="ColumnSize.Is12">B</Column>
+            <Column ColumnSize="ColumnSize.Is12">
+                <EnricherEditor Enricher="State?.Enricher"></EnricherEditor>
+            </Column>
         </Row>
         <Row>
-            <Column ColumnSize="ColumnSize.Is6">B1</Column>
-            <Column ColumnSize="ColumnSize.Is6">B2</Column>
-        </Row>
-    </Column>
-
-    @*Connection - Target*@
-    <Column ColumnSize="ColumnSize.Is4">
-        <Row>
-            <Column ColumnSize="ColumnSize.Is12">C</Column>
-        </Row>
-        <Row>
-            <Column ColumnSize="ColumnSize.Is6">C1</Column>
-            <Column ColumnSize="ColumnSize.Is6">C2</Column>
+            <Column ColumnSize="ColumnSize.Is4">
+                <StateHeaxagon State="Status.Created"></StateHeaxagon>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is8">
+                <CodeBlock>@State?.EnricherOutput?.Body</CodeBlock>
+            </Column>
         </Row>
     </Column>
 </Row>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await State.Init();
+        await base.OnInitializedAsync();
+    }
+}

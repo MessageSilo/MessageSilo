@@ -16,14 +16,15 @@
 
 	<ItemGroup>
 		<PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+		<PackageReference Include="Blazorise.LoadingIndicator" Version="1.2.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.*" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.*" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Blazorise" Version="1.1.*" />
-		<PackageReference Include="Blazorise.Bootstrap5" Version="1.1.*" />
-		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.1.*" />
+		<PackageReference Include="Blazorise" Version="1.2.4" />
+		<PackageReference Include="Blazorise.Bootstrap5" Version="1.2.4" />
+		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.2.4" />
 	</ItemGroup>
 
 	<ItemGroup>
