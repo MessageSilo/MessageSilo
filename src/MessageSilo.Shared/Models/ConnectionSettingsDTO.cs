@@ -24,9 +24,6 @@ namespace MessageSilo.Shared.Models
 
         public ReceiveMode? ReceiveMode { get; set; }
 
-        [YamlIgnore]
-        public bool IsTemporary { get; set; }
-
         //Azure
 
         public string TopicName { get; set; }

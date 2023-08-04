@@ -48,13 +48,6 @@ namespace MessageSilo.Features.Connection
 
         public override async Task OnDeactivateAsync()
         {
-            if (persistence.State.ConnectionSettings.IsTemporary)
-            {
-                await Delete();
-                await base.OnDeactivateAsync();
-                return;
-            }
-
             var grain = grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString());
 
             await grain.GetState();

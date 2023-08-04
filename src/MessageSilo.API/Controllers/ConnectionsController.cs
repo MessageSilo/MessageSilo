@@ -22,16 +22,5 @@ namespace MessageSilo.API.Controllers
             base(logger, client, httpContextAccessor, repo)
         {
         }
-
-        protected override Task<List<ValidationFailure>?> update(ConnectionSettingsDTO dto)
-        {
-            var user = httpContextAccessor?.HttpContext?.User;
-            var role = user?.FindFirst(ClaimTypes.Role)?.Value;
-
-            if (role is not null && role == "obapp-user")
-                dto.IsTemporary = true;
-
-            return base.update(dto);
-        }
     }
 }
