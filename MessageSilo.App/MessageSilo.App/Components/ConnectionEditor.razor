@@ -1,4 +1,5 @@
 ﻿@using FluentValidation.Results;
+@using MessageSilo.App.Pages;
 @inject IDashboardState State
 
 <LoadingIndicator @ref="loadingIndicator" Visible=true>
@@ -102,6 +103,8 @@
 @code {
     [Parameter] public ConnectionSettingsDTO Queue { get; set; }
 
+    [Parameter] public Dashboard Dashboard { get; set; }
+
     private LoadingIndicator loadingIndicator;
 
     private Modal modal;
@@ -130,6 +133,7 @@
             return;
 
         Queue = queue.GetCopy();
+        Dashboard.Refresh();
         await modal.Close(CloseReason.UserClosing);
     }
 

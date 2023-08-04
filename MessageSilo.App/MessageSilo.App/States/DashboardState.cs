@@ -15,9 +15,7 @@ namespace MessageSilo.App.States
 
         public EnricherDTO Enricher { get; set; }
 
-        public Message QueueOutput { get; set; } = new Message();
-
-        public Message EnricherOutput { get; set; } = new Message();
+        public LastMessage LastMessage { get; set; } = new LastMessage();
 
         public DashboardState(MessageSiloAPI messageSiloAPI)
         {
@@ -77,8 +75,9 @@ namespace MessageSilo.App.States
 
         public async Task FillOutputs()
         {
-            QueueOutput = (await messageSiloAPI.GetLastMessage("Connections", "test_conn")).Data?.Output ?? new Message();
-            EnricherOutput = (await messageSiloAPI.GetLastMessage("Enrichers", "test_enricher")).Data?.Output ?? new Message();
+            var lastMessage = await messageSiloAPI.GetLastMessage("Enrichers", "test_enricher");
+
+            LastMessage = lastMessage.Data!;
         }
     }
 }

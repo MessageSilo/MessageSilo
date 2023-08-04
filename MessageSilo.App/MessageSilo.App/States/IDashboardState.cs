@@ -9,14 +9,14 @@ namespace MessageSilo.App.States
 
         EnricherDTO Enricher { get; set; }
 
-        Message QueueOutput { get; set; }
-
-        Message EnricherOutput { get; set; }
+        LastMessage LastMessage { get; set; }
 
         Task Init();
 
         Task<IEnumerable<ValidationFailure>> SaveQueueChanges(ConnectionSettingsDTO queue);
 
         Task<IEnumerable<ValidationFailure>> SaveEnricherChanges(EnricherDTO enricher);
+
+        Task FillOutputs();
     }
 }
