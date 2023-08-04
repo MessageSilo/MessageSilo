@@ -1,11 +1,7 @@
-using FluentValidation;
 using MessageSilo.API;
 using MessageSilo.API.Auth;
 using MessageSilo.API.HealthChecks;
 using MessageSilo.Shared.DataAccess;
-using MessageSilo.Shared.Models;
-using MessageSilo.Shared.Validators;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;

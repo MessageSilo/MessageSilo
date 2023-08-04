@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Net.Http.Headers;
 using RestSharp;
-using RestSharp.Authenticators;
 using System.Net;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
@@ -31,7 +31,7 @@ var userId = await localStorage.GetItemAsync<Guid>("userId");
 
 builder.Services.AddScoped(p =>
 {
-    var client = new RestClient(new RestClientOptions("https://localhost:5000/api/v1")
+    var client = new RestClient(new RestClientOptions(builder.Configuration["ApiUrl"])
     {
         CalculateResponseStatus = httpResponse =>
         httpResponse.IsSuccessStatusCode ||
