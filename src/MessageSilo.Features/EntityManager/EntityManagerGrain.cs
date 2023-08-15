@@ -1,12 +1,12 @@
-﻿using Esprima.Ast;
-using FluentValidation;
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Validators;
 using Microsoft.Extensions.Logging;
 using Orleans;
+using Orleans.Runtime;
+using System.Text;
 
 namespace MessageSilo.Features.EntityManager
 {
@@ -16,15 +16,15 @@ namespace MessageSilo.Features.EntityManager
 
         private readonly IEntityRepository repo;
 
-        private readonly IGrainFactory grainFactory;
+        private IPersistentState<EntityManagerState> persistence { get; set; }
 
         private List<Entity> entities { get; set; } = new List<Entity>();
 
-        public EntityManagerGrain(IEntityRepository repo, IGrainFactory grainFactory, ILogger<EntityManagerGrain> logger)
+        public EntityManagerGrain([PersistentState("EntityManagerState")] IPersistentState<EntityManagerState> state, IEntityRepository repo, ILogger<EntityManagerGrain> logger)
         {
-            this.grainFactory = grainFactory;
             this.repo = repo;
             this.logger = logger;
+            this.persistence = state;
         }
 
         public override async Task OnActivateAsync()
@@ -65,9 +65,6 @@ namespace MessageSilo.Features.EntityManager
                     break;
             }
 
-            if (entities.Count() + 1 > 5)
-                validationErrors.Add(new ValidationFailure("subscription", "Count of max. allowed entities reached! ==WIP: Only in BETA and FREE tier=="));
-
             if (validationErrors.Any())
                 return await Task.FromResult(validationErrors);
 
@@ -89,6 +86,25 @@ namespace MessageSilo.Features.EntityManager
             entities.RemoveAll(p => p.RowKey == entityName);
 
             return await Task.FromResult<List<ValidationFailure>?>(null);
+        }
+
+        public async Task IncreaseUsedThroughput(string messageBody)
+        {
+            var amount = Encoding.UTF8.GetByteCount(messageBody ?? string.Empty) * 0.001;
+            var currentDate = DateTime.UtcNow.Year * 100 + DateTime.UtcNow.Month;
+
+            if (!persistence.State.Throughput.ContainsKey(currentDate))
+                persistence.State.Throughput.Add(currentDate, amount);
+            else
+                persistence.State.Throughput[DateTime.UtcNow.Year] += amount;
+
+            await persistence.WriteStateAsync();
+        }
+
+        public async Task<double> GetUsedThroughput(int date)
+        {
+            var output = persistence.State.Throughput[date];
+            return await Task.FromResult(output);
         }
     }
 }
