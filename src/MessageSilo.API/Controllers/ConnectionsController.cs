@@ -1,12 +1,7 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
-using MessageSilo.Features.Connection;
-using MessageSilo.Features.EntityManager;
-using MessageSilo.Shared.DataAccess;
+﻿using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Orleans;
-using System.Security.Claims;
 
 namespace MessageSilo.API.Controllers
 {
@@ -17,9 +12,8 @@ namespace MessageSilo.API.Controllers
         public ConnectionsController(
             ILogger<CRUDController<ConnectionSettingsDTO, ConnectionState, IConnectionGrain>> logger,
             IClusterClient client,
-            IHttpContextAccessor httpContextAccessor,
-            IEntityRepository repo) :
-            base(logger, client, httpContextAccessor, repo)
+            IHttpContextAccessor httpContextAccessor) :
+            base(logger, client, httpContextAccessor)
         {
         }
     }

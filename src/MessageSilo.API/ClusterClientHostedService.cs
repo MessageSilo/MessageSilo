@@ -1,11 +1,11 @@
-﻿using MessageSilo.API.Controllers;
-using MessageSilo.Features.Connection;
-using MessageSilo.Shared.DataAccess;
+﻿using MessageSilo.Features.Connection;
+using MessageSilo.Features.EntityManager;
+using MessageSilo.Features.UserManager;
 using MessageSilo.Shared.Enums;
-using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using RabbitMQ.Client;
 using System.Net;
 
 namespace MessageSilo.API
@@ -16,16 +16,13 @@ namespace MessageSilo.API
 
         protected readonly ILogger<ClusterClientHostedService> logger;
 
-        protected readonly IEntityRepository repo;
-
-        public ClusterClientHostedService(ILoggerProvider loggerProvider, IConfiguration configuration, ILogger<ClusterClientHostedService> logger, IEntityRepository repo)
+        public ClusterClientHostedService(ILoggerProvider loggerProvider, IConfiguration configuration, ILogger<ClusterClientHostedService> logger)
         {
             this.logger = logger;
-            this.repo = repo;
 
             IClientBuilder clientBuilder = new ClientBuilder();
 
-            var siloIP = IPAddress.Parse(configuration["Orleans:PrimarySiloAddress"]);
+            var siloIP = IPAddress.Parse(configuration["Silo:PrimaryAddress"]);
 
             if (siloIP.Equals(IPAddress.Loopback))
                 clientBuilder = clientBuilder.UseLocalhostClustering();
@@ -49,13 +46,20 @@ namespace MessageSilo.API
             await Client.Connect();
 
             //Init connections
-            var connections = await repo.Query(EntityKind.Connection);
+            var um = Client.GetGrain<IUserManagerGrain>("um");
+            var users = await um.GetAll();
 
-            foreach (var e in connections)
+            foreach (var user in users)
             {
-                var conn = Client.GetGrain<IConnectionGrain>(e.Id);
-                await conn.GetState();
-                logger.LogInformation($"Connection ({e.Id}) initialized.");
+                var em = Client.GetGrain<IEntityManagerGrain>(user);
+                var connections = (await em.GetAll()).Where(p => p.Kind == EntityKind.Connection);
+
+                foreach (var entity in connections)
+                {
+                    var conn = Client.GetGrain<IConnectionGrain>(entity.Id);
+                    await conn.GetState();
+                    logger.LogInformation($"Connection ({entity.Id}) initialized.");
+                }
             }
         }
 

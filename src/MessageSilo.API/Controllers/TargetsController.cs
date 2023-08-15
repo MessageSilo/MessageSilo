@@ -1,10 +1,6 @@
-﻿using FluentValidation;
-using MessageSilo.Features.EntityManager;
-using MessageSilo.Features.Target;
-using MessageSilo.Shared.DataAccess;
+﻿using MessageSilo.Features.Target;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
-using Microsoft.AspNetCore.Mvc;
 using Orleans;
 
 namespace MessageSilo.API.Controllers
@@ -16,9 +12,8 @@ namespace MessageSilo.API.Controllers
         public TargetsController(
             ILogger<CRUDController<TargetDTO, TargetDTO, ITargetGrain>> logger,
             IClusterClient client,
-            IHttpContextAccessor httpContextAccessor,
-            IEntityRepository repo) :
-            base(logger, client, httpContextAccessor, repo)
+            IHttpContextAccessor httpContextAccessor) :
+            base(logger, client, httpContextAccessor)
         {
         }
     }

@@ -1,12 +1,10 @@
-﻿using Esprima.Ast;
-using FluentValidation;
-using FluentValidation.Results;
-using MessageSilo.Shared.DataAccess;
+﻿using FluentValidation.Results;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Validators;
 using Microsoft.Extensions.Logging;
 using Orleans;
+using Orleans.Runtime;
 
 namespace MessageSilo.Features.EntityManager
 {
@@ -14,29 +12,17 @@ namespace MessageSilo.Features.EntityManager
     {
         private readonly ILogger<EntityManagerGrain> logger;
 
-        private readonly IEntityRepository repo;
+        private IPersistentState<EntityManagerState> persistence { get; set; }
 
-        private readonly IGrainFactory grainFactory;
-
-        private List<Entity> entities { get; set; } = new List<Entity>();
-
-        public EntityManagerGrain(IEntityRepository repo, IGrainFactory grainFactory, ILogger<EntityManagerGrain> logger)
+        public EntityManagerGrain([PersistentState("EntityManagerState")] IPersistentState<EntityManagerState> state, ILogger<EntityManagerGrain> logger)
         {
-            this.grainFactory = grainFactory;
-            this.repo = repo;
+            this.persistence = state;
             this.logger = logger;
-        }
-
-        public override async Task OnActivateAsync()
-        {
-            entities = (await repo.Query(userId: this.GetPrimaryKeyString())).ToList();
-
-            await base.OnActivateAsync();
         }
 
         public async Task<IEnumerable<Entity>> GetAll()
         {
-            return await Task.FromResult(entities);
+            return await Task.FromResult(persistence.State.Entities);
         }
 
         public async Task<List<ValidationFailure>?> Upsert(Entity entity)
@@ -47,32 +33,35 @@ namespace MessageSilo.Features.EntityManager
             {
                 case EntityKind.Connection:
                     {
-                        var res = await new ConnectionValidator(entities).ValidateAsync(entity as ConnectionSettingsDTO);
+                        var res = await new ConnectionValidator(persistence.State.Entities).ValidateAsync(entity as ConnectionSettingsDTO);
                         validationErrors = res.Errors;
                     }
                     break;
                 case EntityKind.Target:
                     {
-                        var res = await new TargetValidator(entities).ValidateAsync(entity as TargetDTO);
+                        var res = await new TargetValidator(persistence.State.Entities).ValidateAsync(entity as TargetDTO);
                         validationErrors = res.Errors;
                     }
                     break;
                 case EntityKind.Enricher:
                     {
-                        var res = await new EnricherValidator(entities).ValidateAsync(entity as EnricherDTO);
+                        var res = await new EnricherValidator(persistence.State.Entities).ValidateAsync(entity as EnricherDTO);
                         validationErrors = res.Errors;
                     }
                     break;
             }
 
-            if (entities.Count() + 1 > 5)
+            if (persistence.State.Entities.Count() + 1 > 5)
                 validationErrors.Add(new ValidationFailure("subscription", "Count of max. allowed entities reached! ==WIP: Only in BETA and FREE tier=="));
 
             if (validationErrors.Any())
                 return await Task.FromResult(validationErrors);
 
-            if (!entities.Any(p => p.Id == entity.Id))
-                entities.Add(entity);
+            if (!persistence.State.Entities.Any(p => p.Id == entity.Id))
+            {
+                persistence.State.Entities.Add(entity);
+                await persistence.WriteStateAsync();
+            }
 
             return await Task.FromResult<List<ValidationFailure>?>(null);
         }
@@ -86,7 +75,9 @@ namespace MessageSilo.Features.EntityManager
             if (validationErrors.Any())
                 return await Task.FromResult(validationErrors);
 
-            entities.RemoveAll(p => p.RowKey == entityName);
+            persistence.State.Entities.RemoveAll(p => p.RowKey == entityName);
+
+            await persistence.WriteStateAsync();
 
             return await Task.FromResult<List<ValidationFailure>?>(null);
         }
