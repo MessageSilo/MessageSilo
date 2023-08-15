@@ -5,6 +5,7 @@ using MessageSilo.Shared.Validators;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
+using System.Text;
 
 namespace MessageSilo.Features.EntityManager
 {
@@ -17,7 +18,9 @@ namespace MessageSilo.Features.EntityManager
         public EntityManagerGrain([PersistentState("EntityManagerState")] IPersistentState<EntityManagerState> state, ILogger<EntityManagerGrain> logger)
         {
             this.persistence = state;
+            this.repo = repo;
             this.logger = logger;
+            this.persistence = state;
         }
 
         public async Task<IEnumerable<Entity>> GetAll()
@@ -51,9 +54,6 @@ namespace MessageSilo.Features.EntityManager
                     break;
             }
 
-            if (persistence.State.Entities.Count() + 1 > 5)
-                validationErrors.Add(new ValidationFailure("subscription", "Count of max. allowed entities reached! ==WIP: Only in BETA and FREE tier=="));
-
             if (validationErrors.Any())
                 return await Task.FromResult(validationErrors);
 
@@ -80,6 +80,25 @@ namespace MessageSilo.Features.EntityManager
             await persistence.WriteStateAsync();
 
             return await Task.FromResult<List<ValidationFailure>?>(null);
+        }
+
+        public async Task IncreaseUsedThroughput(string messageBody)
+        {
+            var amount = Encoding.UTF8.GetByteCount(messageBody ?? string.Empty) * 0.001;
+            var currentDate = DateTime.UtcNow.Year * 100 + DateTime.UtcNow.Month;
+
+            if (!persistence.State.Throughput.ContainsKey(currentDate))
+                persistence.State.Throughput.Add(currentDate, amount);
+            else
+                persistence.State.Throughput[DateTime.UtcNow.Year] += amount;
+
+            await persistence.WriteStateAsync();
+        }
+
+        public async Task<double> GetUsedThroughput(int date)
+        {
+            var output = persistence.State.Throughput[date];
+            return await Task.FromResult(output);
         }
     }
 }

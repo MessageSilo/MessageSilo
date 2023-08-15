@@ -1,6 +1,7 @@
 ﻿using MessageSilo.Features.AWS;
 using MessageSilo.Features.Azure;
 using MessageSilo.Features.Enricher;
+using MessageSilo.Features.EntityManager;
 using MessageSilo.Features.RabbitMQ;
 using MessageSilo.Features.Target;
 using MessageSilo.Shared.Enums;
@@ -24,6 +25,8 @@ namespace MessageSilo.Features.Connection
         private IPersistentState<ConnectionState> persistence { get; set; }
 
         private IMessageSenderGrain? target;
+
+        private IEntityManagerGrain entityManager;
 
         private LastMessage lastMessage;
 
@@ -59,6 +62,7 @@ namespace MessageSilo.Features.Connection
             persistence.State.ConnectionSettings = s;
             await persistence.WriteStateAsync();
             await reInit();
+            await persistence.WriteStateAsync();
         }
 
         public async Task Delete()
@@ -81,6 +85,7 @@ namespace MessageSilo.Features.Connection
 
         public async Task Send(Message message)
         {
+            entityManager.InvokeOneWay(p => p.IncreaseUsedThroughput(message.Body));
             await messagePlatformConnection.Enqueue(message);
         }
 
@@ -96,12 +101,13 @@ namespace MessageSilo.Features.Connection
 
                 if (message is null)
                     break;
+
+                entityManager.InvokeOneWay(p => p.IncreaseUsedThroughput(message.Body));
             }
 
             lastMessage.SetOutput(message, null);
 
-            if (target is not null)
-                target.InvokeOneWay(p => p.Send(message));
+            target?.InvokeOneWay(p => p.Send(message));
         }
 
         private async Task reInit()
@@ -110,6 +116,9 @@ namespace MessageSilo.Features.Connection
             {
                 var settings = persistence.State.ConnectionSettings;
                 await settings.Decrypt(configuration["Silo:StateUnlockerKey"]);
+
+                entityManager = grainFactory.GetGrain<IEntityManagerGrain>(settings.PartitionKey);
+
 
                 if (settings.TargetId is not null)
                     switch (settings.TargetKind)
