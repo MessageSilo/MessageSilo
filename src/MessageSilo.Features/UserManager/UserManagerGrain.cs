@@ -27,6 +27,9 @@ namespace MessageSilo.Features.UserManager
 
         public async Task Upsert(string userId)
         {
+            if (persistence.State.Users.Contains(userId))
+                return;
+
             persistence.State.Users.Add(userId);
             await persistence.WriteStateAsync();
         }

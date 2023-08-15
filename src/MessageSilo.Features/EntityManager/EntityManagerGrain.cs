@@ -1,4 +1,5 @@
 ﻿using FluentValidation.Results;
+using MessageSilo.Features.UserManager;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Validators;
@@ -15,12 +16,22 @@ namespace MessageSilo.Features.EntityManager
 
         private IPersistentState<EntityManagerState> persistence { get; set; }
 
-        public EntityManagerGrain([PersistentState("EntityManagerState")] IPersistentState<EntityManagerState> state, ILogger<EntityManagerGrain> logger)
+        private readonly IGrainFactory grainFactory;
+
+        public EntityManagerGrain([PersistentState("EntityManagerState")] IPersistentState<EntityManagerState> state, ILogger<EntityManagerGrain> logger, IGrainFactory grainFactory)
         {
             this.persistence = state;
-            this.repo = repo;
             this.logger = logger;
             this.persistence = state;
+            this.grainFactory = grainFactory;
+        }
+
+        public override async Task OnActivateAsync()
+        {
+            var um = grainFactory.GetGrain<IUserManagerGrain>("um");
+            await um.Upsert(this.GetPrimaryKeyString());
+
+            await base.OnActivateAsync();
         }
 
         public async Task<IEnumerable<Entity>> GetAll()
@@ -59,7 +70,12 @@ namespace MessageSilo.Features.EntityManager
 
             if (!persistence.State.Entities.Any(p => p.Id == entity.Id))
             {
-                persistence.State.Entities.Add(entity);
+                persistence.State.Entities.Add(new Entity()
+                {
+                    PartitionKey = entity.PartitionKey,
+                    RowKey = entity.RowKey,
+                    Kind = entity.Kind
+                });
                 await persistence.WriteStateAsync();
             }
 
