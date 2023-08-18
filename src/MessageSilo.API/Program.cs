@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration
     .AddJsonFile("appsettings.json", false, true)
     .AddJsonFile("appsettings.Development.json", true, true)
+    .AddEnvironmentVariables()
     .Build();
 
 Log.Logger = new LoggerConfiguration()
