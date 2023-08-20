@@ -9,6 +9,7 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers;
 using Serilog;
+using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 using System.Net;
 
 var configuration = new ConfigurationBuilder()
@@ -19,18 +20,22 @@ var configuration = new ConfigurationBuilder()
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
+    .WriteTo.Console()
+    .WriteTo.Conditional(
+        evt => configuration["AppInsightsConnectionString"] != "$(AppInsightsConnectionString)",
+        wt => wt.ApplicationInsights(configuration["AppInsightsConnectionString"], new TraceTelemetryConverter()))
     .CreateBootstrapLogger();
 
 var builder = Host.CreateDefaultBuilder(args)
         .UseOrleans(siloBuilder =>
         {
-            var siloIP = IPAddress.Parse(configuration["Silo:PrimaryAddress"]);
+            var siloIP = IPAddress.Parse(configuration["PrimarySiloAddress"]);
 
             siloBuilder
-            .UseMongoDBClient(configuration["Silo:DatabaseConnectionString"])
+            .UseMongoDBClient(configuration["DatabaseConnectionString"])
             .UseMongoDBClustering(options =>
             {
-                options.DatabaseName = configuration["Silo:DatabaseName"];
+                options.DatabaseName = configuration["DatabaseName"];
                 options.CreateShardKeyForCosmos = false;
             })
             .ConfigureApplicationParts(manager =>
@@ -44,7 +49,7 @@ var builder = Host.CreateDefaultBuilder(args)
             })
             .AddMongoDBGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, options =>
             {
-                options.DatabaseName = configuration["Silo:DatabaseName"];
+                options.DatabaseName = configuration["DatabaseName"];
             })
             .Configure<ClusterOptions>(options =>
             {

@@ -84,7 +84,7 @@ namespace MessageSilo.Features.Enricher
                     break;
                 case EnricherType.AI:
                     {
-                        var apiKey = settings.ApiKey ?? configuration["AI:ApiKey"];
+                        var apiKey = settings.ApiKey ?? configuration["AIApiKey"];
                         enricher = new AIEnricher(apiKey, settings.Command);
                         break;
                     }

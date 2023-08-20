@@ -19,13 +19,12 @@ services:
     ports:
       - "5000:80"
     environment:
-      Silo__PrimaryAddress: "10.5.0.3"
+      PrimarySiloAddress: "10.5.0.3"
     build:
       context: .
       dockerfile: src/MessageSilo.API/Dockerfile
     depends_on:
       - silo
-    restart: always
     networks:
       network:
         ipv4_address: 10.5.0.4
@@ -36,11 +35,11 @@ services:
       - "11111:11111"
       - "30000:30000"
     environment:
-      Silo__PrimaryAddress: "10.5.0.3"
-      Silo__StateUnlockerKey: "test"
-      Silo__DatabaseConnectionString: "mongodb://10.5.0.2:27017"
-      Silo__DatabaseName: "messagesilo-local"
-      AI__ApiKey: ""
+      PrimarySiloAddress: "10.5.0.3"
+      StateUnlockerKey: "test"
+      DatabaseConnectionString: "mongodb://10.5.0.2:27017"
+      DatabaseName: "messagesilo-local"
+      AIApiKey: ""
     build:
       context: .
       dockerfile: src/MessageSilo.Silo/Dockerfile
@@ -54,8 +53,6 @@ services:
     image: mongo:6-jammy
     ports:
       - "27017:27017"
-    environment:
-      - MONGO_INITDB_DATABASE=asdqwe
     volumes: 
       - ~/mongo/data:/data/db
     networks:

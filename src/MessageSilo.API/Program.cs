@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Orleans;
 using Serilog;
+using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,10 @@ var configuration = builder.Configuration
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
+    .WriteTo.Console()
+    .WriteTo.Conditional(
+        evt => configuration["AppInsightsConnectionString"] != "$(AppInsightsConnectionString)",
+        wt => wt.ApplicationInsights(configuration["AppInsightsConnectionString"], new TraceTelemetryConverter()))
     .CreateLogger();
 
 builder.Services.AddSingleton<ClusterClientHostedService>();

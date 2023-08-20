@@ -5,7 +5,7 @@ using MessageSilo.Shared.Enums;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using RabbitMQ.Client;
+using Polly;
 using System.Net;
 
 namespace MessageSilo.API
@@ -22,7 +22,7 @@ namespace MessageSilo.API
 
             IClientBuilder clientBuilder = new ClientBuilder();
 
-            var siloIP = IPAddress.Parse(configuration["Silo:PrimaryAddress"]);
+            var siloIP = IPAddress.Parse(configuration["PrimarySiloAddress"]);
 
             if (siloIP.Equals(IPAddress.Loopback))
                 clientBuilder = clientBuilder.UseLocalhostClustering();
@@ -42,8 +42,12 @@ namespace MessageSilo.API
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            // A retry filter could be provided here.
-            await Client.Connect();
+
+            var retry = Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+            await retry.ExecuteAsync(async () => await Client.Connect());
 
             //Init connections
             var um = Client.GetGrain<IUserManagerGrain>("um");
