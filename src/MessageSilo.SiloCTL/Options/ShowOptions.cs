@@ -1,11 +1,4 @@
-﻿using CommandLine.Text;
-using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Amazon.Util;
+﻿using CommandLine;
 using ConsoleTables;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;

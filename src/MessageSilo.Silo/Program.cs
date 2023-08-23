@@ -18,13 +18,14 @@ var configuration = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-Log.Logger = new LoggerConfiguration()
+var loggerConfig = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
-    .WriteTo.Console()
-    .WriteTo.Conditional(
-        evt => configuration["AppInsightsConnectionString"] != "$(AppInsightsConnectionString)",
-        wt => wt.ApplicationInsights(configuration["AppInsightsConnectionString"], new TraceTelemetryConverter()))
-    .CreateBootstrapLogger();
+    .WriteTo.Console();
+
+if (!string.IsNullOrWhiteSpace(configuration["AppInsightsConnectionString"]))
+    loggerConfig.WriteTo.ApplicationInsights(configuration["AppInsightsConnectionString"], new TraceTelemetryConverter());
+
+Log.Logger = loggerConfig.CreateBootstrapLogger();
 
 var builder = Host.CreateDefaultBuilder(args)
         .UseOrleans(siloBuilder =>

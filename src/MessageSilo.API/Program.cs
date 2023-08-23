@@ -17,13 +17,14 @@ var configuration = builder.Configuration
     .AddEnvironmentVariables()
     .Build();
 
-Log.Logger = new LoggerConfiguration()
+var loggerConfig = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
-    .WriteTo.Console()
-    .WriteTo.Conditional(
-        evt => configuration["AppInsightsConnectionString"] != "$(AppInsightsConnectionString)",
-        wt => wt.ApplicationInsights(configuration["AppInsightsConnectionString"], new TraceTelemetryConverter()))
-    .CreateLogger();
+    .WriteTo.Console();
+
+if (!string.IsNullOrWhiteSpace(configuration["AppInsightsConnectionString"]))
+    loggerConfig.WriteTo.ApplicationInsights(configuration["AppInsightsConnectionString"], new TraceTelemetryConverter());
+
+Log.Logger = loggerConfig.CreateBootstrapLogger();
 
 builder.Services.AddSingleton<ClusterClientHostedService>();
 builder.Services.AddSingleton<IHostedService>(sp => sp.GetService<ClusterClientHostedService>());

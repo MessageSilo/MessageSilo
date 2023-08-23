@@ -1,12 +1,14 @@
 ﻿using MessageSilo.Shared.Serialization;
-using Microsoft.Extensions.Configuration;
-using System.Text;
 using static System.Environment;
 
 namespace MessageSilo.SiloCTL
 {
     public class CTLConfig
     {
+        public const string DEFAULT_API_URL = "https://api.message-silo.dev";
+
+        public const string API_VERSION = "v1";
+
         private const string CONFIG_FILE_NAME = "message-silo-config.yaml";
 
         public string Auth0Domain { get; private set; } = "message-silo.eu.auth0.com";
@@ -23,11 +25,7 @@ namespace MessageSilo.SiloCTL
 
         public string Token { get; set; }
 
-#if DEBUG
-        public string ApiUrl { get; private set; } = "https://localhost:5000/api/v1";
-#else
-        public string ApiUrl { get; private set; } = "https://api.message-silo.dev/api/v1";
-#endif
+        public string ApiUrl { get; set; } = $"{DEFAULT_API_URL}/api/{API_VERSION}";
 
         private ConfigReader configReader;
 
@@ -46,7 +44,7 @@ namespace MessageSilo.SiloCTL
 
             if (!File.Exists(configPath))
             {
-                Id = $"{Guid.NewGuid()}-{Guid.NewGuid()}-{Guid.NewGuid()}";
+                Id = Guid.NewGuid().ToString();
                 var yaml = YamlConverter.Serialize(this);
                 File.WriteAllText(configPath, yaml);
             }
@@ -70,14 +68,14 @@ namespace MessageSilo.SiloCTL
             File.WriteAllText(configPath, yaml);
         }
 
-        public void Delete()
+        public void ClearToken()
         {
-            var appDataFolder = getAppDataFolder();
+            if (ApiUrl == DEFAULT_API_URL)
+            {
+                Token = null;
 
-            var configPath = $"{appDataFolder}/{CONFIG_FILE_NAME}";
-
-            if (File.Exists(configPath))
-                File.Delete(configPath);
+                Save();
+            }
         }
 
         public override string ToString()

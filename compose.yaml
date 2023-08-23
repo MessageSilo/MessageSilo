@@ -20,6 +20,7 @@ services:
       - "5000:80"
     environment:
       PrimarySiloAddress: "10.5.0.3"
+      AppInsightsConnectionString: ""
     build:
       context: .
       dockerfile: src/MessageSilo.API/Dockerfile
@@ -40,6 +41,7 @@ services:
       DatabaseConnectionString: "mongodb://10.5.0.2:27017"
       DatabaseName: "messagesilo-local"
       AIApiKey: ""
+      AppInsightsConnectionString: ""
     build:
       context: .
       dockerfile: src/MessageSilo.Silo/Dockerfile
