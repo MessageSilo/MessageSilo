@@ -13,6 +13,7 @@ namespace MessageSilo.SiloCTL
             {
                 var config = new CTLConfig();
                 config.CreateIfNotExist();
+                config.Load();
 
                 new VersionChecker().CheckLatestVersion(config.LatestVersionInfoUrl);
 

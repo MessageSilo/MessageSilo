@@ -1,4 +1,6 @@
-﻿using RestSharp;
+﻿using MessageSilo.Shared;
+using Microsoft.Net.Http.Headers;
+using RestSharp;
 using RestSharp.Authenticators;
 using System.Diagnostics;
 using System.Net;
@@ -13,23 +15,9 @@ namespace MessageSilo.SiloCTL.Options
 
         public AuthorizedOptions() : base()
         {
-            authApi = new AuthAPIService(config);
-
-            if (!authApi.IsValidtoken())
-            {
-                Process.Start(new ProcessStartInfo(authApi.GetAuthUrl()) { UseShellExecute = true });
-
-                var code = authApi.HandleAuthResponse();
-
-                config.Token = authApi.GetToken(code);
-
-                config.Save();
-            }
-
             var restOptions = new RestClientOptions(this.config.ApiUrl)
             {
                 RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true,
-                Authenticator = new JwtAuthenticator(this.config.Token),
                 CalculateResponseStatus = httpResponse =>
                 httpResponse.IsSuccessStatusCode ||
                 httpResponse.StatusCode == HttpStatusCode.NotFound ||
@@ -37,7 +25,31 @@ namespace MessageSilo.SiloCTL.Options
                 ? ResponseStatus.Completed : ResponseStatus.Error
             };
 
-            api = new MessageSiloAPI(new RestClient(restOptions));
+            if (config.ApiUrl == CTLConfig.DEFAULT_API_URL)
+            {
+
+                authApi = new AuthAPIService(config);
+
+                if (!authApi.IsValidtoken())
+                {
+                    Process.Start(new ProcessStartInfo(authApi.GetAuthUrl()) { UseShellExecute = true });
+
+                    var code = authApi.HandleAuthResponse();
+
+                    config.Token = authApi.GetToken(code);
+
+                    config.Save();
+                }
+
+                restOptions.Authenticator = new JwtAuthenticator(this.config.Token);
+            }
+
+            var client = new RestClient(restOptions);
+
+            if (config.ApiUrl != CTLConfig.DEFAULT_API_URL)
+                client.AddDefaultHeader(HeaderNames.Authorization, config.Id);
+
+            api = new MessageSiloAPI(client);
         }
     }
 }

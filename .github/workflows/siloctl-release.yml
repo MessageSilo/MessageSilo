@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   build-and-publish:
-    name: siloctl-1.0.44
+    name: siloctl-1.0.45
     runs-on: ubuntu-latest
 
     steps:
@@ -24,15 +24,15 @@ jobs:
 
       - name: Publish - Windows
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/win-x64" -p:Version="1.0.44" -r win-x64
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/win-x64" -p:Version="1.0.45" -r win-x64
 
       - name: Publish - Linux
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/linux-x64" -p:Version="1.0.44" -r linux-x64
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/linux-x64" -p:Version="1.0.45" -r linux-x64
 
       - name: Publish - MacOS
         working-directory: ./src/MessageSilo.SiloCTL
-        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/osx-x64" -p:Version="1.0.44" -r osx-x64
+        run: dotnet publish -c Release --sc -o "/home/runner/work/MessageSilo/publish/osx-x64" -p:Version="1.0.45" -r osx-x64
 
       - name: Login to Azure
         uses: azure/login@v1

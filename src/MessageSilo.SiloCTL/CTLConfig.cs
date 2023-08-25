@@ -57,7 +57,9 @@ namespace MessageSilo.SiloCTL
             configReader = new ConfigReader(configPath);
 
             var existing = YamlConverter.Deserialize<CTLConfig>(configReader.FileContents.First());
+            Id = existing.Id;
             Token = existing.Token;
+            ApiUrl = existing.ApiUrl;
         }
 
         public void Save()

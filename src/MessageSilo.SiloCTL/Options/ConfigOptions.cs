@@ -16,7 +16,7 @@ namespace MessageSilo.SiloCTL.Options
         {
             if (!string.IsNullOrEmpty(Url))
             {
-                config.ApiUrl = Url;
+                config.ApiUrl = $"{Url}/api/{CTLConfig.API_VERSION}";
                 config.Save();
 
                 return;
