@@ -58,7 +58,7 @@ namespace MessageSilo.Features.Connection
 
         public async Task Update(ConnectionSettingsDTO s)
         {
-            await s.Encrypt(configuration["Orleans:StateUnlockerKey"]);
+            await s.Encrypt(configuration["StateUnlockerKey"]);
             persistence.State.ConnectionSettings = s;
             await persistence.WriteStateAsync();
             await reInit();
@@ -115,7 +115,7 @@ namespace MessageSilo.Features.Connection
             try
             {
                 var settings = persistence.State.ConnectionSettings;
-                await settings.Decrypt(configuration["Orleans:StateUnlockerKey"]);
+                await settings.Decrypt(configuration["StateUnlockerKey"]);
 
                 entityManager = grainFactory.GetGrain<IEntityManagerGrain>(settings.PartitionKey);
 

@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  app:
+    image: messagesilo/app
+    ports:
+      - "3000:80"
+    build:
+      context: .
+      dockerfile: src/MessageSilo.App/Dockerfile
+    depends_on:
+      - api
+    networks:
+      network:
+        ipv4_address: 10.5.0.5
+
+  api:
+    image: messagesilo/api
+    ports:
+      - "5000:80"
+    environment:
+      PrimarySiloAddress: "10.5.0.3"
+      AppInsightsConnectionString: ""
+    build:
+      context: .
+      dockerfile: src/MessageSilo.API/Dockerfile
+    depends_on:
+      - silo
+    networks:
+      network:
+        ipv4_address: 10.5.0.4
+
+  silo:
+    image: messagesilo/silo
+    ports:
+      - "11111:11111"
+      - "30000:30000"
+    environment:
+      PrimarySiloAddress: "10.5.0.3"
+      StateUnlockerKey: "test"
+      DatabaseConnectionString: "mongodb://10.5.0.2:27017"
+      DatabaseName: "messagesilo-local"
+      AIApiKey: ""
+      AppInsightsConnectionString: ""
+    build:
+      context: .
+      dockerfile: src/MessageSilo.Silo/Dockerfile
+    depends_on:
+      - database
+    networks:
+      network:
+        ipv4_address: 10.5.0.3
+
+  database:
+    image: mongo:6-jammy
+    ports:
+      - "27017:27017"
+    volumes: 
+      - ~/mongo/data:/data/db
+    networks:
+      network:
+        ipv4_address: 10.5.0.2
+
+networks:
+  network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1

@@ -1,30 +1,35 @@
 using MessageSilo.API;
 using MessageSilo.API.Auth;
 using MessageSilo.API.HealthChecks;
-using MessageSilo.Shared.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Orleans;
 using Serilog;
+using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration
     .AddJsonFile("appsettings.json", false, true)
     .AddJsonFile("appsettings.Development.json", true, true)
+    .AddEnvironmentVariables()
     .Build();
 
-Log.Logger = new LoggerConfiguration()
+var loggerConfig = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
-    .CreateLogger();
+    .WriteTo.Console();
+
+if (!string.IsNullOrWhiteSpace(configuration["AppInsightsConnectionString"]))
+    loggerConfig.WriteTo.ApplicationInsights(configuration["AppInsightsConnectionString"], new TraceTelemetryConverter());
+
+Log.Logger = loggerConfig.CreateBootstrapLogger();
 
 builder.Services.AddSingleton<ClusterClientHostedService>();
 builder.Services.AddSingleton<IHostedService>(sp => sp.GetService<ClusterClientHostedService>());
 builder.Services.AddSingleton<IClusterClient>(sp => sp.GetService<ClusterClientHostedService>()!.Client);
 builder.Services.AddSingleton<IGrainFactory>(sp => sp.GetService<ClusterClientHostedService>()!.Client);
-builder.Services.AddSingleton<IEntityRepository, EntityRepository>();
 
 builder.Services.AddAuthentication()
         .AddScheme<OnboardingAuthSchemeOptions, OnboardingAuthHandler>("OnboardingAuthScheme", options => { })

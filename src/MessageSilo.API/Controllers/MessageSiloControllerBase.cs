@@ -1,5 +1,4 @@
 ﻿using MessageSilo.Features.EntityManager;
-using MessageSilo.Shared.DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;

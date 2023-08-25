@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using MessageSilo.Features.Enricher;
-using MessageSilo.Features.EntityManager;
-using MessageSilo.Shared.DataAccess;
+﻿using MessageSilo.Features.Enricher;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Orleans;
@@ -15,9 +12,8 @@ namespace MessageSilo.API.Controllers
         public EnrichersController(
             ILogger<CRUDController<EnricherDTO, EnricherDTO, IEnricherGrain>> logger,
             IClusterClient client,
-            IHttpContextAccessor httpContextAccessor,
-            IEntityRepository repo) :
-            base(logger, client, httpContextAccessor, repo)
+            IHttpContextAccessor httpContextAccessor) :
+            base(logger, client, httpContextAccessor)
         {
         }
     }

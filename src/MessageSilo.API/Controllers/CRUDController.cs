@@ -1,7 +1,5 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 using MessageSilo.Features.EntityManager;
-using MessageSilo.Shared.DataAccess;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -15,17 +13,16 @@ namespace MessageSilo.API.Controllers
         where STATE : class
         where GRAIN : IEntityGrain<DTO, STATE>
     {
-        protected readonly IEntityRepository repo;
-
         protected abstract EntityKind GetKind();
+
+        protected IEntityManagerGrain entityManager;
 
         public CRUDController(
             ILogger<CRUDController<DTO, STATE, GRAIN>> logger,
-            IClusterClient client, IHttpContextAccessor httpContextAccessor,
-            IEntityRepository repo)
+            IClusterClient client, IHttpContextAccessor httpContextAccessor)
             : base(logger, httpContextAccessor, client)
         {
-            this.repo = repo;
+            entityManager = client.GetGrain<IEntityManagerGrain>(loggedInUserId);
         }
 
         [HttpGet()]
@@ -33,7 +30,7 @@ namespace MessageSilo.API.Controllers
         {
             var result = new List<STATE>();
 
-            var entities = await repo.Query(GetKind(), loggedInUserId);
+            var entities = (await entityManager.GetAll()).Where(p => p.Kind == GetKind());
 
             foreach (var c in entities)
             {
@@ -56,7 +53,7 @@ namespace MessageSilo.API.Controllers
                 return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status400BadRequest, errors: validationResults));
 
             await entity.Delete();
-            await repo.Delete(loggedInUserId, name);
+            await entityManager.Delete(name);
 
             return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK));
         }
@@ -65,7 +62,7 @@ namespace MessageSilo.API.Controllers
         public async Task<ApiContract<STATE>> Show(string name)
         {
             var id = $"{loggedInUserId}|{name}";
-            var entities = await repo.Query(GetKind(), loggedInUserId);
+            var entities = (await entityManager.GetAll()).Where(p => p.Kind == GetKind());
 
             if (!entities.Any(p => p.Id == id))
             {
@@ -81,7 +78,7 @@ namespace MessageSilo.API.Controllers
         public async Task<ApiContract<LastMessage>> ShowLastMessage(string name)
         {
             var id = $"{loggedInUserId}|{name}";
-            var entities = await repo.Query(GetKind(), loggedInUserId);
+            var entities = (await entityManager.GetAll()).Where(p => p.Kind == GetKind());
 
             if (!entities.Any(p => p.Id == id))
             {
@@ -98,29 +95,15 @@ namespace MessageSilo.API.Controllers
         {
             dto.PartitionKey = loggedInUserId;
 
-            var validationResults = await update(dto);
+            var validationResults = await entityManagerGrain.Upsert(dto);
 
             if (validationResults is not null)
                 return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status400BadRequest, errors: validationResults));
-
-            await repo.Upsert(
-                new Entity()
-                {
-                    PartitionKey = loggedInUserId,
-                    RowKey = name,
-                    Kind = GetKind()
-                }
-            );
 
             var entity = client!.GetGrain<GRAIN>(dto.Id);
             await entity.Update(dto);
 
             return await Task.FromResult(new ApiContract<STATE>(httpContextAccessor, StatusCodes.Status200OK, data: await entity.GetState()));
-        }
-
-        protected virtual async Task<List<ValidationFailure>?> update(DTO dto)
-        {
-            return await entityManagerGrain.Upsert(dto);
         }
     }
 }

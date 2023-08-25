@@ -1,10 +1,4 @@
-﻿using CommandLine.Text;
-using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommandLine;
 
 namespace MessageSilo.SiloCTL.Options
 {
@@ -22,7 +16,7 @@ namespace MessageSilo.SiloCTL.Options
         {
             if (authApi.Logout())
             {
-                config.Delete();
+                config.ClearToken();
                 Console.WriteLine("LOGOUT SUCCEEDED");
                 return;
             }
