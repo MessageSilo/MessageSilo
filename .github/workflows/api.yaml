@@ -25,6 +25,7 @@ jobs:
           tokenSuffix: ')'
           files: '["**/appsettings.json"]'
         env:
+          PrimarySiloAddress: 127.0.0.1
           AppInsightsConnectionString: ${{ secrets.CONNECTIONSTRINGS_AI }}
 
       - name: Build
