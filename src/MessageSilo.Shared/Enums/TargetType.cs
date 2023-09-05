@@ -8,6 +8,7 @@ namespace MessageSilo.Shared.Enums
 {
     public enum TargetType
     {
-        API
+        API,
+        Azure_EventGrid
     }
 }

@@ -1,16 +1,8 @@
-﻿using Amazon.Util;
-using Azure;
-using MessageSilo.Features.Connection;
+﻿using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
-using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MessageSilo.Features.Target
 {
@@ -22,7 +14,7 @@ namespace MessageSilo.Features.Target
 
         private IPersistentState<TargetDTO> persistence { get; set; }
 
-        private IRestClient client = new RestClient();
+        private ITarget target;
 
         private LastMessage lastMessage;
 
@@ -33,20 +25,21 @@ namespace MessageSilo.Features.Target
             this.grainFactory = grainFactory;
         }
 
+        public override async Task OnActivateAsync()
+        {
+            if (this.persistence.RecordExists)
+                reInit();
+
+            await base.OnActivateAsync();
+        }
+
         public async Task Send(Message message)
         {
             lastMessage = new LastMessage(message);
 
             try
             {
-                var request = new RestRequest(persistence.State.Url, Method.Post);
-                request.AddBody(message.Body, contentType: ContentType.Json);
-
-                var response = await client.ExecutePostAsync(request);
-
-                if (!response.IsSuccessful)
-                    throw response.ErrorException;
-
+                await target.Send(message);
                 lastMessage.SetOutput(null, null);
             }
             catch (Exception ex)
@@ -60,6 +53,7 @@ namespace MessageSilo.Features.Target
         {
             persistence.State = t;
             await persistence.WriteStateAsync();
+            reInit();
         }
 
         public async Task<TargetDTO> GetState()
@@ -75,6 +69,21 @@ namespace MessageSilo.Features.Target
         public async Task Delete()
         {
             await this.persistence.ClearStateAsync();
+        }
+
+        private void reInit()
+        {
+            var settings = persistence.State;
+
+            switch (settings.Type)
+            {
+                case TargetType.API:
+                    target = new APITarget(settings.Url);
+                    break;
+                case TargetType.Azure_EventGrid:
+                    target = new AzureEventGridTarget(settings.Endpoint, settings.TopicName, settings.AccessKey);
+                    break;
+            }
         }
     }
 }
