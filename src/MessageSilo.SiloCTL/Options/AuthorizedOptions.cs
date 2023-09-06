@@ -25,7 +25,7 @@ namespace MessageSilo.SiloCTL.Options
                 ? ResponseStatus.Completed : ResponseStatus.Error
             };
 
-            if (config.ApiUrl == CTLConfig.DEFAULT_API_URL)
+            if (config.ApiUrl.StartsWith(CTLConfig.DEFAULT_API_URL))
             {
 
                 authApi = new AuthAPIService(config);
@@ -46,7 +46,7 @@ namespace MessageSilo.SiloCTL.Options
 
             var client = new RestClient(restOptions);
 
-            if (config.ApiUrl != CTLConfig.DEFAULT_API_URL)
+            if (config.ApiUrl.StartsWith(CTLConfig.DEFAULT_API_URL))
                 client.AddDefaultHeader(HeaderNames.Authorization, config.Id);
 
             api = new MessageSiloAPI(client);
