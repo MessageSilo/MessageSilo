@@ -24,9 +24,6 @@ namespace MessageSilo.SiloCTL
 
         public string Id { get; set; }
 
-        [YamlIgnore]
-        public string Code { get; set; }
-
         public string Token { get; set; }
 
         public string ApiUrl { get; set; } = $"{DEFAULT_API_URL}/api/{API_VERSION}";
@@ -62,7 +59,6 @@ namespace MessageSilo.SiloCTL
 
             var existing = YamlConverter.Deserialize<CTLConfig>(configReader.FileContents.First());
             Id = existing.Id;
-            Code = $"{Guid.NewGuid()}-{Guid.NewGuid()}-{Guid.NewGuid()}";
             Token = existing.Token;
             ApiUrl = existing.ApiUrl;
         }
@@ -77,7 +73,7 @@ namespace MessageSilo.SiloCTL
 
         public void ClearToken()
         {
-            if (ApiUrl == DEFAULT_API_URL)
+            if (ApiUrl.StartsWith(DEFAULT_API_URL))
             {
                 Token = null;
 
