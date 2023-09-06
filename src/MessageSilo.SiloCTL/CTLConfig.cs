@@ -1,4 +1,5 @@
 ﻿using MessageSilo.Shared.Serialization;
+using YamlDotNet.Serialization;
 using static System.Environment;
 
 namespace MessageSilo.SiloCTL
@@ -22,6 +23,9 @@ namespace MessageSilo.SiloCTL
         public string LatestVersionInfoUrl { get; private set; } = "https://api.github.com/repos/MessageSilo/MessageSilo/releases/latest";
 
         public string Id { get; set; }
+
+        [YamlIgnore]
+        public string Code { get; set; }
 
         public string Token { get; set; }
 
@@ -58,6 +62,7 @@ namespace MessageSilo.SiloCTL
 
             var existing = YamlConverter.Deserialize<CTLConfig>(configReader.FileContents.First());
             Id = existing.Id;
+            Code = $"{Guid.NewGuid()}-{Guid.NewGuid()}-{Guid.NewGuid()}";
             Token = existing.Token;
             ApiUrl = existing.ApiUrl;
         }

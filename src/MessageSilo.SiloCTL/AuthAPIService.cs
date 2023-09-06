@@ -62,7 +62,7 @@ namespace MessageSilo.SiloCTL
 
         public string GetAuthUrl()
         {
-            return $"https://{config.Auth0Domain}/authorize?prompt=login&response_type=code&code_challenge_method=S256&code_challenge={config.Id}{config.Id}{config.Id}&client_id={config.Auth0ClinetID}&redirect_uri={config.Auth0RedirectUrl}&scope=openid%20profile%20email&audience={config.Auth0Audiance}";
+            return $"https://{config.Auth0Domain}/authorize?prompt=login&response_type=code&code_challenge_method=S256&code_challenge={config.Code}&client_id={config.Auth0ClinetID}&redirect_uri={config.Auth0RedirectUrl}&scope=openid%20profile%20email&audience={config.Auth0Audiance}";
         }
 
         public string GetToken(string code)
@@ -74,7 +74,7 @@ namespace MessageSilo.SiloCTL
             var contentType = "application/x-www-form-urlencoded";
 
             request.AddHeader("content-type", contentType);
-            request.AddParameter(contentType, $"grant_type=authorization_code&client_id={config.Auth0ClinetID}&code_verifier={config.Id}{config.Id}{config.Id}&code={code}&redirect_uri={config.Auth0RedirectUrl}", ParameterType.RequestBody);
+            request.AddParameter(contentType, $"grant_type=authorization_code&client_id={config.Auth0ClinetID}&code_verifier={config.Code}&code={code}&redirect_uri={config.Auth0RedirectUrl}", ParameterType.RequestBody);
 
             var response = client.Execute(request);
 
