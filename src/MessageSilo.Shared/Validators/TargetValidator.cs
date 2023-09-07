@@ -24,7 +24,14 @@ namespace MessageSilo.Shared.Validators
 
             RuleFor(p => p.Type).NotEmpty();
 
-            RuleFor(p => p.Url).NotEmpty();
+            RuleFor(p => p.Url).NotEmpty()
+                .When(p => p.Type == TargetType.API);
+
+            RuleFor(p => p.Endpoint).NotEmpty()
+                .When(p => p.Type == TargetType.Azure_EventGrid);
+
+            RuleFor(p => p.AccessKey).NotEmpty()
+                .When(p => p.Type == TargetType.Azure_EventGrid);
         }
 
         private bool isUnique(IEnumerable<Entity> entities, TargetDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);

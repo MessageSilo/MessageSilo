@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.SQS" Version="3.7.100.95" />
-    <PackageReference Include="Azure.Messaging.EventGrid" Version="4.17.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.0" />
     <PackageReference Include="Betalgo.OpenAI" Version="7.0.0" />
     <PackageReference Include="Jint" Version="3.0.0-beta-2042" />

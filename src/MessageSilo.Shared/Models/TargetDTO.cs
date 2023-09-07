@@ -19,8 +19,6 @@ namespace MessageSilo.Shared.Models
         //Azure_EventGrid
         public string Endpoint { get; set; }
 
-        public string TopicName { get; set; }
-
         public string AccessKey { get; set; }
 
         public TargetDTO()

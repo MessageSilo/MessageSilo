@@ -1,6 +1,4 @@
-﻿using Azure;
-using Azure.Messaging.EventGrid;
-using MessageSilo.Shared.Models;
+﻿using MessageSilo.Shared.Models;
 using RestSharp;
 
 namespace MessageSilo.Features.Target
@@ -9,26 +7,26 @@ namespace MessageSilo.Features.Target
     {
         private readonly string endpoint;
 
-        private readonly string topicName;
-
         private readonly string accessKey;
 
-        private EventGridPublisherClient client;
+        private IRestClient client = new RestClient();
 
-        public AzureEventGridTarget(string endpoint, string topicName, string accessKey)
+        public AzureEventGridTarget(string endpoint, string accessKey)
         {
             this.endpoint = endpoint;
-            this.topicName = topicName;
             this.accessKey = accessKey;
-
-            client = new EventGridPublisherClient(
-                 new Uri(endpoint),
-                 new AzureKeyCredential(accessKey));
         }
 
         public async Task Send(Message message)
         {
-            //EventGridEvent egEvent = new EventGridEvent();
+            var request = new RestRequest(endpoint, Method.Post);
+            request.AddHeader("aeg-sas-key", accessKey);
+            request.AddBody(message.Body, contentType: ContentType.Json);
+
+            var response = await client.ExecutePostAsync(request);
+
+            if (!response.IsSuccessful)
+                throw response.ErrorException;
         }
     }
 }

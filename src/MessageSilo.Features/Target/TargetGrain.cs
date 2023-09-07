@@ -81,7 +81,7 @@ namespace MessageSilo.Features.Target
                     target = new APITarget(settings.Url);
                     break;
                 case TargetType.Azure_EventGrid:
-                    target = new AzureEventGridTarget(settings.Endpoint, settings.TopicName, settings.AccessKey);
+                    target = new AzureEventGridTarget(settings.Endpoint, settings.AccessKey);
                     break;
             }
         }
