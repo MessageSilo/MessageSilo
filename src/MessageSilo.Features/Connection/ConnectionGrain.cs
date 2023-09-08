@@ -62,7 +62,6 @@ namespace MessageSilo.Features.Connection
             persistence.State.ConnectionSettings = s;
             await persistence.WriteStateAsync();
             await reInit();
-            await persistence.WriteStateAsync();
         }
 
         public async Task Delete()
@@ -171,6 +170,14 @@ namespace MessageSilo.Features.Connection
             lastMessage = new LastMessage(msg);
 
             grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString()).InvokeOneWay(p => p.TransformAndSend(msg));
+        }
+
+        private async Task save(ConnectionSettingsDTO s, string password)
+        {
+            await s.Encrypt(password);
+            persistence.State.ConnectionSettings = s;
+            await persistence.WriteStateAsync();
+            await s.Decrypt(password);
         }
     }
 }
