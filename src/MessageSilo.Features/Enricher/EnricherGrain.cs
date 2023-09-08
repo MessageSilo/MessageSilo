@@ -70,6 +70,11 @@ namespace MessageSilo.Features.Enricher
             }
         }
 
+        public async Task Delete()
+        {
+            await this.persistence.ClearStateAsync();
+        }
+
         private void reInit()
         {
             var settings = persistence.State;
@@ -89,11 +94,6 @@ namespace MessageSilo.Features.Enricher
                         break;
                     }
             }
-        }
-
-        public async Task Delete()
-        {
-            await this.persistence.ClearStateAsync();
         }
     }
 }

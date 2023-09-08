@@ -62,7 +62,6 @@ namespace MessageSilo.Features.Connection
             persistence.State.ConnectionSettings = s;
             await persistence.WriteStateAsync();
             await reInit();
-            await persistence.WriteStateAsync();
         }
 
         public async Task Delete()

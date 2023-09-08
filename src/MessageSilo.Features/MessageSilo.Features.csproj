@@ -24,4 +24,8 @@
     <ProjectReference Include="..\MessageSilo.Shared\MessageSilo.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Orleans_CodeGenInputs Remove="Target\APITarget.cs" />
+  </ItemGroup>
+
 </Project>
