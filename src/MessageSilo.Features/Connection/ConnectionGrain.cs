@@ -171,13 +171,5 @@ namespace MessageSilo.Features.Connection
 
             grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString()).InvokeOneWay(p => p.TransformAndSend(msg));
         }
-
-        private async Task save(ConnectionSettingsDTO s, string password)
-        {
-            await s.Encrypt(password);
-            persistence.State.ConnectionSettings = s;
-            await persistence.WriteStateAsync();
-            await s.Decrypt(password);
-        }
     }
 }
