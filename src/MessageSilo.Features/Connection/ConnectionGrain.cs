@@ -21,14 +21,14 @@ namespace MessageSilo.Features.Connection
 
         private readonly IConfiguration configuration;
 
-        private IMessagePlatformConnection messagePlatformConnection;
+        private IMessagePlatformConnection messagePlatformConnection { get; set; }
         private IPersistentState<ConnectionState> persistence { get; set; }
 
-        private IMessageSenderGrain? target;
+        private IMessageSenderGrain? target { get; set; }
 
-        private IEntityManagerGrain entityManager;
+        private IEntityManagerGrain entityManager { get; set; }
 
-        private LastMessage lastMessage;
+        private LastMessage lastMessage { get; set; }
 
         public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory, IConfiguration configuration)
         {
