@@ -35,15 +35,15 @@ namespace MessageSilo.Features.Target
 
         public async Task Send(Message message)
         {
-            lastMessage = new LastMessage(message);
-
             try
             {
+                lastMessage = new LastMessage(message);
                 await target.Send(message);
                 lastMessage.SetOutput(null, null);
             }
             catch (Exception ex)
             {
+                lastMessage = new LastMessage();
                 lastMessage.SetOutput(null, ex.Message);
                 logger.LogError(ex.Message);
             }

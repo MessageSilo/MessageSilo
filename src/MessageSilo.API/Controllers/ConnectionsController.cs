@@ -1,7 +1,10 @@
 ﻿using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Orleans;
+using System.Text.Json;
 
 namespace MessageSilo.API.Controllers
 {
@@ -15,6 +18,17 @@ namespace MessageSilo.API.Controllers
             IHttpContextAccessor httpContextAccessor) :
             base(logger, client, httpContextAccessor)
         {
+        }
+
+        [HttpPost(template: "{name}/send")]
+        public async Task<ApiContract<string>> Send(string name, [FromBody] dynamic message)
+        {
+            var id = $"{loggedInUserId}|{name}";
+
+            var conn = client!.GetGrain<IConnectionGrain>(id);
+            await conn.Send(new Message(Guid.NewGuid().ToString(), JsonSerializer.Serialize(message)));
+
+            return new ApiContract<string>(httpContextAccessor, StatusCodes.Status200OK, data: null);
         }
     }
 }
