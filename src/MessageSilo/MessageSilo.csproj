@@ -8,13 +8,20 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.13" />
+    <PackageReference Include="Microsoft.Orleans.Serialization.SystemTextJson" Version="7.2.2" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.2" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="7.6.0" />
     <PackageReference Include="Serilog" Version="3.0.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="7.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="7.0.1" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MessageSilo.Features\MessageSilo.Features.csproj" />
+    <ProjectReference Include="..\MessageSilo.Shared\MessageSilo.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -4,7 +4,6 @@ using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Validators;
 using Microsoft.Extensions.Logging;
-using Orleans.Concurrency;
 using Orleans.Runtime;
 using System.Text;
 
@@ -71,8 +70,8 @@ namespace MessageSilo.Features.EntityManager
             {
                 persistence.State.Entities.Add(new Entity()
                 {
-                    PartitionKey = entity.PartitionKey,
-                    RowKey = entity.RowKey,
+                    UserId = entity.UserId,
+                    Name = entity.Name,
                     Kind = entity.Kind
                 });
                 await persistence.WriteStateAsync();
@@ -90,7 +89,7 @@ namespace MessageSilo.Features.EntityManager
             if (validationErrors.Any())
                 return await Task.FromResult(validationErrors);
 
-            persistence.State.Entities.RemoveAll(p => p.RowKey == entityName);
+            persistence.State.Entities.RemoveAll(p => p.Name == entityName);
 
             await persistence.WriteStateAsync();
 

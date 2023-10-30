@@ -38,7 +38,7 @@ namespace MessageSilo.SiloCTL
 
         public ApiContract<R> Update<DTO, R>(string controller, DTO dto) where DTO : Entity where R : class
         {
-            var result = httpClient.PutJson<DTO, ApiContract<R>>($"{controller}/{dto.RowKey}", dto);
+            var result = httpClient.PutJson<DTO, ApiContract<R>>($"{controller}/{dto.Name}", dto);
             return result;
         }
 

@@ -93,7 +93,7 @@ namespace MessageSilo.Features.Connection
 
             foreach (var enricherName in settings.Enrichers)
             {
-                var enricherGrain = grainFactory.GetGrain<IEnricherGrain>($"{settings.PartitionKey}|{enricherName}");
+                var enricherGrain = grainFactory.GetGrain<IEnricherGrain>($"{settings.UserId}|{enricherName}");
 
                 message = await enricherGrain.Enrich(message);
 
@@ -116,7 +116,7 @@ namespace MessageSilo.Features.Connection
                 var settings = persistence.State.ConnectionSettings;
                 await settings.Decrypt(configuration["StateUnlockerKey"]);
 
-                entityManager = grainFactory.GetGrain<IEntityManagerGrain>(settings.PartitionKey);
+                entityManager = grainFactory.GetGrain<IEntityManagerGrain>(settings.UserId);
 
 
                 if (settings.TargetId is not null)

@@ -80,11 +80,11 @@ namespace MessageSilo.SiloCTL.Options
         {
             if (apiContract.Errors.Count == 0)
             {
-                Console.WriteLine($"Changes applied on '{entity.RowKey} - {entity.Kind}' successfully!");
+                Console.WriteLine($"Changes applied on '{entity.Name} - {entity.Kind}' successfully!");
                 return;
             }
 
-            Console.WriteLine($"Cannot apply changes on '{entity.RowKey}' because the following errors:");
+            Console.WriteLine($"Cannot apply changes on '{entity.Name}' because the following errors:");
 
             if (apiContract.Errors.Count > 0)
             {

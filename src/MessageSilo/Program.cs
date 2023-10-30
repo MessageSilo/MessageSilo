@@ -6,6 +6,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Net.Http.Headers;
 using MessageSilo.HealthChecks;
+using System.Net;
+using Orleans.Configuration;
+using Orleans.Providers;
+using Orleans.Serialization;
+using MessageSilo.Shared.Models;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false, true)
@@ -26,8 +31,40 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseOrleans(siloBuilder =>
 {
-    siloBuilder.UseLocalhostClustering();
-    siloBuilder.AddMemoryGrainStorage("urls");
+    var siloIP = IPAddress.Parse(configuration["PrimarySiloAddress"]);
+
+    siloBuilder.Services.AddSerializer(serializerBuilder =>
+    {
+        var supportedTypes = new[]
+        {
+            nameof(ConnectionSettingsDTO),
+            nameof(ConnectionState),
+            nameof(EnricherDTO),
+            nameof(Entity),
+            nameof(EntityManagerState)
+        };
+
+        serializerBuilder.AddJsonSerializer(
+            isSupported: type => supportedTypes.Any(p => p == type.Name));
+    });
+
+    siloBuilder
+    .UseMongoDBClient(configuration["DatabaseConnectionString"])
+    .UseMongoDBClustering(options =>
+    {
+        options.DatabaseName = configuration["DatabaseName"];
+        options.CreateShardKeyForCosmos = false;
+    })
+    .AddMongoDBGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, options =>
+    {
+        options.DatabaseName = configuration["DatabaseName"];
+    })
+    .Configure<ClusterOptions>(options =>
+    {
+        options.ClusterId = "MessageSiloCluster001";
+        options.ServiceId = "MessageSiloService001";
+    })
+    .ConfigureEndpoints(siloIP, 11111, 30000);
 });
 
 builder.Host.UseSerilog(Log.Logger);

@@ -18,23 +18,23 @@ namespace MessageSilo.SiloCTL.Options
         {
             var entitiesToDelete = api.GetEntities().Data!;
 
-            entitiesToDelete = entitiesToDelete.Where(p => string.IsNullOrEmpty(Name) || p.RowKey == Name);
+            entitiesToDelete = entitiesToDelete.Where(p => string.IsNullOrEmpty(Name) || p.Name == Name);
 
             foreach (var connection in entitiesToDelete.Where(p => p.Kind == EntityKind.Connection))
             {
-                var result = api.Delete<ConnectionSettingsDTO>("Connections", connection.RowKey);
+                var result = api.Delete<ConnectionSettingsDTO>("Connections", connection.Name);
                 displayResult(connection, result);
             }
 
             foreach (var target in entitiesToDelete.Where(p => p.Kind == EntityKind.Target))
             {
-                var result = api.Delete<TargetDTO>("Targets", target.RowKey);
+                var result = api.Delete<TargetDTO>("Targets", target.Name);
                 displayResult(target, result);
             }
 
             foreach (var enricher in entitiesToDelete.Where(p => p.Kind == EntityKind.Enricher))
             {
-                var result = api.Delete<EnricherDTO>("Enrichers", enricher.RowKey);
+                var result = api.Delete<EnricherDTO>("Enrichers", enricher.Name);
                 displayResult(enricher, result);
             }
         }
@@ -43,11 +43,11 @@ namespace MessageSilo.SiloCTL.Options
         {
             if (apiContract.Errors.Count == 0)
             {
-                Console.WriteLine($"Entity '{entity.RowKey} - {entity.Kind}' deleted successfully!");
+                Console.WriteLine($"Entity '{entity.Name} - {entity.Kind}' deleted successfully!");
                 return;
             }
 
-            Console.WriteLine($"Cannot delete '{entity.RowKey}' because the following errors:");
+            Console.WriteLine($"Cannot delete '{entity.Name}' because the following errors:");
 
             if (apiContract.Errors.Count > 0)
             {

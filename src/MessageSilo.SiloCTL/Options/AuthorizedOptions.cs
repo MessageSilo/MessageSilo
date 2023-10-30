@@ -1,5 +1,4 @@
-﻿using MessageSilo.Shared;
-using Microsoft.Net.Http.Headers;
+﻿using Microsoft.Net.Http.Headers;
 using RestSharp;
 using RestSharp.Authenticators;
 using System.Diagnostics;

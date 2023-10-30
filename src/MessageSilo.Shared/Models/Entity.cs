@@ -7,25 +7,22 @@ using YamlDotNet.Serialization;
 
 namespace MessageSilo.Shared.Models
 {
-    public class Entity : ITableEntity, IComparable<Entity>
+    [GenerateSerializer]
+    public class Entity: IComparable<Entity>
     {
-        [YamlMember(Alias = "userId")]
-        public string PartitionKey { get; set; }
+        [Id(0)]
+        public string UserId { get; set; }
 
-        [YamlMember(Alias = "name")]
-        public string RowKey { get; set; }
+        [Id(1)]
+        public string Name { get; set; }
 
+        [Id(2)]
         public EntityKind Kind { get; set; }
 
         [YamlIgnore]
-        public string Id => $"{PartitionKey}|{RowKey}";
+        public string Id => $"{UserId}|{Name}";
 
-        [YamlIgnore]
-        public DateTimeOffset? Timestamp { get; set; }
-
-        [YamlIgnore]
-        public ETag ETag { get; set; }
-
+        [Id(3)]
         private byte[] IV =
         {
             0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
