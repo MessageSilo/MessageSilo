@@ -2,7 +2,6 @@
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Orleans;
 using Orleans.Runtime;
 using RestSharp;
 
@@ -22,17 +21,17 @@ namespace MessageSilo.Features.Enricher
 
         public EnricherGrain([PersistentState("EnricherState")] IPersistentState<EnricherDTO> state, ILogger<EnricherGrain> logger, IConfiguration configuration)
         {
-            this.persistence = state;
+            persistence = state;
             this.logger = logger;
             this.configuration = configuration;
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            if (this.persistence.RecordExists)
+            if (persistence.RecordExists)
                 reInit();
 
-            await base.OnActivateAsync();
+            await base.OnActivateAsync(cancellationToken);
         }
 
         public async Task Update(EnricherDTO e)

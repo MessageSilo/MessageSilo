@@ -4,7 +4,7 @@ using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using MessageSilo.Shared.Validators;
 using Microsoft.Extensions.Logging;
-using Orleans;
+using Orleans.Concurrency;
 using Orleans.Runtime;
 using System.Text;
 
@@ -20,18 +20,17 @@ namespace MessageSilo.Features.EntityManager
 
         public EntityManagerGrain([PersistentState("EntityManagerState")] IPersistentState<EntityManagerState> state, ILogger<EntityManagerGrain> logger, IGrainFactory grainFactory)
         {
-            this.persistence = state;
+            persistence = state;
             this.logger = logger;
-            this.persistence = state;
             this.grainFactory = grainFactory;
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var um = grainFactory.GetGrain<IUserManagerGrain>("um");
             await um.Upsert(this.GetPrimaryKeyString());
 
-            await base.OnActivateAsync();
+            await base.OnActivateAsync(cancellationToken);
         }
 
         public async Task<IEnumerable<Entity>> GetAll()

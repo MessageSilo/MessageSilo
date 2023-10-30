@@ -1,12 +1,6 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MessageSilo.Shared.Validators
 {

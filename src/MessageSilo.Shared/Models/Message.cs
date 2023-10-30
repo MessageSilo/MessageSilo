@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Text;
-using System.Text.Json;
-
-namespace MessageSilo.Shared.Models
+﻿namespace MessageSilo.Shared.Models
 {
     public class Message
     {

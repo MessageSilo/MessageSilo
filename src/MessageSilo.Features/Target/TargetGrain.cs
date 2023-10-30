@@ -1,7 +1,6 @@
 ﻿using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
-using Orleans;
 using Orleans.Runtime;
 
 namespace MessageSilo.Features.Target
@@ -20,17 +19,17 @@ namespace MessageSilo.Features.Target
 
         public TargetGrain([PersistentState("TargetState")] IPersistentState<TargetDTO> state, ILogger<TargetGrain> logger, IGrainFactory grainFactory)
         {
-            this.persistence = state;
+            persistence = state;
             this.logger = logger;
             this.grainFactory = grainFactory;
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            if (this.persistence.RecordExists)
+            if (persistence.RecordExists)
                 reInit();
 
-            await base.OnActivateAsync();
+            await base.OnActivateAsync(cancellationToken);
         }
 
         public async Task Send(Message message)
