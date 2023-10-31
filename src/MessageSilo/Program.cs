@@ -33,21 +33,6 @@ builder.Host.UseOrleans(siloBuilder =>
 {
     var siloIP = IPAddress.Parse(configuration["PrimarySiloAddress"]);
 
-    siloBuilder.Services.AddSerializer(serializerBuilder =>
-    {
-        var supportedTypes = new[]
-        {
-            nameof(ConnectionSettingsDTO),
-            nameof(ConnectionState),
-            nameof(EnricherDTO),
-            nameof(Entity),
-            nameof(EntityManagerState)
-        };
-
-        serializerBuilder.AddJsonSerializer(
-            isSupported: type => supportedTypes.Any(p => p == type.Name));
-    });
-
     siloBuilder
     .UseMongoDBClient(configuration["DatabaseConnectionString"])
     .UseMongoDBClustering(options =>

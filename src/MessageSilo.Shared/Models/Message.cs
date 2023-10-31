@@ -1,9 +1,12 @@
 ﻿namespace MessageSilo.Shared.Models
 {
+    [GenerateSerializer]
     public class Message
     {
+        [Id(0)]
         public string Id { get; set; }
 
+        [Id(1)]
         public string Body { get; set; }
 
         public Message()

@@ -2,12 +2,16 @@
 
 namespace MessageSilo.Shared.Models
 {
+    [GenerateSerializer]
     public class LastMessage
     {
+        [Id(0)]
         public Message Input { get; set; }
 
+        [Id(1)]
         public Message? Output { get; set; }
 
+        [Id(2)]
         public string? Error { get; set; }
 
         public LastMessage(Message input)
