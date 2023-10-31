@@ -11,6 +11,11 @@ using Orleans.Configuration;
 using Orleans.Providers;
 using Orleans.Serialization;
 using MessageSilo.Shared.Models;
+using MessageSilo.Features.Connection;
+using MessageSilo.Features.EntityManager;
+using MessageSilo.Features.UserManager;
+using MessageSilo.Shared.Enums;
+using MessageSilo;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false, true)
@@ -57,7 +62,7 @@ builder.Host.UseSerilog(Log.Logger);
 builder.Services.AddControllers();
 
 builder.Services.AddAuthentication()
-        .AddScheme<OnboardingAuthSchemeOptions, OnboardingAuthHandler>("OnboardingAuthScheme", options => { })
+        .AddScheme<LocalAuthSchemeOptions, LocalAuthHandler>("LocalAuthScheme", options => { })
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
         {
             c.Authority = $"{configuration["Auth0:Domain"]}";
@@ -72,7 +77,7 @@ builder.Services.AddAuthorization(options =>
 {
     var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
         JwtBearerDefaults.AuthenticationScheme,
-        "OnboardingAuthScheme");
+        "LocalAuthScheme");
     defaultAuthorizationPolicyBuilder = defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
     options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
 });
@@ -82,6 +87,8 @@ builder.Services.AddControllers();
 builder.Services.AddHealthChecks()
     .AddCheck<ShallowHealthCheck>("shallow")
     .AddCheck<DeepHealthCheck>("deep");
+
+builder.Services.AddHostedService<StartupService>();
 
 var app = builder.Build();
 

@@ -6,17 +6,15 @@ using System.Text.Encodings.Web;
 
 namespace MessageSilo.Auth
 {
-    public class OnboardingAuthSchemeOptions
-        : AuthenticationSchemeOptions
+    public class LocalAuthSchemeOptions: AuthenticationSchemeOptions
     {
 
     }
 
-    public class OnboardingAuthHandler
-    : AuthenticationHandler<OnboardingAuthSchemeOptions>
+    public class LocalAuthHandler: AuthenticationHandler<LocalAuthSchemeOptions>
     {
-        public OnboardingAuthHandler(
-            IOptionsMonitor<OnboardingAuthSchemeOptions> options,
+        public LocalAuthHandler(
+            IOptionsMonitor<LocalAuthSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
             ISystemClock clock)
@@ -37,10 +35,10 @@ namespace MessageSilo.Auth
             {
                 var claims = new[] {
                     new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                    new Claim(ClaimTypes.Role, "obapp-user") };
+                    new Claim(ClaimTypes.Role, "local-user") };
 
                 var claimsIdentity = new ClaimsIdentity(claims,
-                            nameof(OnboardingAuthHandler));
+                            nameof(LocalAuthHandler));
 
                 var ticket = new AuthenticationTicket(
                     new ClaimsPrincipal(claimsIdentity), this.Scheme.Name);
