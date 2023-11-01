@@ -75,7 +75,7 @@ namespace MessageSilo.Features.Azure
 
         private Task processErrorAsync(ProcessErrorEventArgs arg)
         {
-            logger.LogError(arg.Exception, "deadLetterProcessor");
+            logger.LogError(arg.Exception, arg.Exception.Message);
             return Task.CompletedTask;
         }
 
