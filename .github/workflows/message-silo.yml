@@ -1,8 +1,8 @@
-name: Silo
+name: Message Silo
 
 on:
   push:
-    branches: ["main"]
+    branches: ["refactor/simp"]
     paths-ignore:
       - "scripts/**"
 
@@ -16,7 +16,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.0.x
 
       - name: Transform appsettings
         uses: cschleiden/replace-tokens@v1
@@ -33,22 +33,12 @@ jobs:
           AppInsightsConnectionString: ${{ secrets.CONNECTIONSTRINGS_AI }}
 
       - name: Build
-        working-directory: ./src/MessageSilo.Silo
+        working-directory: ./src/MessageSilo
         run: dotnet build
 
       - name: Publish
-        working-directory: ./src/MessageSilo.Silo
+        working-directory: ./src/MessageSilo
         run: dotnet publish -c Release -o "/home/runner/work/MessageSilo/publish"
-
-      - name: Upload build artifact
-        uses: garygrossgarten/github-action-scp@release
-        with:
-          host: ${{ secrets.IP }}
-          username: ${{ secrets.U }}
-          password: ${{ secrets.P }}
-          port: ${{ secrets.PORT }}
-          local: /home/runner/work/MessageSilo/publish
-          remote: /home/temp/silo
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
@@ -62,4 +52,4 @@ jobs:
           context: .
           file: src/MessageSilo.Silo/Dockerfile
           push: true
-          tags: "berkid89/messagesilo-silo:latest"
+          tags: "berkid89/messagesilo:latest"
