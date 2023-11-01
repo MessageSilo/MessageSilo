@@ -25,8 +25,6 @@ namespace MessageSilo.Features.Connection
 
         private IMessageSenderGrain? target { get; set; }
 
-        private IEntityManagerGrain entityManager { get; set; }
-
         private LastMessage lastMessage { get; set; }
 
         public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory, IConfiguration configuration)
@@ -83,7 +81,6 @@ namespace MessageSilo.Features.Connection
 
         public async Task Send(Message message)
         {
-            await entityManager.IncreaseUsedThroughput(message.Body);
             await messagePlatformConnection.Enqueue(message);
         }
 
@@ -99,8 +96,6 @@ namespace MessageSilo.Features.Connection
 
                 if (message is null)
                     break;
-
-                await entityManager.IncreaseUsedThroughput(message.Body);
             }
 
             lastMessage.SetOutput(message, null);
@@ -115,9 +110,6 @@ namespace MessageSilo.Features.Connection
             {
                 var settings = persistence.State.ConnectionSettings;
                 await settings.Decrypt(configuration["StateUnlockerKey"]);
-
-                entityManager = grainFactory.GetGrain<IEntityManagerGrain>(settings.UserId);
-
 
                 if (settings.TargetId is not null)
                     switch (settings.TargetKind)

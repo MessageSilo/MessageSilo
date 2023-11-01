@@ -95,24 +95,5 @@ namespace MessageSilo.Features.EntityManager
 
             return await Task.FromResult<List<ValidationFailure>?>(null);
         }
-
-        public async Task IncreaseUsedThroughput(string messageBody)
-        {
-            var amount = Encoding.UTF8.GetByteCount(messageBody ?? string.Empty) * 0.001;
-            var currentDate = DateTime.UtcNow.Year * 100 + DateTime.UtcNow.Month;
-
-            if (!persistence.State.Throughput.ContainsKey(currentDate))
-                persistence.State.Throughput.Add(currentDate, amount);
-            else
-                persistence.State.Throughput[DateTime.UtcNow.Year] += amount;
-
-            await persistence.WriteStateAsync();
-        }
-
-        public async Task<double> GetUsedThroughput(int date)
-        {
-            var output = persistence.State.Throughput[date];
-            return await Task.FromResult(output);
-        }
     }
 }
