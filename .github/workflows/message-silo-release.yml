@@ -20,3 +20,5 @@ jobs:
             image: berkid89/messagesilo:latest
             name: message-silo-prd-aci
             location: 'westeurope'
+            cpu: 1
+            memory: 2
