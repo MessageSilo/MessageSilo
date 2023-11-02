@@ -28,7 +28,7 @@ jobs:
           PrimarySiloAddress: 127.0.0.1
           StateUnlockerKey: ${{ secrets.ORLEANS_STATEUNLOCKERKEY }}
           DatabaseConnectionString: ${{ secrets.DATABASECONNECTIONSTRING }}
-          DatabaseName: messagesilo-prd
+          DatabaseName: messagesilo-prod
           AIApiKey: ${{ secrets.AI_APIKEY }}
           AppInsightsConnectionString: ${{ secrets.CONNECTIONSTRINGS_AI }}
 
@@ -53,3 +53,12 @@ jobs:
           file: src/MessageSilo/Dockerfile
           push: true
           tags: "berkid89/messagesilo:latest"
+
+      - name: 'Deploy to Azure Container Instances'
+        uses: 'azure/aci-deploy@v1'
+        with:
+            resource-group: message-silo-prd-rg-sponsor
+            dns-name-label: message-silo
+            image: berkid89/messagesilo:latest
+            name: message-silo-prd-aci
+            location: 'westeurope'
