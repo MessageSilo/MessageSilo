@@ -1,4 +1,4 @@
-name: siloctl-build
+name: siloctl Build
 
 on:
   push:

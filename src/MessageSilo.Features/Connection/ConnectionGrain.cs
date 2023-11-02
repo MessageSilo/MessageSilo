@@ -8,7 +8,6 @@ using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Orleans;
 using Orleans.Runtime;
 
 namespace MessageSilo.Features.Connection
@@ -26,8 +25,6 @@ namespace MessageSilo.Features.Connection
 
         private IMessageSenderGrain? target { get; set; }
 
-        private IEntityManagerGrain entityManager { get; set; }
-
         private LastMessage lastMessage { get; set; }
 
         public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory, IConfiguration configuration)
@@ -38,7 +35,7 @@ namespace MessageSilo.Features.Connection
             this.configuration = configuration;
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             this.persistence.State.Status = Status.Created;
             this.persistence.State.InitializationError = null;
@@ -46,10 +43,10 @@ namespace MessageSilo.Features.Connection
             if (this.persistence.RecordExists)
                 await reInit();
 
-            await base.OnActivateAsync();
+            await base.OnActivateAsync(cancellationToken);
         }
 
-        public override async Task OnDeactivateAsync()
+        public override async Task OnDeactivateAsync(DeactivationReason reason, CancellationToken token)
         {
             var grain = grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString());
 
@@ -84,7 +81,6 @@ namespace MessageSilo.Features.Connection
 
         public async Task Send(Message message)
         {
-            entityManager.InvokeOneWay(p => p.IncreaseUsedThroughput(message.Body));
             await messagePlatformConnection.Enqueue(message);
         }
 
@@ -94,19 +90,18 @@ namespace MessageSilo.Features.Connection
 
             foreach (var enricherName in settings.Enrichers)
             {
-                var enricherGrain = grainFactory.GetGrain<IEnricherGrain>($"{settings.PartitionKey}|{enricherName}");
+                var enricherGrain = grainFactory.GetGrain<IEnricherGrain>($"{settings.UserId}|{enricherName}");
 
                 message = await enricherGrain.Enrich(message);
 
                 if (message is null)
                     break;
-
-                entityManager.InvokeOneWay(p => p.IncreaseUsedThroughput(message.Body));
             }
 
             lastMessage.SetOutput(message, null);
 
-            target?.InvokeOneWay(p => p.Send(message));
+            if (target is not null)
+                await target.Send(message);
         }
 
         private async Task reInit()
@@ -115,9 +110,6 @@ namespace MessageSilo.Features.Connection
             {
                 var settings = persistence.State.ConnectionSettings;
                 await settings.Decrypt(configuration["StateUnlockerKey"]);
-
-                entityManager = grainFactory.GetGrain<IEntityManagerGrain>(settings.PartitionKey);
-
 
                 if (settings.TargetId is not null)
                     switch (settings.TargetKind)
@@ -165,11 +157,11 @@ namespace MessageSilo.Features.Connection
         {
             var msg = (e as MessageReceivedEventArgs)!.Message;
 
-            logger.Debug($"Connection: {this.GetPrimaryKeyString()} received a messsage: {msg.Id}.");
+            logger.LogDebug($"Connection: {this.GetPrimaryKeyString()} received a messsage: {msg.Id}.");
 
             lastMessage = new LastMessage(msg);
 
-            grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString()).InvokeOneWay(p => p.TransformAndSend(msg));
+            grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString()).TransformAndSend(msg);
         }
     }
 }

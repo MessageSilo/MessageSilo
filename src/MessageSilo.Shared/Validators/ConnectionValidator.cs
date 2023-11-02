@@ -1,12 +1,6 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MessageSilo.Shared.Validators
 {
@@ -14,13 +8,13 @@ namespace MessageSilo.Shared.Validators
     {
         public ConnectionValidator(IEnumerable<Entity> entities) : base()
         {
-            RuleFor(p => p.PartitionKey).NotEmpty().WithName("UserId");
+            RuleFor(p => p.UserId).NotEmpty().WithName("UserId");
 
-            RuleFor(p => p.RowKey)
+            RuleFor(p => p.Name)
                 .NotEmpty()
                 .MaximumLength(20)
                 .Matches("^[a-zA-Z0-9$_-]+$")
-                .Must((e, x) => isUnique(entities, e)).WithMessage(p => $"Entity with name '{p.RowKey}' already exist")
+                .Must((e, x) => isUnique(entities, e)).WithMessage(p => $"Entity with name '{p.Name}' already exist")
                 .WithName("Name");
 
             RuleFor(p => p.Type).NotEmpty();
@@ -63,8 +57,8 @@ namespace MessageSilo.Shared.Validators
 
         private bool isUnique(IEnumerable<Entity> entities, ConnectionSettingsDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);
 
-        private bool isTargetExist(IEnumerable<Entity> entities, string targetName) => entities.Any(p => (p.Kind == EntityKind.Target || p.Kind == EntityKind.Connection) && p.RowKey == targetName);
+        private bool isTargetExist(IEnumerable<Entity> entities, string targetName) => entities.Any(p => (p.Kind == EntityKind.Target || p.Kind == EntityKind.Connection) && p.Name == targetName);
 
-        private bool isEnricherExist(IEnumerable<Entity> entities, string enricherName) => entities.Any(p => p.Kind == EntityKind.Enricher && p.RowKey == enricherName);
+        private bool isEnricherExist(IEnumerable<Entity> entities, string enricherName) => entities.Any(p => p.Kind == EntityKind.Enricher && p.Name == enricherName);
     }
 }

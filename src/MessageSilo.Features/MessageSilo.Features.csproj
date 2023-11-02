@@ -1,23 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.SQS" Version="3.7.100.95" />
-    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.0" />
-    <PackageReference Include="Betalgo.OpenAI" Version="7.0.0" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.200.64" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.2" />
+    <PackageReference Include="Betalgo.OpenAI" Version="7.3.1" />
     <PackageReference Include="Jint" Version="3.0.0-beta-2042" />
-    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Orleans.Core" Version="3.6.5" />
-    <PackageReference Include="Microsoft.Orleans.Runtime.Abstractions" Version="3.6.5" />
-    <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.2" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.6.0" />
   </ItemGroup>
 
   <ItemGroup>

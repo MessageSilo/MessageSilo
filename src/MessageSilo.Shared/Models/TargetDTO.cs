@@ -1,24 +1,24 @@
 ﻿using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MessageSilo.Shared.Models
 {
+    [GenerateSerializer]
     public class TargetDTO : Entity
     {
         //Common
+        [Id(0)]
         public TargetType? Type { get; set; }
 
         //API
+        [Id(1)]
         public string Url { get; set; }
 
         //Azure_EventGrid
+        [Id(2)]
         public string Endpoint { get; set; }
 
+        [Id(3)]
         public string AccessKey { get; set; }
 
         public TargetDTO()

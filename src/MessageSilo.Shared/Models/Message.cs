@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
-using System.Text;
-using System.Text.Json;
-
-namespace MessageSilo.Shared.Models
+﻿namespace MessageSilo.Shared.Models
 {
+    [GenerateSerializer]
     public class Message
     {
+        [Id(0)]
         public string Id { get; set; }
 
+        [Id(1)]
         public string Body { get; set; }
 
         public Message()

@@ -1,11 +1,6 @@
 ﻿using FluentValidation;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MessageSilo.Shared.Validators
 {
@@ -13,13 +8,13 @@ namespace MessageSilo.Shared.Validators
     {
         public EnricherValidator(IEnumerable<Entity> entities)
         {
-            RuleFor(p => p.PartitionKey).NotEmpty().WithName("UserId");
+            RuleFor(p => p.UserId).NotEmpty().WithName("UserId");
 
-            RuleFor(p => p.RowKey)
+            RuleFor(p => p.Name)
                 .NotEmpty()
                 .MaximumLength(20)
                 .Matches("^[a-zA-Z0-9$_-]+$")
-                .Must((e, x) => isUnique(entities, e)).WithMessage(p => $"Entity with name '{p.RowKey}' already exist")
+                .Must((e, x) => isUnique(entities, e)).WithMessage(p => $"Entity with name '{p.Name}' already exist")
                 .WithName("Name");
 
             RuleFor(p => p.Type).NotEmpty();

@@ -1,9 +1,8 @@
 <img width=300 height=300 src="https://www.message-silo.dev/assets/images/logo/logo.svg" align="right"></img>
 # Message Silo
 
-[![siloctl-build](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml)
-[![API](https://github.com/MessageSilo/MessageSilo/actions/workflows/api.yaml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/api.yaml)
-[![Silo](https://github.com/MessageSilo/MessageSilo/actions/workflows/silo.yml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/silo.yml)
+[![siloctl](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml)
+[![Message Silo](https://github.com/MessageSilo/MessageSilo/actions/workflows/message-silo-build.yaml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/message-silo-build.yaml)
 
 Cleanup the mess of messages!
 

@@ -28,23 +28,23 @@ namespace MessageSilo.SiloCTL.Options
             {
                 var entities = api.GetEntities();
 
-                var entity = entities.Data?.FirstOrDefault(p => p.RowKey == Name);
+                var entity = entities.Data?.FirstOrDefault(p => p.Name == Name);
 
                 if (entity is not null)
                 {
                     switch (entity.Kind)
                     {
                         case EntityKind.Connection:
-                            Console.WriteLine(api.Get<ConnectionState>("Connections", entity.RowKey).Data);
-                            Console.WriteLine(api.GetLastMessage("Connections", entity.RowKey).Data);
+                            Console.WriteLine(api.Get<ConnectionState>("Connections", entity.Name).Data);
+                            Console.WriteLine(api.GetLastMessage("Connections", entity.Name).Data);
                             break;
                         case EntityKind.Enricher:
-                            Console.WriteLine(api.Get<EnricherDTO>("Enrichers", entity.RowKey).Data);
-                            Console.WriteLine(api.GetLastMessage("Enrichers", entity.RowKey).Data);
+                            Console.WriteLine(api.Get<EnricherDTO>("Enrichers", entity.Name).Data);
+                            Console.WriteLine(api.GetLastMessage("Enrichers", entity.Name).Data);
                             break;
                         case EntityKind.Target:
-                            Console.WriteLine(api.Get<TargetDTO>("Targets", entity.RowKey).Data);
-                            Console.WriteLine(api.GetLastMessage("Targets", entity.RowKey).Data);
+                            Console.WriteLine(api.Get<TargetDTO>("Targets", entity.Name).Data);
+                            Console.WriteLine(api.GetLastMessage("Targets", entity.Name).Data);
                             break;
                     }
                 }
@@ -65,13 +65,13 @@ namespace MessageSilo.SiloCTL.Options
             }
 
             foreach (var c in existingConnections)
-                showEntitesTable.AddRow(c.ConnectionSettings.Kind, c.ConnectionSettings.RowKey, c.ConnectionSettings.Type, c.Status);
+                showEntitesTable.AddRow(c.ConnectionSettings.Kind, c.ConnectionSettings.Name, c.ConnectionSettings.Type, c.Status);
 
             foreach (var t in existingTargets)
-                showEntitesTable.AddRow(t.Kind, t.RowKey, t.Type, Status.Created);
+                showEntitesTable.AddRow(t.Kind, t.Name, t.Type, Status.Created);
 
             foreach (var t in existingEnrichers)
-                showEntitesTable.AddRow(t.Kind, t.RowKey, t.Type, Status.Created);
+                showEntitesTable.AddRow(t.Kind, t.Name, t.Type, Status.Created);
 
             showEntitesTable.Write(Format.Default);
         }

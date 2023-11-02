@@ -14,7 +14,7 @@ namespace MessageSilo.Features.UserManager
 
         private IPersistentState<UserManagerState> persistence { get; set; }
 
-        public UserManagerGrain([PersistentState("EntityManagerState")] IPersistentState<UserManagerState> state, ILogger<UserManagerGrain> logger)
+        public UserManagerGrain([PersistentState("UserManagerState")] IPersistentState<UserManagerState> state, ILogger<UserManagerGrain> logger)
         {
             this.persistence = state;
             this.logger = logger;

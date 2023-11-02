@@ -1,8 +1,9 @@
 ﻿namespace MessageSilo.Shared.Models
 {
+    [GenerateSerializer]
     public class EntityManagerState
     {
-        public Dictionary<int, double> Throughput { get; set; } = new Dictionary<int, double>();
+        [Id(0)]
         public List<Entity> Entities { get; set; } = new();
     }
 }
