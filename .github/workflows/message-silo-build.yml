@@ -2,7 +2,7 @@ name: Message Silo
 
 on:
   push:
-    branches: ["refactor/simp"]
+    branches: ["main"]
     paths-ignore:
       - "scripts/**"
 
@@ -53,17 +53,3 @@ jobs:
           file: src/MessageSilo/Dockerfile
           push: true
           tags: "berkid89/messagesilo:latest"
-
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS_S }}
-
-      - name: 'Deploy to Azure Container Instances'
-        uses: 'azure/aci-deploy@v1'
-        with:
-            resource-group: message-silo-prd-rg-sponsor
-            dns-name-label: message-silo
-            image: berkid89/messagesilo:latest
-            name: message-silo-prd-aci
-            location: 'westeurope'
