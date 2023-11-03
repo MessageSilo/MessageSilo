@@ -46,8 +46,8 @@ namespace MessageSilo.Features.RabbitMQ
 
         public override async Task Enqueue(Message message)
         {
-            channel.BasicPublish(exchange: ExchangeName,
-                     routingKey: string.Empty,
+            channel.BasicPublish(exchange: ExchangeName ?? string.Empty,
+                     routingKey: ExchangeName is null ? QueueName : string.Empty,
                      basicProperties: channel.CreateBasicProperties(),
                      body: Encoding.UTF8.GetBytes(message.Body));
 
