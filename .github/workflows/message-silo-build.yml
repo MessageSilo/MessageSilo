@@ -18,20 +18,6 @@ jobs:
         with:
           dotnet-version: 7.0.x
 
-      - name: Transform appsettings
-        uses: cschleiden/replace-tokens@v1
-        with:
-          tokenPrefix: '$('
-          tokenSuffix: ')'
-          files: '["**/appsettings.json"]'
-        env:
-          PrimarySiloAddress: 127.0.0.1
-          StateUnlockerKey: ${{ secrets.ORLEANS_STATEUNLOCKERKEY }}
-          DatabaseConnectionString: ${{ secrets.DATABASECONNECTIONSTRING }}
-          DatabaseName: messagesilo-prod
-          AIApiKey: ${{ secrets.AI_APIKEY }}
-          AppInsightsConnectionString: ${{ secrets.CONNECTIONSTRINGS_AI }}
-
       - name: Build
         working-directory: ./src/MessageSilo
         run: dotnet build

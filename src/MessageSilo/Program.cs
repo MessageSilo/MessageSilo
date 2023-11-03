@@ -1,21 +1,15 @@
-using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
-using Serilog;
+using MessageSilo;
 using MessageSilo.Auth;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Net.Http.Headers;
 using MessageSilo.HealthChecks;
-using System.Net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Orleans.Configuration;
 using Orleans.Providers;
-using Orleans.Serialization;
-using MessageSilo.Shared.Models;
-using MessageSilo.Features.Connection;
-using MessageSilo.Features.EntityManager;
-using MessageSilo.Features.UserManager;
-using MessageSilo.Shared.Enums;
-using MessageSilo;
+using Serilog;
+using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
+using System.Net;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false, true)
@@ -38,18 +32,26 @@ builder.Host.UseOrleans(siloBuilder =>
 {
     var siloIP = IPAddress.Parse(configuration["PrimarySiloAddress"]);
 
-    siloBuilder
-    .UseMongoDBClient(configuration["DatabaseConnectionString"])
-    .UseMongoDBClustering(options =>
+    if (!string.IsNullOrWhiteSpace(configuration["DatabaseConnectionString"]) && !string.IsNullOrWhiteSpace(configuration["DatabaseConnectionString"]))
     {
-        options.DatabaseName = configuration["DatabaseName"];
-        options.CreateShardKeyForCosmos = false;
-    })
-    .AddMongoDBGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, options =>
+        siloBuilder.UseMongoDBClient(configuration["DatabaseConnectionString"])
+        .UseMongoDBClustering(options =>
+        {
+            options.DatabaseName = configuration["DatabaseName"];
+            options.CreateShardKeyForCosmos = false;
+        })
+        .AddMongoDBGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, options =>
+        {
+            options.DatabaseName = configuration["DatabaseName"];
+        });
+    }
+    else
     {
-        options.DatabaseName = configuration["DatabaseName"];
-    })
-    .Configure<ClusterOptions>(options =>
+        siloBuilder.UseLocalhostClustering(primarySiloEndpoint: new IPEndPoint(siloIP, 11111))
+        .AddMemoryGrainStorageAsDefault();
+    }
+
+    siloBuilder.Configure<ClusterOptions>(options =>
     {
         options.ClusterId = "MessageSiloCluster001";
         options.ServiceId = "MessageSiloService001";
