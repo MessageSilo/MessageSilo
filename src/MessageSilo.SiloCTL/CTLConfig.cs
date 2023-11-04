@@ -26,7 +26,7 @@ namespace MessageSilo.SiloCTL
 
         public string Token { get; set; }
 
-        public string ApiUrl { get; set; } = $"{DEFAULT_API_URL}/api/{API_VERSION}";
+        public string ApiUrl { get; set; } = $"http://localhost:5000/api/{API_VERSION}";
 
         private ConfigReader configReader;
 
