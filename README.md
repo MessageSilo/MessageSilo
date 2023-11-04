@@ -13,7 +13,7 @@ Azure Service Bus, AWS SQS, RabbitMQ, and more...
 
 ## Getting Started
 - [Check the Docs](https://github.com/MessageSilo/MessageSilo/wiki)
-- [Download siloctl](https://github.com/MessageSilo/MessageSilo/wiki/01.-Getting-Started)
+- [Quick start](https://github.com/MessageSilo/MessageSilo/wiki/01.-Getting-Started)
 
 
 
