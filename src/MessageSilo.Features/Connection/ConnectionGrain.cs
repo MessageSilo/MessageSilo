@@ -1,12 +1,10 @@
 ﻿using MessageSilo.Features.AWS;
 using MessageSilo.Features.Azure;
 using MessageSilo.Features.Enricher;
-using MessageSilo.Features.EntityManager;
 using MessageSilo.Features.RabbitMQ;
 using MessageSilo.Features.Target;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Orleans.Runtime;
 
@@ -18,8 +16,6 @@ namespace MessageSilo.Features.Connection
 
         private readonly IGrainFactory grainFactory;
 
-        private readonly IConfiguration configuration;
-
         private IMessagePlatformConnection messagePlatformConnection { get; set; }
         private IPersistentState<ConnectionState> persistence { get; set; }
 
@@ -27,12 +23,11 @@ namespace MessageSilo.Features.Connection
 
         private LastMessage lastMessage { get; set; }
 
-        public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory, IConfiguration configuration)
+        public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory)
         {
             this.persistence = state;
             this.logger = logger;
             this.grainFactory = grainFactory;
-            this.configuration = configuration;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -55,7 +50,6 @@ namespace MessageSilo.Features.Connection
 
         public async Task Update(ConnectionSettingsDTO s)
         {
-            await s.Encrypt(configuration["StateUnlockerKey"]);
             persistence.State.ConnectionSettings = s;
             await persistence.WriteStateAsync();
             await reInit();
@@ -109,7 +103,6 @@ namespace MessageSilo.Features.Connection
             try
             {
                 var settings = persistence.State.ConnectionSettings;
-                await settings.Decrypt(configuration["StateUnlockerKey"]);
 
                 if (settings.TargetId is not null)
                     switch (settings.TargetKind)

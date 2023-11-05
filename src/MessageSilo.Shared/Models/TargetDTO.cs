@@ -26,18 +26,6 @@ namespace MessageSilo.Shared.Models
             Kind = EntityKind.Target;
         }
 
-        public async Task Encrypt(string password)
-        {
-            if (AccessKey is not null)
-                AccessKey = await encryptAsync(AccessKey, password);
-        }
-
-        public async Task Decrypt(string password)
-        {
-            if (AccessKey is not null)
-                AccessKey = await decryptAsync(AccessKey, password);
-        }
-
         public override string ToString()
         {
             return YamlConverter.Serialize(this);

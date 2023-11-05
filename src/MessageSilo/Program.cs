@@ -30,7 +30,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseOrleans(siloBuilder =>
 {
-    var siloIP = IPAddress.Parse(configuration["PrimarySiloAddress"]);
+    var siloIP = string.IsNullOrWhiteSpace(configuration["PrimarySiloAddress"]) ? IPAddress.Loopback : IPAddress.Parse(configuration["PrimarySiloAddress"]);
 
     if (!string.IsNullOrWhiteSpace(configuration["DatabaseConnectionString"]) && !string.IsNullOrWhiteSpace(configuration["DatabaseConnectionString"]))
     {
