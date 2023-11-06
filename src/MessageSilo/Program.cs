@@ -21,8 +21,8 @@ var loggerConfig = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
     .WriteTo.Console();
 
-if (!string.IsNullOrWhiteSpace(configuration["AppInsightsConnectionString"]))
-    loggerConfig.WriteTo.ApplicationInsights(configuration["AppInsightsConnectionString"], new TraceTelemetryConverter());
+if (!string.IsNullOrWhiteSpace(configuration["APPINSIGHTS_CONNECTIONSTRING"]))
+    loggerConfig.WriteTo.ApplicationInsights(configuration["APPINSIGHTS_CONNECTIONSTRING"], new TraceTelemetryConverter());
 
 Log.Logger = loggerConfig.CreateBootstrapLogger();
 
@@ -30,19 +30,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseOrleans(siloBuilder =>
 {
-    var siloIP = string.IsNullOrWhiteSpace(configuration["PrimarySiloAddress"]) ? IPAddress.Loopback : IPAddress.Parse(configuration["PrimarySiloAddress"]);
+    var siloIP = string.IsNullOrWhiteSpace(configuration["PRIMARY_SILO_ADDRESS"]) ? IPAddress.Loopback : IPAddress.Parse(configuration["PRIMARY_SILO_ADDRESS"]);
 
-    if (!string.IsNullOrWhiteSpace(configuration["DatabaseConnectionString"]) && !string.IsNullOrWhiteSpace(configuration["DatabaseConnectionString"]))
+    if (!string.IsNullOrWhiteSpace(configuration["DATABASE_CONNECTION_STRING"]) && !string.IsNullOrWhiteSpace(configuration["DATABASE_CONNECTION_STRING"]))
     {
-        siloBuilder.UseMongoDBClient(configuration["DatabaseConnectionString"])
+        siloBuilder.UseMongoDBClient(configuration["DATABASE_CONNECTION_STRING"])
         .UseMongoDBClustering(options =>
         {
-            options.DatabaseName = configuration["DatabaseName"];
+            options.DatabaseName = configuration["DATABASE_NAME"];
             options.CreateShardKeyForCosmos = false;
         })
         .AddMongoDBGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, options =>
         {
-            options.DatabaseName = configuration["DatabaseName"];
+            options.DatabaseName = configuration["DATABASE_NAME"];
         });
     }
     else
