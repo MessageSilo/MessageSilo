@@ -16,7 +16,7 @@ namespace MessageSilo.Features.Connection
 
         private readonly IGrainFactory grainFactory;
 
-        private IMessagePlatformConnection messagePlatformConnection { get; set; }
+        private IMessagePlatformConnectionGrain messagePlatformConnection { get; set; }
         private IPersistentState<ConnectionState> persistence { get; set; }
 
         private IMessageSenderGrain? target { get; set; }
@@ -39,13 +39,6 @@ namespace MessageSilo.Features.Connection
                 await reInit();
 
             await base.OnActivateAsync(cancellationToken);
-        }
-
-        public override async Task OnDeactivateAsync(DeactivationReason reason, CancellationToken token)
-        {
-            var grain = grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString());
-
-            await grain.GetState();
         }
 
         public async Task Update(ConnectionSettingsDTO s)
@@ -80,6 +73,8 @@ namespace MessageSilo.Features.Connection
 
         public async Task TransformAndSend(Message message)
         {
+            lastMessage = new LastMessage(message);
+
             var settings = persistence.State.ConnectionSettings;
 
             foreach (var enricherName in settings.Enrichers)
@@ -118,22 +113,18 @@ namespace MessageSilo.Features.Connection
                 switch (settings.Type)
                 {
                     case MessagePlatformType.Azure_Queue:
-                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.QueueName, settings.SubQueue, settings.ReceiveMode!.Value, logger);
-                        break;
                     case MessagePlatformType.Azure_Topic:
-                        messagePlatformConnection = new AzureServiceBusConnection(settings.ConnectionString, settings.TopicName, settings.SubscriptionName, settings.SubQueue, settings.ReceiveMode!.Value, logger);
+                        messagePlatformConnection = grainFactory.GetGrain<IAzureServiceBusConnectionGrain>(this.GetPrimaryKeyString());
                         break;
                     case MessagePlatformType.RabbitMQ:
-                        messagePlatformConnection = new RabbitMQConnection(settings.ConnectionString, settings.QueueName, settings.ExchangeName, settings.ReceiveMode!.Value, logger);
+                        messagePlatformConnection = grainFactory.GetGrain<IRabbitMQConnectionGrain>(this.GetPrimaryKeyString());
                         break;
                     case MessagePlatformType.AWS_SQS:
-                        messagePlatformConnection = new AWSSQSConnection(settings.QueueName, settings.Region, settings.AccessKey, settings.SecretAccessKey, settings.ReceiveMode!.Value, logger);
+                        messagePlatformConnection = grainFactory.GetGrain<IAWSSQSConnectionGrain>(this.GetPrimaryKeyString());
                         break;
                 }
 
-                messagePlatformConnection.MessageReceived += messageReceived;
-
-                await messagePlatformConnection.Init();
+                await messagePlatformConnection.Init(settings);
 
                 persistence.State.Status = Status.Connected;
                 persistence.State.InitializationError = null;
@@ -144,17 +135,6 @@ namespace MessageSilo.Features.Connection
                 persistence.State.InitializationError = ex.Message;
                 logger.LogError(ex.Message);
             }
-        }
-
-        private void messageReceived(object? sender, EventArgs e)
-        {
-            var msg = (e as MessageReceivedEventArgs)!.Message;
-
-            logger.LogDebug($"Connection: {this.GetPrimaryKeyString()} received a messsage: {msg.Id}.");
-
-            lastMessage = new LastMessage(msg);
-
-            grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString()).TransformAndSend(msg);
         }
     }
 }
