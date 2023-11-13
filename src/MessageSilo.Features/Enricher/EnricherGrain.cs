@@ -17,8 +17,6 @@ namespace MessageSilo.Features.Enricher
 
         private IEnricher enricher;
 
-        private LastMessage lastMessage;
-
         public EnricherGrain([PersistentState("EnricherState")] IPersistentState<EnricherDTO> state, ILogger<EnricherGrain> logger, IConfiguration configuration)
         {
             persistence = state;
@@ -46,27 +44,10 @@ namespace MessageSilo.Features.Enricher
             return await Task.FromResult(persistence.State);
         }
 
-        public async Task<LastMessage> GetLastMessage()
-        {
-            return await Task.FromResult(lastMessage);
-        }
-
         public async Task<Message?> Enrich(Message message)
         {
-            lastMessage = new LastMessage(message);
-
-            try
-            {
-                message.Body = await enricher.TransformMessage(message.Body);
-                lastMessage.SetOutput(message, null);
-                return message;
-
-            }
-            catch (Exception ex)
-            {
-                lastMessage.SetOutput(null, ex.Message);
-                return null;
-            }
+            message.Body = await enricher.TransformMessage(message.Body);
+            return message;
         }
 
         public async Task Delete()

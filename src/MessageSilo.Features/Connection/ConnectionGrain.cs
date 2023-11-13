@@ -21,8 +21,6 @@ namespace MessageSilo.Features.Connection
 
         private IMessageSenderGrain? target { get; set; }
 
-        private LastMessage lastMessage { get; set; }
-
         public ConnectionGrain([PersistentState("ConnectionState")] IPersistentState<ConnectionState> state, ILogger<ConnectionGrain> logger, IGrainFactory grainFactory)
         {
             this.persistence = state;
@@ -61,11 +59,6 @@ namespace MessageSilo.Features.Connection
             return await Task.FromResult(persistence.State);
         }
 
-        public async Task<LastMessage> GetLastMessage()
-        {
-            return await Task.FromResult(lastMessage);
-        }
-
         public async Task Send(Message message)
         {
             await messagePlatformConnection.Enqueue(message);
@@ -73,8 +66,6 @@ namespace MessageSilo.Features.Connection
 
         public async Task TransformAndSend(Message message)
         {
-            lastMessage = new LastMessage(message);
-
             var settings = persistence.State.ConnectionSettings;
 
             foreach (var enricherName in settings.Enrichers)
@@ -86,8 +77,6 @@ namespace MessageSilo.Features.Connection
                 if (message is null)
                     break;
             }
-
-            lastMessage.SetOutput(message, null);
 
             if (target is not null)
                 await target.Send(message);

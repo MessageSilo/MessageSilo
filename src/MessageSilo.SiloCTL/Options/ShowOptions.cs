@@ -36,15 +36,12 @@ namespace MessageSilo.SiloCTL.Options
                     {
                         case EntityKind.Connection:
                             Console.WriteLine(api.Get<ConnectionState>("Connections", entity.Name).Data);
-                            Console.WriteLine(api.GetLastMessage("Connections", entity.Name).Data);
                             break;
                         case EntityKind.Enricher:
                             Console.WriteLine(api.Get<EnricherDTO>("Enrichers", entity.Name).Data);
-                            Console.WriteLine(api.GetLastMessage("Enrichers", entity.Name).Data);
                             break;
                         case EntityKind.Target:
                             Console.WriteLine(api.Get<TargetDTO>("Targets", entity.Name).Data);
-                            Console.WriteLine(api.GetLastMessage("Targets", entity.Name).Data);
                             break;
                     }
                 }

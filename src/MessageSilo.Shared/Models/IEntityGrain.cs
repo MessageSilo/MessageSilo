@@ -7,7 +7,5 @@
         Task Delete();
 
         Task<S> GetState();
-
-        Task<LastMessage> GetLastMessage();
     }
 }

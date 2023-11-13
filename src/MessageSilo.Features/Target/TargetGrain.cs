@@ -15,8 +15,6 @@ namespace MessageSilo.Features.Target
 
         private ITarget target;
 
-        private LastMessage lastMessage;
-
         public TargetGrain([PersistentState("TargetState")] IPersistentState<TargetDTO> state, ILogger<TargetGrain> logger, IGrainFactory grainFactory)
         {
             persistence = state;
@@ -34,18 +32,7 @@ namespace MessageSilo.Features.Target
 
         public async Task Send(Message message)
         {
-            try
-            {
-                lastMessage = new LastMessage(message);
-                await target.Send(message);
-                lastMessage.SetOutput(null, null);
-            }
-            catch (Exception ex)
-            {
-                lastMessage = new LastMessage();
-                lastMessage.SetOutput(null, ex.Message);
-                logger.LogError(ex.Message);
-            }
+            await target.Send(message);
         }
 
         public async Task Update(TargetDTO t)
@@ -58,11 +45,6 @@ namespace MessageSilo.Features.Target
         public async Task<TargetDTO> GetState()
         {
             return await Task.FromResult(persistence.State);
-        }
-
-        public async Task<LastMessage> GetLastMessage()
-        {
-            return await Task.FromResult(lastMessage);
         }
 
         public async Task Delete()
