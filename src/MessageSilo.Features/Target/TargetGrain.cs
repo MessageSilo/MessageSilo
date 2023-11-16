@@ -1,7 +1,8 @@
-﻿using MessageSilo.Shared.Enums;
+﻿using MessageSilo.Features.EntityManager;
+using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Extensions;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
-using Orleans.Runtime;
 
 namespace MessageSilo.Features.Target
 {
@@ -11,21 +12,25 @@ namespace MessageSilo.Features.Target
 
         private readonly IGrainFactory grainFactory;
 
-        private IPersistentState<TargetDTO> persistence { get; set; }
-
         private ITarget target;
 
-        public TargetGrain([PersistentState("TargetState")] IPersistentState<TargetDTO> state, ILogger<TargetGrain> logger, IGrainFactory grainFactory)
+        public TargetGrain(ILogger<TargetGrain> logger, IGrainFactory grainFactory)
         {
-            persistence = state;
             this.logger = logger;
             this.grainFactory = grainFactory;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            if (persistence.RecordExists)
-                reInit();
+            var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
+
+            var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
+            var settings = await em.GetTargetSettings(name);
+
+            if (settings == null)
+                return;
+
+            target = getTarget(settings);
 
             await base.OnActivateAsync(cancellationToken);
         }
@@ -35,36 +40,14 @@ namespace MessageSilo.Features.Target
             await target.Send(message);
         }
 
-        public async Task Update(TargetDTO t)
+        private ITarget getTarget(TargetDTO dto)
         {
-            persistence.State = t;
-            await persistence.WriteStateAsync();
-            reInit();
-        }
-
-        public async Task<TargetDTO> GetState()
-        {
-            return await Task.FromResult(persistence.State);
-        }
-
-        public async Task Delete()
-        {
-            await this.persistence.ClearStateAsync();
-        }
-
-        private void reInit()
-        {
-            var settings = persistence.State;
-
-            switch (settings.Type)
+            return dto.Type switch
             {
-                case TargetType.API:
-                    target = new APITarget(settings.Url);
-                    break;
-                case TargetType.Azure_EventGrid:
-                    target = new AzureEventGridTarget(settings.Endpoint, settings.AccessKey);
-                    break;
-            }
+                TargetType.API => new APITarget(dto.Url),
+                TargetType.Azure_EventGrid => new AzureEventGridTarget(dto.Endpoint, dto.AccessKey),
+                _ => throw new NotSupportedException(),
+            };
         }
     }
 }

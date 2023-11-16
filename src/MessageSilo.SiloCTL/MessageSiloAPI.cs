@@ -1,4 +1,5 @@
 ﻿using MessageSilo.Shared.Models;
+using Microsoft.Azure.Amqp.Transaction;
 using RestSharp;
 
 namespace MessageSilo.SiloCTL
@@ -12,34 +13,22 @@ namespace MessageSilo.SiloCTL
             this.httpClient = httpClient;
         }
 
-        public ApiContract<IEnumerable<Entity>> GetEntities()
+        public IEnumerable<Entity> List()
         {
-            var result = httpClient.GetJson<ApiContract<IEnumerable<Entity>>>("Entities");
+            var result = httpClient.GetJson<IEnumerable<Entity>>("Entities");
             return result;
         }
 
-        public ApiContract<IEnumerable<R>> Get<R>(string controller) where R : class
+        public void Clear()
         {
-            var result = httpClient.GetJson<ApiContract<IEnumerable<R>>>(controller);
-            return result;
+            var request = new RestRequest($"Entities", Method.Delete);
+            httpClient.Delete(request);
         }
 
-        public ApiContract<R> Get<R>(string controller, string name) where R : class
+        public IEnumerable<EntityValidationErrors>? Apply(ApplyDTO dto)
         {
-            var result = httpClient.GetJson<ApiContract<R>>($"{controller}/{name}");
+            var result = httpClient.PostJson<ApplyDTO, IEnumerable<EntityValidationErrors>?>("Entities", dto);
             return result;
-        }
-
-        public ApiContract<R> Update<DTO, R>(string controller, DTO dto) where DTO : Entity where R : class
-        {
-            var result = httpClient.PutJson<DTO, ApiContract<R>>($"{controller}/{dto.Name}", dto);
-            return result;
-        }
-
-        public ApiContract<R> Delete<R>(string controller, string name) where R : class
-        {
-            var request = new RestRequest($"{controller}/{name}", Method.Delete);
-            return httpClient.Delete<ApiContract<R>>(request);
         }
     }
 }

@@ -1,11 +1,13 @@
-﻿using FluentValidation.Results;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using MessageSilo.Features.Connection;
 using MessageSilo.Features.UserManager;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
+using MessageSilo.Shared.Serialization;
 using MessageSilo.Shared.Validators;
 using Microsoft.Extensions.Logging;
 using Orleans.Runtime;
-using System.Text;
 
 namespace MessageSilo.Features.EntityManager
 {
@@ -32,9 +34,103 @@ namespace MessageSilo.Features.EntityManager
             await base.OnActivateAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Entity>> GetAll()
+        public async Task<IEnumerable<Entity>> List()
         {
             return await Task.FromResult(persistence.State.Entities);
+        }
+
+        public async Task<List<EntityValidationErrors>> Vaidate(ApplyDTO dto)
+        {
+            var result = new List<EntityValidationErrors>();
+
+            var entities = new List<Entity>().Concat(dto.Targets).Concat(dto.Enrichers).Concat(dto.Connections);
+
+            var targetValidator = new TargetValidator(entities);
+            var enricherValidator = new EnricherValidator(entities);
+            var connectionValidator = new ConnectionValidator(entities);
+
+            foreach (var target in dto.Targets)
+            {
+                var res = await targetValidator.ValidateAsync(target);
+                if (res.Errors.Count > 0)
+                    result.Add(new EntityValidationErrors()
+                    {
+                        EntityName = target.Name,
+                        ValidationFailures = res.Errors
+                    });
+            }
+
+            foreach (var enricher in dto.Enrichers)
+            {
+                var res = await enricherValidator.ValidateAsync(enricher);
+                if (res.Errors.Count > 0)
+                    result.Add(new EntityValidationErrors()
+                    {
+                        EntityName = enricher.Name,
+                        ValidationFailures = res.Errors
+                    });
+            }
+
+            foreach (var conn in dto.Connections)
+            {
+                var res = await connectionValidator.ValidateAsync(conn);
+                if (res.Errors.Count > 0)
+                    result.Add(new EntityValidationErrors()
+                    {
+                        EntityName = conn.Name,
+                        ValidationFailures = res.Errors
+                    });
+            }
+
+            return result;
+        }
+
+        public async Task Apply(ApplyDTO dto)
+        {
+            foreach (var target in dto.Targets)
+            {
+                persistence.State.Entities.Add(new Entity()
+                {
+                    UserId = target.UserId,
+                    Name = target.Name,
+                    Kind = target.Kind,
+                    YamlDefinition = target.ToString()
+                });
+            }
+
+            foreach (var enricher in dto.Enrichers)
+            {
+                persistence.State.Entities.Add(new Entity()
+                {
+                    UserId = enricher.UserId,
+                    Name = enricher.Name,
+                    Kind = enricher.Kind,
+                    YamlDefinition = enricher.ToString()
+                });
+            }
+
+            foreach (var conn in dto.Connections)
+            {
+                persistence.State.Entities.Add(new Entity()
+                {
+                    UserId = conn.UserId,
+                    Name = conn.Name,
+                    Kind = conn.Kind,
+                    YamlDefinition = conn.ToString()
+                });
+            }
+
+            persistence.State.Scale = dto.Scale;
+            await persistence.WriteStateAsync();
+
+            foreach (var conn in dto.Connections)
+            {
+                for (int scaleSet = 1; scaleSet <= persistence.State.Scale; scaleSet++)
+                {
+                    var grain = grainFactory.GetGrain<IConnectionGrain>($"{conn.Id}#{scaleSet}");
+                    await grain.Init();
+                }
+            }
         }
 
         public async Task<List<ValidationFailure>?> Upsert(Entity entity)
@@ -64,7 +160,7 @@ namespace MessageSilo.Features.EntityManager
             }
 
             if (validationErrors.Any())
-                return await Task.FromResult(validationErrors);
+                return validationErrors;
 
             if (!persistence.State.Entities.Any(p => p.Id == entity.Id))
             {
@@ -72,28 +168,66 @@ namespace MessageSilo.Features.EntityManager
                 {
                     UserId = entity.UserId,
                     Name = entity.Name,
-                    Kind = entity.Kind
+                    Kind = entity.Kind,
+                    YamlDefinition = entity.ToString()
                 });
                 await persistence.WriteStateAsync();
             }
 
-            return await Task.FromResult<List<ValidationFailure>?>(null);
+            return null;
         }
 
-        public async Task<List<ValidationFailure>?> Delete(string entityName)
+        public async Task<ConnectionSettingsDTO> GetConnectionSettings(string name)
         {
-            var validationErrors = new List<ValidationFailure>();
+            var result = persistence.State.Entities.FirstOrDefault(p => p.Name == name);
 
-            //TODO: Delete validations
+            if (result == null)
+                return null;
 
-            if (validationErrors.Any())
-                return await Task.FromResult(validationErrors);
+            return YamlConverter.Deserialize<ConnectionSettingsDTO>(result.YamlDefinition);
+        }
 
-            persistence.State.Entities.RemoveAll(p => p.Name == entityName);
+        public async Task<TargetDTO> GetTargetSettings(string name)
+        {
+            var result = persistence.State.Entities.FirstOrDefault(p => p.Name == name);
+
+            if (result == null)
+                return null;
+
+            return YamlConverter.Deserialize<TargetDTO>(result.YamlDefinition);
+        }
+
+        public async Task<EnricherDTO> GetEnricherSettings(string name)
+        {
+            var result = persistence.State.Entities.FirstOrDefault(p => p.Name == name);
+
+            if (result == null)
+                return null;
+
+            return YamlConverter.Deserialize<EnricherDTO>(result.YamlDefinition);
+        }
+
+        public async Task Clear()
+        {
+            var connections = persistence.State.Entities.Where(p => p.Kind == EntityKind.Connection);
+
+            foreach (var connection in connections)
+            {
+                for (int scaleSet = 1; scaleSet <= persistence.State.Scale; scaleSet++)
+                {
+                    var connGrain = grainFactory.GetGrain<IConnectionGrain>($"{connection.Id}#{scaleSet}");
+                    await connGrain.Delete();
+                }
+            }
+
+            persistence.State.Entities = new List<Entity>();
 
             await persistence.WriteStateAsync();
+        }
 
-            return await Task.FromResult<List<ValidationFailure>?>(null);
+        public async Task<int> GetScale()
+        {
+            return persistence.State.Scale;
         }
     }
 }

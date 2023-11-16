@@ -30,13 +30,16 @@ namespace MessageSilo
             foreach (var user in users)
             {
                 var em = GrainFactory.GetGrain<IEntityManagerGrain>(user);
-                var connections = (await em.GetAll()).Where(p => p.Kind == EntityKind.Connection);
+                var connections = (await em.List()).Where(p => p.Kind == EntityKind.Connection);
+                var scale = await em.GetScale();
 
-                foreach (var entity in connections)
+                foreach (var connection in connections)
                 {
-                    var conn = GrainFactory.GetGrain<IConnectionGrain>(entity.Id);
-                    await conn.GetState();
-                    logger.LogInformation($"Connection ({entity.Id}) initialized.");
+                    for (var scaleSet = 1; scaleSet <= scale; scaleSet++)
+                    {
+                        var grain = GrainFactory.GetGrain<IConnectionGrain>($"{connection.Id}#{scaleSet}");
+                        await grain.Init();
+                    }
                 }
             }
         }

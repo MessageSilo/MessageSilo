@@ -20,24 +20,22 @@ namespace MessageSilo.SiloCTL
                 if (interactiveMode)
                     args = Console.ReadLine()!.Split();
 
-                Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions, DeleteOptions, LogoutOptions>(args)
+                Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions, ClearOptions, LogoutOptions>(args)
                            .WithParsed<ShowOptions>(o =>
                            {
                                o.Show();
                            })
                            .WithParsed<ApplyOptions>(o =>
                            {
-                               var targets = o.InitTargets();
-                               o.InitEnrichers();
-                               o.InitConnections(targets);
+                               o.Apply();
                            })
                            .WithParsed<ConfigOptions>(o =>
                            {
                                o.Show();
                            })
-                           .WithParsed<DeleteOptions>(o =>
+                           .WithParsed<ClearOptions>(o =>
                            {
-                               o.Delete();
+                               o.Clear();
                            })
                            .WithParsed<LogoutOptions>(o =>
                            {

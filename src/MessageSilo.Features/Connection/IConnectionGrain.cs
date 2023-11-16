@@ -1,12 +1,19 @@
 ﻿using MessageSilo.Shared.Models;
-using Orleans;
 using Orleans.Concurrency;
 
 namespace MessageSilo.Features.Connection
 {
-    public interface IConnectionGrain : IEntityGrain<ConnectionSettingsDTO, ConnectionState>, IMessageSenderGrain
+    public interface IConnectionGrain : IMessageSenderGrain
     {
         [OneWay]
         Task TransformAndSend(Message message);
+
+        [OneWay]
+        Task Delete();
+
+        Task Health();
+
+        [OneWay]
+        Task Init();
     }
 }
