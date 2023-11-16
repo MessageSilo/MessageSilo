@@ -16,7 +16,7 @@ namespace MessageSilo.SiloCTL.Options
         [Option('f', "filename", Required = true, HelpText = "Filename or directory to files to use to create the entities.")]
         public string FileName { get; set; }
 
-        [Option('s', "scale", Required = false, HelpText = "Scale, The default is 1.")]
+        [Option('s', "scale", Required = false, HelpText = "How many instances of entities to run in parallel. The default value is 1.")]
         public int Scale { get; set; } = 1;
 
         public void Apply()

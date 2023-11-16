@@ -29,6 +29,6 @@ namespace MessageSilo.Shared.Validators
                 .When(p => p.Type == EnricherType.AI);
         }
 
-        private bool isUnique(IEnumerable<Entity> entities, EnricherDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);
+        private bool isUnique(IEnumerable<Entity> entities, EnricherDTO entity) => entities.Count(p => p.Id == entity.Id) == 1;
     }
 }

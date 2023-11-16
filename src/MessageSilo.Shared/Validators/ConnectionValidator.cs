@@ -55,7 +55,7 @@ namespace MessageSilo.Shared.Validators
                 .When(p => p.Type == MessagePlatformType.AWS_SQS);
         }
 
-        private bool isUnique(IEnumerable<Entity> entities, ConnectionSettingsDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);
+        private bool isUnique(IEnumerable<Entity> entities, ConnectionSettingsDTO entity) => entities.Count(p => p.Id == entity.Id) == 1;
 
         private bool isTargetExist(IEnumerable<Entity> entities, string targetName) => entities.Any(p => (p.Kind == EntityKind.Target || p.Kind == EntityKind.Connection) && p.Name == targetName);
 

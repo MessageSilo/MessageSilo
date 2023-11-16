@@ -29,6 +29,6 @@ namespace MessageSilo.Shared.Validators
                 .When(p => p.Type == TargetType.Azure_EventGrid);
         }
 
-        private bool isUnique(IEnumerable<Entity> entities, TargetDTO entity) => !entities.Any(p => p.Id == entity.Id && p.Kind != entity.Kind);
+        private bool isUnique(IEnumerable<Entity> entities, TargetDTO entity) => entities.Count(p => p.Id == entity.Id) == 1;
     }
 }
