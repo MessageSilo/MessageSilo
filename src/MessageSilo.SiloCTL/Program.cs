@@ -15,7 +15,7 @@ namespace MessageSilo.SiloCTL
                 config.CreateIfNotExist();
                 config.Load();
 
-                new VersionChecker().CheckLatestVersion(config.LatestVersionInfoUrl);
+                //new VersionChecker().CheckLatestVersion(config.LatestVersionInfoUrl);
 
                 if (interactiveMode)
                     args = Console.ReadLine()!.Split();

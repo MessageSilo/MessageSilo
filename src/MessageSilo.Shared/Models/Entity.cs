@@ -15,6 +15,7 @@ namespace MessageSilo.Shared.Models
         [Id(2)]
         public EntityKind Kind { get; set; }
 
+        [Id(3)]
         public string YamlDefinition { get; set; }
 
         [YamlIgnore]
