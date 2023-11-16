@@ -1,8 +1,4 @@
-﻿using Azure;
-using Azure.Data.Tables;
-using MessageSilo.Shared.Enums;
-using System.Security.Cryptography;
-using System.Text;
+﻿using MessageSilo.Shared.Enums;
 using YamlDotNet.Serialization;
 
 namespace MessageSilo.Shared.Models
@@ -18,6 +14,9 @@ namespace MessageSilo.Shared.Models
 
         [Id(2)]
         public EntityKind Kind { get; set; }
+
+        [Id(3)]
+        public string YamlDefinition { get; set; }
 
         [YamlIgnore]
         public string Id => $"{UserId}|{Name}";

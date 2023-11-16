@@ -2,7 +2,7 @@
 
 namespace MessageSilo.Features.Target
 {
-    public interface ITargetGrain : IEntityGrain<TargetDTO, TargetDTO>, IMessageSenderGrain
+    public interface ITargetGrain : IMessageSenderGrain
     {
     }
 }

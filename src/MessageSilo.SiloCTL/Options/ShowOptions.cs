@@ -10,7 +10,7 @@ namespace MessageSilo.SiloCTL.Options
     {
         private readonly ConsoleTable showEntitesTable = new ConsoleTable(new ConsoleTableOptions()
         {
-            Columns = new[] { "KIND", "NAME", "TYPE", "STATUS" },
+            Columns = new[] { "KIND", "NAME" },
             EnableCount = true,
             NumberAlignment = Alignment.Right
         });
@@ -24,54 +24,28 @@ namespace MessageSilo.SiloCTL.Options
 
         public void Show()
         {
+            var entities = api.List();
+
             if (!string.IsNullOrEmpty(Name))
             {
-                var entities = api.GetEntities();
-
-                var entity = entities.Data?.FirstOrDefault(p => p.Name == Name);
+                var entity = entities.FirstOrDefault(p => p.Name == Name);
 
                 if (entity is not null)
-                {
-                    switch (entity.Kind)
-                    {
-                        case EntityKind.Connection:
-                            Console.WriteLine(api.Get<ConnectionState>("Connections", entity.Name).Data);
-                            Console.WriteLine(api.GetLastMessage("Connections", entity.Name).Data);
-                            break;
-                        case EntityKind.Enricher:
-                            Console.WriteLine(api.Get<EnricherDTO>("Enrichers", entity.Name).Data);
-                            Console.WriteLine(api.GetLastMessage("Enrichers", entity.Name).Data);
-                            break;
-                        case EntityKind.Target:
-                            Console.WriteLine(api.Get<TargetDTO>("Targets", entity.Name).Data);
-                            Console.WriteLine(api.GetLastMessage("Targets", entity.Name).Data);
-                            break;
-                    }
-                }
+                    Console.WriteLine(entity.YamlDefinition);
                 else
                     Console.WriteLine($"Entity '{Name}' not found.");
 
                 return;
             }
 
-            var existingConnections = api.Get<ConnectionState>("Connections").Data!;
-            var existingTargets = api.Get<TargetDTO>("Targets").Data!;
-            var existingEnrichers = api.Get<EnricherDTO>("Enrichers").Data!;
-
-            if ((existingConnections.Count() + existingTargets.Count() + existingEnrichers.Count()) == 0)
+            if (!entities.Any())
             {
                 Console.WriteLine("No entities found.");
                 return;
             }
 
-            foreach (var c in existingConnections)
-                showEntitesTable.AddRow(c.ConnectionSettings.Kind, c.ConnectionSettings.Name, c.ConnectionSettings.Type, c.Status);
-
-            foreach (var t in existingTargets)
-                showEntitesTable.AddRow(t.Kind, t.Name, t.Type, Status.Created);
-
-            foreach (var t in existingEnrichers)
-                showEntitesTable.AddRow(t.Kind, t.Name, t.Type, Status.Created);
+            foreach (var entity in entities)
+                showEntitesTable.AddRow(entity.Kind, entity.Name);
 
             showEntitesTable.Write(Format.Default);
         }

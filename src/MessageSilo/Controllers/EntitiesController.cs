@@ -1,5 +1,9 @@
-﻿using MessageSilo.Shared.Models;
+﻿using FluentValidation.Results;
+using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Models;
+using MessageSilo.Shared.Validators;
 using Microsoft.AspNetCore.Mvc;
+using SharpCompress.Common;
 
 namespace MessageSilo.Controllers
 {
@@ -14,11 +18,41 @@ namespace MessageSilo.Controllers
         }
 
         [HttpGet()]
-        public async Task<ApiContract<IEnumerable<Entity>>> Index()
+        public async Task<IEnumerable<Entity>> Index()
         {
-            var result = await entityManagerGrain.GetAll();
+            var result = await entityManagerGrain.List();
 
-            return new ApiContract<IEnumerable<Entity>>(httpContextAccessor, StatusCodes.Status200OK, data: result);
+            return result;
+        }
+
+        [HttpDelete()]
+        public async Task Clear()
+        {
+            await entityManagerGrain.Clear();
+        }
+
+        [HttpPost()]
+        public async Task<IEnumerable<EntityValidationErrors>?> Apply([FromBody] ApplyDTO dto)
+        {
+            foreach (var item in dto.Targets)
+                item.UserId = loggedInUserId;
+
+            foreach (var item in dto.Enrichers)
+                item.UserId = loggedInUserId;
+
+            foreach (var item in dto.Connections)
+                item.UserId = loggedInUserId;
+
+            var validationResults = await entityManagerGrain.Vaidate(dto);
+
+            if (validationResults?.Count > 0)
+                return validationResults;
+
+            await Clear();
+
+            await entityManagerGrain.Apply(dto);
+
+            return null;
         }
     }
 }

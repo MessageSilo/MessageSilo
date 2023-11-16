@@ -1,7 +1,8 @@
-﻿using MessageSilo.Shared.Enums;
+﻿using MessageSilo.Features.EntityManager;
+using MessageSilo.Shared.Enums;
+using MessageSilo.Shared.Extensions;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
-using Orleans.Runtime;
 
 namespace MessageSilo.Features.Target
 {
@@ -11,78 +12,42 @@ namespace MessageSilo.Features.Target
 
         private readonly IGrainFactory grainFactory;
 
-        private IPersistentState<TargetDTO> persistence { get; set; }
-
         private ITarget target;
 
-        private LastMessage lastMessage;
-
-        public TargetGrain([PersistentState("TargetState")] IPersistentState<TargetDTO> state, ILogger<TargetGrain> logger, IGrainFactory grainFactory)
+        public TargetGrain(ILogger<TargetGrain> logger, IGrainFactory grainFactory)
         {
-            persistence = state;
             this.logger = logger;
             this.grainFactory = grainFactory;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            if (persistence.RecordExists)
-                reInit();
+            var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
+
+            var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
+            var settings = await em.GetTargetSettings(name);
+
+            if (settings == null)
+                return;
+
+            target = getTarget(settings);
 
             await base.OnActivateAsync(cancellationToken);
         }
 
         public async Task Send(Message message)
         {
-            try
+            await target.Send(message);
+        }
+
+        private ITarget getTarget(TargetDTO dto)
+        {
+            return dto.Type switch
             {
-                lastMessage = new LastMessage(message);
-                await target.Send(message);
-                lastMessage.SetOutput(null, null);
-            }
-            catch (Exception ex)
-            {
-                lastMessage = new LastMessage();
-                lastMessage.SetOutput(null, ex.Message);
-                logger.LogError(ex.Message);
-            }
-        }
-
-        public async Task Update(TargetDTO t)
-        {
-            persistence.State = t;
-            await persistence.WriteStateAsync();
-            reInit();
-        }
-
-        public async Task<TargetDTO> GetState()
-        {
-            return await Task.FromResult(persistence.State);
-        }
-
-        public async Task<LastMessage> GetLastMessage()
-        {
-            return await Task.FromResult(lastMessage);
-        }
-
-        public async Task Delete()
-        {
-            await this.persistence.ClearStateAsync();
-        }
-
-        private void reInit()
-        {
-            var settings = persistence.State;
-
-            switch (settings.Type)
-            {
-                case TargetType.API:
-                    target = new APITarget(settings.Url);
-                    break;
-                case TargetType.Azure_EventGrid:
-                    target = new AzureEventGridTarget(settings.Endpoint, settings.AccessKey);
-                    break;
-            }
+                TargetType.API => new APITarget(dto.Url),
+                TargetType.Azure_EventGrid => new AzureEventGridTarget(dto.Endpoint, dto.AccessKey),
+                _ => throw new NotSupportedException(),
+            };
         }
     }
 }
