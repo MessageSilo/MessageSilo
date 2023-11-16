@@ -24,7 +24,7 @@ namespace MessageSilo.Features.Connection
 
         private EntityKind? targetKind { get; set; }
 
-        private MessagePlatformType messagePlatformType { get; set; }
+        private MessagePlatformType? messagePlatformType { get; set; }
 
         private List<string> enrichers = new List<string>();
 
@@ -36,6 +36,9 @@ namespace MessageSilo.Features.Connection
 
         public async Task Init()
         {
+            if (messagePlatformType is not null)
+                return;
+
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
 
             var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
@@ -64,12 +67,16 @@ namespace MessageSilo.Features.Connection
 
         public async Task Send(Message message)
         {
+            await Init();
+
             var messagePlatformConnection = getMessagePlatformConnection();
             await messagePlatformConnection.Enqueue(message);
         }
 
         public async Task TransformAndSend(Message message)
         {
+            await Init();
+
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
 
             foreach (var enricherName in enrichers)
