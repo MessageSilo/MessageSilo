@@ -45,7 +45,7 @@ namespace MessageSilo.SiloCTL
 
             if (!File.Exists(configPath))
             {
-                Id = Guid.NewGuid().ToString();
+                Id = Guid.Empty.ToString();
                 var yaml = YamlConverter.Serialize(this);
                 File.WriteAllText(configPath, yaml);
             }
