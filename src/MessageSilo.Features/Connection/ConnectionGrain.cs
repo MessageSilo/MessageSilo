@@ -11,9 +11,6 @@ using Microsoft.Extensions.Logging;
 
 namespace MessageSilo.Features.Connection
 {
-    /// <summary>
-    /// id = UserId|Name#scaleSet
-    /// </summary>
     public class ConnectionGrain : Grain, IConnectionGrain
     {
         private readonly ILogger<ConnectionGrain> logger;
@@ -34,9 +31,9 @@ namespace MessageSilo.Features.Connection
             this.grainFactory = grainFactory;
         }
 
-        public async Task Init()
+        public async Task Init(bool force = false)
         {
-            if (messagePlatformType is not null)
+            if (!force && messagePlatformType is not null)
                 return;
 
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();

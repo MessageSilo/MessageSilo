@@ -13,7 +13,6 @@ namespace MessageSilo.Features.Connection
 
         Task Health();
 
-        [OneWay]
-        Task Init();
+        Task Init(bool force = false);
     }
 }

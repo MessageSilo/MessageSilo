@@ -38,7 +38,7 @@ namespace MessageSilo
                     for (var scaleSet = 1; scaleSet <= scale; scaleSet++)
                     {
                         var grain = GrainFactory.GetGrain<IConnectionGrain>($"{connection.Id}#{scaleSet}");
-                        await grain.Init();
+                        await grain.Init(true);
                     }
                 }
             }

@@ -128,7 +128,7 @@ namespace MessageSilo.Features.EntityManager
                 for (int scaleSet = 1; scaleSet <= persistence.State.Scale; scaleSet++)
                 {
                     var grain = grainFactory.GetGrain<IConnectionGrain>($"{conn.Id}#{scaleSet}");
-                    await grain.Init();
+                    await grain.Init(true);
                 }
             }
         }
