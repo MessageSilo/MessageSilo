@@ -3,23 +3,19 @@ using Amazon.SQS.Model;
 using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
-using Microsoft.Extensions.Logging;
 
 namespace MessageSilo.Features.AWS
 {
     public class AWSSQSConnectionGrain : MessagePlatformConnectionGrain, IAWSSQSConnectionGrain
     {
-        private readonly ILogger<AWSSQSConnectionGrain> logger;
-
         private readonly IGrainFactory grainFactory;
 
         private IAmazonSQS client;
 
         private string queueUrl;
 
-        public AWSSQSConnectionGrain(ILogger<AWSSQSConnectionGrain> logger, IGrainFactory grainFactory)
+        public AWSSQSConnectionGrain(IGrainFactory grainFactory)
         {
-            this.logger = logger;
             this.grainFactory = grainFactory;
         }
 
@@ -27,7 +23,7 @@ namespace MessageSilo.Features.AWS
         {
             var grain = grainFactory.GetGrain<IAWSSQSConnectionGrain>(this.GetPrimaryKeyString());
 
-           grain.GetPrimaryKeyString();
+            grain.GetPrimaryKeyString();
 
             return Task.CompletedTask;
         }
@@ -74,9 +70,9 @@ namespace MessageSilo.Features.AWS
 
                 var connection = grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString());
 
-                await connection.TransformAndSend(new Shared.Models.Message(msg.MessageId, msg.Body));
+                var isDelivered = await connection.TransformAndSend(new Shared.Models.Message(msg.MessageId, msg.Body));
 
-                if (this.settings.ReceiveMode == ReceiveMode.ReceiveAndDelete)
+                if (isDelivered && settings.ReceiveMode == ReceiveMode.ReceiveAndDelete)
                     await client.DeleteMessageAsync(queueUrl, msg.ReceiptHandle);
             }
         }

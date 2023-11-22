@@ -22,22 +22,48 @@ namespace MessageSilo.Features.Target
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
-
-            var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
-            var settings = await em.GetTargetSettings(name);
-
-            if (settings == null)
-                return;
-
-            target = getTarget(settings);
+            await Init();
 
             await base.OnActivateAsync(cancellationToken);
         }
 
         public async Task Send(Message message)
         {
-            await target.Send(message);
+            try
+            {
+                await target.Send(message);
+            }
+            catch (Exception ex)
+            {
+                var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
+                logger.LogError(ex, $"[Target][{name}][#{scaleSet}] Cannot send message [{message?.Id}]");
+                throw;
+            }
+        }
+
+        public async Task Init(TargetDTO? dto = null)
+        {
+            var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
+
+            try
+            {
+                TargetDTO? settings = dto;
+
+                if (settings == null)
+                {
+                    var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
+                    settings = await em.GetTargetSettings(name);
+                }
+
+                if (settings == null)
+                    return;
+
+                target = getTarget(settings);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"[Target][{name}][#{scaleSet}] Initialization error");
+            }
         }
 
         private ITarget getTarget(TargetDTO dto)

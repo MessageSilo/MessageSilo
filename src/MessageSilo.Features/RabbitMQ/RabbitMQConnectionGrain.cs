@@ -1,5 +1,4 @@
-﻿using MessageSilo.Features.AWS;
-using MessageSilo.Features.Connection;
+﻿using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
@@ -79,11 +78,13 @@ namespace MessageSilo.Features.RabbitMQ
 
                     var connection = grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString());
 
-                    await connection.TransformAndSend(new Message(messageId, body));
+                    var isDelivered = await connection.TransformAndSend(new Message(messageId, body));
+
+                    if (isDelivered && this.settings.ReceiveMode == ReceiveMode.ReceiveAndDelete)
+                        channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                 };
 
                 channel.BasicConsume(queue: this.settings.QueueName,
-                                     autoAck: this.settings.ReceiveMode == ReceiveMode.ReceiveAndDelete,
                                      consumer: consumer);
 
             }

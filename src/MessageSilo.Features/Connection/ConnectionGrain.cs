@@ -38,22 +38,29 @@ namespace MessageSilo.Features.Connection
 
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
 
-            var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
-            var settings = await em.GetConnectionSettings(name);
-
-            if (settings == null)
-                return;
-
-            if (settings.TargetId is not null)
+            try
             {
-                targetId = $"{settings.TargetId}#{scaleSet}";
-                targetKind = settings.TargetKind;
-            }
+                var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
+                var settings = await em.GetConnectionSettings(name);
 
-            messagePlatformType = settings.Type.Value;
-            enrichers = settings.Enrichers.ToList();
-            var messagePlatformConnection = getMessagePlatformConnection();
-            await messagePlatformConnection.Init(settings);
+                if (settings == null)
+                    return;
+
+                if (settings.TargetId is not null)
+                {
+                    targetId = $"{settings.TargetId}#{scaleSet}";
+                    targetKind = settings.TargetKind;
+                }
+
+                messagePlatformType = settings.Type.Value;
+                enrichers = settings.Enrichers.ToList();
+                var messagePlatformConnection = getMessagePlatformConnection();
+                await messagePlatformConnection.Init(settings);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"[Connection][{name}][#{scaleSet}] Initialization error");
+            }
         }
 
         public async Task Delete()
@@ -64,30 +71,51 @@ namespace MessageSilo.Features.Connection
 
         public async Task Send(Message message)
         {
-            await Init();
+            try
+            {
+                await Init();
 
-            var messagePlatformConnection = getMessagePlatformConnection();
-            await messagePlatformConnection.Enqueue(message);
+                var messagePlatformConnection = getMessagePlatformConnection();
+                await messagePlatformConnection.Enqueue(message);
+            }
+            catch (Exception ex)
+            {
+                var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
+                logger.LogError(ex, $"[Connection][{name}][#{scaleSet}] Cannot enqueue message [{message?.Id}]");
+                throw;
+            }
         }
 
-        public async Task TransformAndSend(Message message)
+        public async Task<bool> TransformAndSend(Message message)
         {
-            await Init();
-
-            var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
-
-            foreach (var enricherName in enrichers)
+            try
             {
+                await Init();
+
+                var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
+
+                foreach (var enricherName in enrichers)
+                {
+                    if (message is null)
+                        return false;
+
+                    var enricherGrain = grainFactory.GetGrain<IEnricherGrain>($"{userId}|{enricherName}#{scaleSet}");
+
+                    message = await enricherGrain.Enrich(message);
+                }
+
                 if (message is null)
-                    break;
+                    return false;
 
-                var enricherGrain = grainFactory.GetGrain<IEnricherGrain>($"{userId}|{enricherName}#{scaleSet}");
+                if (targetId is not null)
+                    await getTarget().Send(message);
 
-                message = await enricherGrain.Enrich(message);
+                return true;
             }
-
-            if (targetId is not null && message is not null)
-                await getTarget().Send(message);
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task Health()

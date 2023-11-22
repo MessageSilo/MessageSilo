@@ -5,8 +5,7 @@ namespace MessageSilo.Features.Connection
 {
     public interface IConnectionGrain : IMessageSenderGrain
     {
-        [OneWay]
-        Task TransformAndSend(Message message);
+        Task<bool> TransformAndSend(Message message);
 
         [OneWay]
         Task Delete();

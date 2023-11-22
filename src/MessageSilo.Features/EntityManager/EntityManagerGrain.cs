@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MessageSilo.Features.Connection;
+using MessageSilo.Features.Enricher;
+using MessageSilo.Features.Target;
 using MessageSilo.Features.UserManager;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
@@ -122,6 +124,24 @@ namespace MessageSilo.Features.EntityManager
 
             persistence.State.Scale = dto.Scale;
             await persistence.WriteStateAsync();
+
+            foreach (var target in dto.Targets)
+            {
+                for (int scaleSet = 1; scaleSet <= persistence.State.Scale; scaleSet++)
+                {
+                    var grain = grainFactory.GetGrain<ITargetGrain>($"{target.Id}#{scaleSet}");
+                    await grain.Init(target);
+                }
+            }
+
+            foreach (var enricher in dto.Enrichers)
+            {
+                for (int scaleSet = 1; scaleSet <= persistence.State.Scale; scaleSet++)
+                {
+                    var grain = grainFactory.GetGrain<IEnricherGrain>($"{enricher.Id}#{scaleSet}");
+                    await grain.Init(enricher);
+                }
+            }
 
             foreach (var conn in dto.Connections)
             {

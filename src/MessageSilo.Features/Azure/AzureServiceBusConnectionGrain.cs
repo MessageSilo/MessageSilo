@@ -42,16 +42,14 @@ namespace MessageSilo.Features.Azure
 
             client = new ServiceBusClient(this.settings.ConnectionString);
 
-            var sbrm = this.settings.ReceiveMode == ReceiveMode.ReceiveAndDelete ? ServiceBusReceiveMode.ReceiveAndDelete : ServiceBusReceiveMode.PeekLock;
-
             switch (this.settings.Type)
             {
                 case MessagePlatformType.Azure_Queue:
-                    processor = client.CreateProcessor(this.settings.QueueName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = sbrm, AutoCompleteMessages = this.settings.ReceiveMode == ReceiveMode.ReceiveAndDelete });
+                    processor = client.CreateProcessor(this.settings.QueueName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = ServiceBusReceiveMode.PeekLock, AutoCompleteMessages = false });
                     sender = client.CreateSender(this.settings.QueueName);
                     break;
                 case MessagePlatformType.Azure_Topic:
-                    processor = client.CreateProcessor(this.settings.TopicName, this.settings.SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = sbrm, AutoCompleteMessages = this.settings.ReceiveMode == ReceiveMode.ReceiveAndDelete });
+                    processor = client.CreateProcessor(this.settings.TopicName, this.settings.SubscriptionName, new ServiceBusProcessorOptions() { SubQueue = sq, ReceiveMode = ServiceBusReceiveMode.PeekLock, AutoCompleteMessages = false });
                     sender = client.CreateSender(this.settings.TopicName);
                     break;
             }
@@ -73,7 +71,10 @@ namespace MessageSilo.Features.Azure
         {
             var connection = grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString());
 
-            await connection.TransformAndSend(new Message(arg.Message.MessageId, arg.Message.Body.ToString()));
+            var isDelivered = await connection.TransformAndSend(new Message(arg.Message.MessageId, arg.Message.Body.ToString()));
+
+            if (isDelivered && settings.ReceiveMode == ReceiveMode.ReceiveAndDelete)
+                await arg.CompleteMessageAsync(arg.Message);
         }
 
         public override async Task Enqueue(Message message)
