@@ -2,11 +2,13 @@
 using MessageSilo.Features.Azure;
 using MessageSilo.Features.Enricher;
 using MessageSilo.Features.EntityManager;
+using MessageSilo.Features.Hubs;
 using MessageSilo.Features.RabbitMQ;
 using MessageSilo.Features.Target;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Extensions;
 using MessageSilo.Shared.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
 namespace MessageSilo.Features.Connection
@@ -17,6 +19,8 @@ namespace MessageSilo.Features.Connection
 
         private readonly IGrainFactory grainFactory;
 
+        private readonly IHubContext<SignalHub> hubContext;
+
         private string? targetId { get; set; }
 
         private EntityKind? targetKind { get; set; }
@@ -25,10 +29,11 @@ namespace MessageSilo.Features.Connection
 
         private List<string> enrichers = new List<string>();
 
-        public ConnectionGrain(ILogger<ConnectionGrain> logger, IGrainFactory grainFactory)
+        public ConnectionGrain(ILogger<ConnectionGrain> logger, IGrainFactory grainFactory, IHubContext<SignalHub> hubContext)
         {
             this.logger = logger;
             this.grainFactory = grainFactory;
+            this.hubContext = hubContext;
         }
 
         public async Task Init(bool force = false)
@@ -37,6 +42,8 @@ namespace MessageSilo.Features.Connection
                 return;
 
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
+
+            await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Initializing, LogLevel.None, "Initialization started..."));
 
             try
             {
@@ -56,10 +63,14 @@ namespace MessageSilo.Features.Connection
                 enrichers = settings.Enrichers.ToList();
                 var messagePlatformConnection = getMessagePlatformConnection();
                 await messagePlatformConnection.Init(settings);
+
+                await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Active, LogLevel.Information, "Active"));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"[Connection][{name}][#{scaleSet}] Initialization error");
+                var msg = $"[Connection][{name}#{scaleSet}] Initialization error - {ex.Message}";
+                logger.LogError(ex, msg);
+                await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Malfunctioned, LogLevel.Error, msg));
             }
         }
 
@@ -81,7 +92,9 @@ namespace MessageSilo.Features.Connection
             catch (Exception ex)
             {
                 var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
-                logger.LogError(ex, $"[Connection][{name}][#{scaleSet}] Cannot enqueue message [{message?.Id}]");
+                var msg = $"[Connection][{name}#{scaleSet}] Cannot enqueue message [{message?.Id}] - {ex.Message}";
+                logger.LogError(ex, msg);
+                await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Malfunctioned, LogLevel.Error, msg));
                 throw;
             }
         }

@@ -1,7 +1,9 @@
 ﻿using MessageSilo.Features.EntityManager;
+using MessageSilo.Features.Hubs;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Extensions;
 using MessageSilo.Shared.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RestSharp;
@@ -16,13 +18,16 @@ namespace MessageSilo.Features.Enricher
 
         private readonly IConfiguration configuration;
 
+        private readonly IHubContext<SignalHub> hubContext;
+
         private IEnricher enricher { get; set; }
 
-        public EnricherGrain(ILogger<EnricherGrain> logger, IConfiguration configuration, IGrainFactory grainFactory)
+        public EnricherGrain(ILogger<EnricherGrain> logger, IConfiguration configuration, IGrainFactory grainFactory, IHubContext<SignalHub> hubContext)
         {
             this.logger = logger;
             this.configuration = configuration;
             this.grainFactory = grainFactory;
+            this.hubContext = hubContext;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -42,7 +47,9 @@ namespace MessageSilo.Features.Enricher
             catch (Exception ex)
             {
                 var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
-                logger.LogError(ex, $"[Enricher][{name}][#{scaleSet}] Cannot enrich message [{message?.Id}]");
+                var msg = $"[Enricher][{name}][#{scaleSet}] Cannot enrich message [{message?.Id}] - {ex.Message}";
+                logger.LogError(ex, msg);
+                await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Malfunctioned, LogLevel.Error, msg));
                 throw;
             }
         }
@@ -50,6 +57,8 @@ namespace MessageSilo.Features.Enricher
         public async Task Init(EnricherDTO? dto = null)
         {
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
+
+            await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Initializing, LogLevel.None, "Initialization started..."));
 
             try
             {
@@ -65,10 +74,14 @@ namespace MessageSilo.Features.Enricher
                     return;
 
                 enricher = getEnricher(settings);
+
+                await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Active, LogLevel.Information, "Active"));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"[Enricher][{name}][#{scaleSet}] Initialization error");
+                var msg = $"[Enricher][{name}][#{scaleSet}] Initialization error - {ex.Message}";
+                logger.LogError(ex, msg);
+                await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Malfunctioned, LogLevel.Error, msg));
             }
         }
 

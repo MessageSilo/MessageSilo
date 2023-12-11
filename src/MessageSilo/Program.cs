@@ -1,5 +1,6 @@
 using MessageSilo;
 using MessageSilo.Auth;
+using MessageSilo.Features.Hubs;
 using MessageSilo.HealthChecks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,7 @@ using Orleans.Providers;
 using Serilog;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 using System.Net;
+using System.Text.Json.Serialization;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false, true)
@@ -51,7 +53,8 @@ builder.Host.UseOrleans(siloBuilder =>
         .AddMemoryGrainStorageAsDefault();
     }
 
-    siloBuilder.Configure<ClusterOptions>(options =>
+    siloBuilder
+    .Configure<ClusterOptions>(options =>
     {
         options.ClusterId = "MessageSiloCluster001";
         options.ServiceId = "MessageSiloService001";
@@ -84,6 +87,11 @@ builder.Services.AddAuthorization(options =>
     options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
 });
 
+builder.Services.AddSignalR().AddJsonProtocol(options =>
+{
+    options.PayloadSerializerOptions.Converters
+       .Add(new JsonStringEnumConverter());
+});
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks()
@@ -94,7 +102,7 @@ builder.Services.AddHostedService<StartupService>();
 
 var app = builder.Build();
 
-app.UseStaticFiles();
+app.UseFileServer();
 app.UseSerilogRequestLogging();
 app.UseCors(builder => builder.SetIsOriginAllowed(isOriginAllowed: _ => true).WithExposedHeaders(HeaderNames.ContentDisposition).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 app.UseHttpsRedirection();
@@ -103,5 +111,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
+app.MapHub<SignalHub>("/signal");
 
 app.Run();

@@ -1,7 +1,9 @@
 ﻿using MessageSilo.Features.EntityManager;
+using MessageSilo.Features.Hubs;
 using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Extensions;
 using MessageSilo.Shared.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
 namespace MessageSilo.Features.Target
@@ -12,12 +14,15 @@ namespace MessageSilo.Features.Target
 
         private readonly IGrainFactory grainFactory;
 
+        private readonly IHubContext<SignalHub> hubContext;
+
         private ITarget target;
 
-        public TargetGrain(ILogger<TargetGrain> logger, IGrainFactory grainFactory)
+        public TargetGrain(ILogger<TargetGrain> logger, IGrainFactory grainFactory, IHubContext<SignalHub> hubContext)
         {
             this.logger = logger;
             this.grainFactory = grainFactory;
+            this.hubContext = hubContext;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -36,7 +41,9 @@ namespace MessageSilo.Features.Target
             catch (Exception ex)
             {
                 var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
-                logger.LogError(ex, $"[Target][{name}][#{scaleSet}] Cannot send message [{message?.Id}]");
+                var msg = $"[Target][{name}][#{scaleSet}] Cannot send message [{message?.Id}] - {ex.Message}";
+                logger.LogError(ex, msg);
+                await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Malfunctioned, LogLevel.Error, msg));
                 throw;
             }
         }
@@ -44,6 +51,8 @@ namespace MessageSilo.Features.Target
         public async Task Init(TargetDTO? dto = null)
         {
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
+
+            await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Initializing, LogLevel.None, "Initialization started..."));
 
             try
             {
@@ -59,10 +68,14 @@ namespace MessageSilo.Features.Target
                     return;
 
                 target = getTarget(settings);
+
+                await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Active, LogLevel.Information, "Active"));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"[Target][{name}][#{scaleSet}] Initialization error");
+                var msg = $"[Target][{name}][#{scaleSet}] Initialization error - {ex.Message}";
+                logger.LogError(ex, msg);
+                await hubContext.Clients.Group(userId).SendAsync("signalReceived", new Signal($"{name}#{scaleSet}", SignalType.Malfunctioned, LogLevel.Error, msg));
             }
         }
 

@@ -11,6 +11,7 @@
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.0" />
     <PackageReference Include="Betalgo.OpenAI" Version="7.4.1" />
     <PackageReference Include="Jint" Version="3.0.0-beta-2042" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.3" />
     <PackageReference Include="RabbitMQ.Client" Version="6.7.0" />
   </ItemGroup>
