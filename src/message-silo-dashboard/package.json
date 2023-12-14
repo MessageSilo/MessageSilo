@@ -14,7 +14,8 @@
     "next": "14.0.3",
     "react": "^18",
     "react-dom": "^18",
-    "swr": "^2.2.4"
+    "swr": "^2.2.4",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "autoprefixer": "^10.0.1",

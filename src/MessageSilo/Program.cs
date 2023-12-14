@@ -93,7 +93,11 @@ builder.Services.AddSignalR().AddJsonProtocol(options =>
        .Add(new JsonStringEnumConverter());
 });
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddHealthChecks()
     .AddCheck<ShallowHealthCheck>("shallow")
     .AddCheck<DeepHealthCheck>("deep");
