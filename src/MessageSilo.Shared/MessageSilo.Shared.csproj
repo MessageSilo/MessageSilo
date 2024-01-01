@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Orleans_CodeGenInputs Remove="Models\MessageReceivedEventArgs.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Orleans_CodeGenInputs Remove="Models\Entity.cs" />
   </ItemGroup>
 
