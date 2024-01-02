@@ -70,7 +70,7 @@ namespace MessageSilo.Features.Target
         {
             return dto.Type switch
             {
-                TargetType.API => new APITarget(dto.Url),
+                TargetType.API => new APITarget(dto.Url, dto.Retry ?? new()),
                 TargetType.Azure_EventGrid => new AzureEventGridTarget(dto.Endpoint, dto.AccessKey),
                 _ => throw new NotSupportedException(),
             };

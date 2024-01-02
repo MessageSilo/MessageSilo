@@ -12,6 +12,7 @@
     <PackageReference Include="Betalgo.OpenAI" Version="7.4.1" />
     <PackageReference Include="Jint" Version="3.0.0-beta-2042" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.3" />
+    <PackageReference Include="Polly.Core" Version="8.2.0" />
     <PackageReference Include="RabbitMQ.Client" Version="6.7.0" />
   </ItemGroup>
 

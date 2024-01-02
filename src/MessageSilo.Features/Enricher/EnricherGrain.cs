@@ -77,7 +77,7 @@ namespace MessageSilo.Features.Enricher
             return dto.Type switch
             {
                 EnricherType.Inline => new InlineEnricher(dto.Function),
-                EnricherType.API => new APIEnricher(dto.Url, dto.Method ?? Method.Post),
+                EnricherType.API => new APIEnricher(dto.Url, dto.Method ?? Method.Post, dto.Retry ?? new()),
                 EnricherType.AI => new AIEnricher(dto.ApiKey ?? configuration["AI_API_KEY"], dto.Command),
                 _ => throw new NotSupportedException(),
             };

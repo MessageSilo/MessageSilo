@@ -1,6 +1,7 @@
 ﻿using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Serialization;
 using RestSharp;
+using YamlDotNet.Serialization;
 
 namespace MessageSilo.Shared.Models
 {
@@ -21,6 +22,9 @@ namespace MessageSilo.Shared.Models
 
         [Id(3)]
         public Method? Method { get; set; }
+
+        [Id(6)]
+        public RetrySettings? Retry { get; set; }
 
         //AI
         [Id(4)]

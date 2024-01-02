@@ -1,11 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
-using OpenAI;
-using OpenAI.Interfaces;
+﻿using OpenAI;
 using OpenAI.Managers;
 using OpenAI.ObjectModels;
 using OpenAI.ObjectModels.RequestModels;
-using RestSharp;
-using System.Text.RegularExpressions;
 
 namespace MessageSilo.Features.Enricher
 {

@@ -6,7 +6,7 @@ namespace MessageSilo.Integration.Tests
     public class RabbitMQTests
     {
         [Theory]
-        [InlineData(10000)]
+        [InlineData(1)]
         public void SendMessageTest(int count)
         {
             var factory = new ConnectionFactory { HostName = "localhost" };

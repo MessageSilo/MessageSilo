@@ -14,6 +14,9 @@ namespace MessageSilo.Shared.Models
         [Id(1)]
         public string Url { get; set; }
 
+        [Id(4)]
+        public RetrySettings? Retry { get; set; }
+
         //Azure_EventGrid
         [Id(2)]
         public string Endpoint { get; set; }

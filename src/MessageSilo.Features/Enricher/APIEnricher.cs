@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using MessageSilo.Shared.Models;
+using Newtonsoft.Json.Linq;
+using Polly;
+using Polly.Retry;
 using RestSharp;
 using System.Text.RegularExpressions;
 
@@ -10,14 +13,25 @@ namespace MessageSilo.Features.Enricher
 
         private readonly Method method;
 
-        private Regex rg = new Regex("{[a-zA-Z0-9_.-]*}");
+        private readonly Regex rg = new Regex("{[a-zA-Z0-9_.-]*}");
 
-        private IRestClient client = new RestClient();
+        private readonly IRestClient client = new RestClient();
 
-        public APIEnricher(string url, Method method)
+        private readonly ResiliencePipeline<RestResponse> pipeline;
+
+        public APIEnricher(string url, Method method, RetrySettings retrySettings)
         {
             this.url = url;
             this.method = method;
+            pipeline = new ResiliencePipelineBuilder<RestResponse>()
+                .AddRetry(new RetryStrategyOptions<RestResponse>
+                {
+                    ShouldHandle = new PredicateBuilder<RestResponse>().HandleResult(r => !r.IsSuccessful),
+                    MaxRetryAttempts = retrySettings.MaxRetryAttempts,
+                    BackoffType = DelayBackoffType.Exponential,
+                    UseJitter = true,
+                })
+                .Build();
         }
 
         public async Task<string> TransformMessage(string message)
@@ -44,7 +58,13 @@ namespace MessageSilo.Features.Enricher
                 request = new RestRequest(replacedURL, method);
             }
 
-            var response = await client.ExecuteAsync(request);
+            var response = await pipeline.ExecuteAsync(async token =>
+            {
+                return await client.ExecuteAsync(request, cancellationToken: token);
+            });
+
+            if (!response.IsSuccessful)
+                throw response.ErrorException;
 
             return response.Content;
         }

@@ -1,4 +1,6 @@
 ﻿using MessageSilo.Shared.Models;
+using Polly;
+using Polly.Retry;
 using RestSharp;
 
 namespace MessageSilo.Features.Target
@@ -11,9 +13,20 @@ namespace MessageSilo.Features.Target
 
         private IRestClient client = new RestClient();
 
-        public APITarget(string url)
+        private readonly ResiliencePipeline<RestResponse> pipeline;
+
+        public APITarget(string url, RetrySettings retrySettings)
         {
             this.url = url;
+            pipeline = new ResiliencePipelineBuilder<RestResponse>()
+                .AddRetry(new RetryStrategyOptions<RestResponse>
+                {
+                    ShouldHandle = new PredicateBuilder<RestResponse>().HandleResult(r => !r.IsSuccessful),
+                    MaxRetryAttempts = retrySettings.MaxRetryAttempts,
+                    BackoffType = DelayBackoffType.Exponential,
+                    UseJitter = true,
+                })
+                .Build();
         }
 
         public async Task Send(Message message)
@@ -21,7 +34,10 @@ namespace MessageSilo.Features.Target
             var request = new RestRequest(url, method);
             request.AddBody(message.Body, contentType: ContentType.Json);
 
-            var response = await client.ExecutePostAsync(request);
+            var response = await pipeline.ExecuteAsync(async token =>
+            {
+                return await client.ExecutePostAsync(request, cancellationToken: token);
+            });
 
             if (!response.IsSuccessful)
                 throw response.ErrorException;
