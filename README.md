@@ -1,4 +1,4 @@
-<img width=300 height=300 src="https://www.message-silo.dev/assets/images/logo/logo.svg" align="right"></img>
+![cover](https://github.com/MessageSilo/MessageSilo/assets/16096587/63c5268c-94df-47f0-8b1b-f1f6a7512323)
 # Message Silo
 
 [![siloctl](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml/badge.svg)](https://github.com/MessageSilo/MessageSilo/actions/workflows/siloctl-build.yml)
