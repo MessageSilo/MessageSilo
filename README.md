@@ -8,7 +8,7 @@ Cleanup the mess of messages!
 
 https://www.message-silo.dev
 
-A platform to auto-correct your dead-lettered messages and make integration simpler for event-driven systems.
+A tool to auto-correct your dead-lettered messages and make integration simpler for event-driven systems.
 Azure Service Bus, AWS SQS, RabbitMQ, and more...
 
 ## Getting Started
