@@ -38,4 +38,4 @@ jobs:
           context: .
           file: src/MessageSilo/Dockerfile
           push: true
-          tags: "${{ secrets.DOCKERHUB_USERNAME }}/messagesilo:latest,${{ secrets.DOCKERHUB_USERNAME }}/messagesilo:1.2.${{ github.run_number }}"
+          tags: "messagesilo/messagesilo:latest,messagesilo/messagesilo:1.2.${{ github.run_number }}"
