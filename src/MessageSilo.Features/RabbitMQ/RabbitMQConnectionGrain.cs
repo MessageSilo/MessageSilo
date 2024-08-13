@@ -1,5 +1,6 @@
-﻿using MessageSilo.Features.Connection;
-using MessageSilo.Shared.Enums;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
+using MessageSilo.Features.Connection;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;

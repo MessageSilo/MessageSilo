@@ -1,7 +1,6 @@
-﻿using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Serialization;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
 using RestSharp;
-using YamlDotNet.Serialization;
 
 namespace MessageSilo.Shared.Models
 {
@@ -36,17 +35,6 @@ namespace MessageSilo.Shared.Models
         public EnricherDTO()
         {
             Kind = EntityKind.Enricher;
-        }
-
-        public override string ToString()
-        {
-            return YamlConverter.Serialize(this);
-        }
-
-        public EnricherDTO GetCopy()
-        {
-            var yaml = ToString();
-            return YamlConverter.Deserialize<EnricherDTO>(yaml);
         }
     }
 }

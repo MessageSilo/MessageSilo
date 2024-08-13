@@ -1,11 +1,12 @@
-﻿using MessageSilo.Features.AWS;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
+using MessageSilo.Domain.Helpers;
+using MessageSilo.Features.AWS;
 using MessageSilo.Features.Azure;
 using MessageSilo.Features.Enricher;
 using MessageSilo.Features.EntityManager;
 using MessageSilo.Features.RabbitMQ;
 using MessageSilo.Features.Target;
-using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Extensions;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 

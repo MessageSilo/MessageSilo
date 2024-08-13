@@ -1,5 +1,5 @@
-﻿using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Serialization;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
 using YamlDotNet.Serialization;
 
 namespace MessageSilo.Shared.Models
@@ -62,17 +62,6 @@ namespace MessageSilo.Shared.Models
         public ConnectionSettingsDTO()
         {
             Kind = EntityKind.Connection;
-        }
-
-        public override string ToString()
-        {
-            return YamlConverter.Serialize(this);
-        }
-
-        public ConnectionSettingsDTO GetCopy()
-        {
-            var yaml = ToString();
-            return YamlConverter.Deserialize<ConnectionSettingsDTO>(yaml);
         }
     }
 }

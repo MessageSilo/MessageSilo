@@ -1,4 +1,6 @@
-﻿namespace MessageSilo.Shared.Models
+﻿using MessageSilo.Domain.Entities;
+
+namespace MessageSilo.Shared.Models
 {
     [GenerateSerializer]
     public class EntityManagerState

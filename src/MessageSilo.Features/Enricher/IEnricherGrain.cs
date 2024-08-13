@@ -1,4 +1,5 @@
-﻿using MessageSilo.Shared.Models;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Shared.Models;
 using Orleans.Concurrency;
 
 namespace MessageSilo.Features.Enricher

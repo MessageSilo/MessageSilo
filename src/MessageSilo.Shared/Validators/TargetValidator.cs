@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using MessageSilo.Shared.Enums;
+using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
 using MessageSilo.Shared.Models;
 
 namespace MessageSilo.Shared.Validators

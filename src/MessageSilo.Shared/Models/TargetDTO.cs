@@ -1,5 +1,5 @@
-﻿using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Serialization;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
 
 namespace MessageSilo.Shared.Models
 {
@@ -27,11 +27,6 @@ namespace MessageSilo.Shared.Models
         public TargetDTO()
         {
             Kind = EntityKind.Target;
-        }
-
-        public override string ToString()
-        {
-            return YamlConverter.Serialize(this);
         }
     }
 }

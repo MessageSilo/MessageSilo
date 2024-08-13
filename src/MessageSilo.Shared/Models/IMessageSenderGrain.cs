@@ -1,4 +1,5 @@
-﻿using Orleans.Concurrency;
+﻿using MessageSilo.Domain.Entities;
+using Orleans.Concurrency;
 
 namespace MessageSilo.Shared.Models
 {

@@ -1,9 +1,6 @@
-﻿using FluentValidation.Results;
-using MessageSilo.Shared.Enums;
+﻿using MessageSilo.Domain.Entities;
 using MessageSilo.Shared.Models;
-using MessageSilo.Shared.Validators;
 using Microsoft.AspNetCore.Mvc;
-using SharpCompress.Common;
 
 namespace MessageSilo.Controllers
 {

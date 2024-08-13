@@ -1,6 +1,8 @@
-﻿using MessageSilo.Features.EntityManager;
-using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Extensions;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
+using MessageSilo.Domain.Helpers;
+using MessageSilo.Domain.Interfaces;
+using MessageSilo.Features.EntityManager;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

@@ -1,4 +1,5 @@
-﻿using MessageSilo.Shared.Models;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Shared.Models;
 using Polly;
 using Polly.Retry;
 using RestSharp;

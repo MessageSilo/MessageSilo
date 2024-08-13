@@ -1,4 +1,5 @@
 ﻿using FluentValidation.Results;
+using MessageSilo.Domain.Entities;
 using MessageSilo.Shared.Models;
 
 namespace MessageSilo.Features.EntityManager

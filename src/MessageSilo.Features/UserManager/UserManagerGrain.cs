@@ -1,10 +1,5 @@
-﻿using FluentValidation.Results;
-using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Models;
-using MessageSilo.Shared.Validators;
+﻿using MessageSilo.Domain.Entities;
 using Microsoft.Extensions.Logging;
-using Orleans;
-using Orleans.Runtime;
 
 namespace MessageSilo.Features.UserManager
 {

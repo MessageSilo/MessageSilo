@@ -1,7 +1,7 @@
 ﻿using Azure.Messaging.ServiceBus;
-using MessageSilo.Features.AWS;
+using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
 using MessageSilo.Features.Connection;
-using MessageSilo.Shared.Enums;
 using MessageSilo.Shared.Models;
 using Microsoft.Extensions.Logging;
 using SQ = Azure.Messaging.ServiceBus.SubQueue;

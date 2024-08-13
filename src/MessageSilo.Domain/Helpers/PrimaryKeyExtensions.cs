@@ -1,4 +1,4 @@
-﻿namespace MessageSilo.Shared.Extensions
+﻿namespace MessageSilo.Domain.Helpers
 {
     public static class PrimaryKeyExtensions
     {

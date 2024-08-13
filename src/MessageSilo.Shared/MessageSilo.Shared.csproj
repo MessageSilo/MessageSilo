@@ -10,20 +10,16 @@
     <PackageReference Include="Azure.Data.Tables" Version="12.8.2" />
     <PackageReference Include="FluentValidation" Version="11.8.1" />
     <PackageReference Include="Microsoft.Orleans.Sdk" Version="7.2.3" />
-    <PackageReference Include="RestSharp" Version="110.2.0" />
+    <PackageReference Include="RestSharp" Version="111.4.1" />
     <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Orleans_CodeGenInputs Remove="Models\Entity.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Orleans_CodeGenInputs Remove="Enums\EnricherType.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Orleans_CodeGenInputs Remove="Models\EntityManagerState.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MessageSilo.Domain\MessageSilo.Domain.csproj" />
   </ItemGroup>
 
 </Project>

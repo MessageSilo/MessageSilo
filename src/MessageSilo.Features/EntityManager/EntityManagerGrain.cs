@@ -1,12 +1,13 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
 using MessageSilo.Features.Connection;
 using MessageSilo.Features.Enricher;
 using MessageSilo.Features.Target;
 using MessageSilo.Features.UserManager;
-using MessageSilo.Shared.Enums;
+using MessageSilo.Infrastructure.Interfaces;
 using MessageSilo.Shared.Models;
-using MessageSilo.Shared.Serialization;
 using MessageSilo.Shared.Validators;
 using Microsoft.Extensions.Logging;
 using Orleans.Runtime;
@@ -21,11 +22,14 @@ namespace MessageSilo.Features.EntityManager
 
         private readonly IGrainFactory grainFactory;
 
-        public EntityManagerGrain([PersistentState("EntityManagerState")] IPersistentState<EntityManagerState> state, ILogger<EntityManagerGrain> logger, IGrainFactory grainFactory)
+        private readonly IYamlConverterService yamlConverterService;
+
+        public EntityManagerGrain([PersistentState("EntityManagerState")] IPersistentState<EntityManagerState> state, ILogger<EntityManagerGrain> logger, IGrainFactory grainFactory, IYamlConverterService yamlConverterService)
         {
             persistence = state;
             this.logger = logger;
             this.grainFactory = grainFactory;
+            this.yamlConverterService = yamlConverterService;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -96,7 +100,7 @@ namespace MessageSilo.Features.EntityManager
                     UserId = target.UserId,
                     Name = target.Name,
                     Kind = target.Kind,
-                    YamlDefinition = target.ToString()
+                    YamlDefinition = yamlConverterService.Serialize(target)
                 });
             }
 
@@ -107,7 +111,7 @@ namespace MessageSilo.Features.EntityManager
                     UserId = enricher.UserId,
                     Name = enricher.Name,
                     Kind = enricher.Kind,
-                    YamlDefinition = enricher.ToString()
+                    YamlDefinition = yamlConverterService.Serialize(enricher)
                 });
             }
 
@@ -118,7 +122,7 @@ namespace MessageSilo.Features.EntityManager
                     UserId = conn.UserId,
                     Name = conn.Name,
                     Kind = conn.Kind,
-                    YamlDefinition = conn.ToString()
+                    YamlDefinition = yamlConverterService.Serialize(conn)
                 });
             }
 
@@ -189,7 +193,7 @@ namespace MessageSilo.Features.EntityManager
                     UserId = entity.UserId,
                     Name = entity.Name,
                     Kind = entity.Kind,
-                    YamlDefinition = entity.ToString()
+                    YamlDefinition = yamlConverterService.Serialize(entity)
                 });
                 await persistence.WriteStateAsync();
             }
@@ -204,7 +208,7 @@ namespace MessageSilo.Features.EntityManager
             if (result == null)
                 return null;
 
-            return YamlConverter.Deserialize<ConnectionSettingsDTO>(result.YamlDefinition);
+            return yamlConverterService.Deserialize<ConnectionSettingsDTO>(result.YamlDefinition);
         }
 
         public async Task<TargetDTO> GetTargetSettings(string name)
@@ -214,7 +218,7 @@ namespace MessageSilo.Features.EntityManager
             if (result == null)
                 return null;
 
-            return YamlConverter.Deserialize<TargetDTO>(result.YamlDefinition);
+            return yamlConverterService.Deserialize<TargetDTO>(result.YamlDefinition);
         }
 
         public async Task<EnricherDTO> GetEnricherSettings(string name)
@@ -224,7 +228,7 @@ namespace MessageSilo.Features.EntityManager
             if (result == null)
                 return null;
 
-            return YamlConverter.Deserialize<EnricherDTO>(result.YamlDefinition);
+            return yamlConverterService.Deserialize<EnricherDTO>(result.YamlDefinition);
         }
 
         public async Task Clear()

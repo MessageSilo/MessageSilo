@@ -1,6 +1,4 @@
 ﻿using CommandLine;
-using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Models;
 
 namespace MessageSilo.SiloCTL.Options
 {
