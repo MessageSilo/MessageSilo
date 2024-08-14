@@ -1,6 +1,5 @@
-﻿using MessageSilo.Domain.Entities;
-using MessageSilo.Shared.Models;
-using Microsoft.Azure.Amqp.Transaction;
+﻿using MessageSilo.Application.DTOs;
+using MessageSilo.Domain.Entities;
 using RestSharp;
 
 namespace MessageSilo.SiloCTL

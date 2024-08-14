@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MessageSilo.Features\MessageSilo.Features.csproj" />
-    <ProjectReference Include="..\MessageSilo.Shared\MessageSilo.Shared.csproj" />
+    <ProjectReference Include="..\MessageSilo.Application\MessageSilo.Application.csproj" />
+    <ProjectReference Include="..\MessageSilo.Infrastructure\MessageSilo.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

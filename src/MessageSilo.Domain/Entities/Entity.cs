@@ -9,7 +9,7 @@ namespace MessageSilo.Domain.Entities
 
         public required string Name { get; set; }
 
-        public EntityKind Kind { get; set; }
+        public required EntityKind Kind { get; set; }
 
         public required string YamlDefinition { get; set; }
 

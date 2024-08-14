@@ -1,8 +1,8 @@
 ﻿using CommandLine;
+using MessageSilo.Application.DTOs;
 using MessageSilo.Domain.Enums;
 using MessageSilo.Infrastructure.Interfaces;
 using MessageSilo.Infrastructure.Services;
-using MessageSilo.Shared.Models;
 
 namespace MessageSilo.SiloCTL.Options
 {

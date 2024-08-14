@@ -11,4 +11,8 @@
     <PackageReference Include="YamlDotNet" Version="16.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MessageSilo.Application\MessageSilo.Application.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,10 +1,9 @@
-﻿using MessageSilo.Domain.Entities;
-using MessageSilo.Shared.Models;
+﻿using MessageSilo.Domain.Interfaces;
 using Polly;
 using Polly.Retry;
 using RestSharp;
 
-namespace MessageSilo.Features.Target
+namespace MessageSilo.Domain.Entities
 {
     public class APITarget : ITarget
     {
@@ -12,7 +11,7 @@ namespace MessageSilo.Features.Target
 
         private readonly Method method = Method.Post;
 
-        private IRestClient client = new RestClient();
+        private readonly IRestClient client = new RestClient();
 
         private readonly ResiliencePipeline<RestResponse> pipeline;
 

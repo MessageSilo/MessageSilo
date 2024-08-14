@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Orleans_CodeGenInputs Remove="Models\EntityManagerState.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\MessageSilo.Domain\MessageSilo.Domain.csproj" />
   </ItemGroup>
 

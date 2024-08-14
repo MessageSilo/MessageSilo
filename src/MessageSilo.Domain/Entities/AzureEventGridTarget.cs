@@ -1,8 +1,7 @@
-﻿using MessageSilo.Domain.Entities;
-using MessageSilo.Shared.Models;
+﻿using MessageSilo.Domain.Interfaces;
 using RestSharp;
 
-namespace MessageSilo.Features.Target
+namespace MessageSilo.Domain.Entities
 {
     public class AzureEventGridTarget : ITarget
     {
@@ -10,7 +9,7 @@ namespace MessageSilo.Features.Target
 
         private readonly string accessKey;
 
-        private IRestClient client = new RestClient();
+        private readonly IRestClient client = new RestClient();
 
         public AzureEventGridTarget(string endpoint, string accessKey)
         {

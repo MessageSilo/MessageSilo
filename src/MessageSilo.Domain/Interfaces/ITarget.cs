@@ -1,7 +1,6 @@
 ﻿using MessageSilo.Domain.Entities;
-using MessageSilo.Shared.Models;
 
-namespace MessageSilo.Features.Target
+namespace MessageSilo.Domain.Interfaces
 {
     public interface ITarget
     {
