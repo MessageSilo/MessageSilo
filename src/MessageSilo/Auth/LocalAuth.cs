@@ -6,19 +6,18 @@ using System.Text.Encodings.Web;
 
 namespace MessageSilo.Auth
 {
-    public class LocalAuthSchemeOptions: AuthenticationSchemeOptions
+    public class LocalAuthSchemeOptions : AuthenticationSchemeOptions
     {
 
     }
 
-    public class LocalAuthHandler: AuthenticationHandler<LocalAuthSchemeOptions>
+    public class LocalAuthHandler : AuthenticationHandler<LocalAuthSchemeOptions>
     {
         public LocalAuthHandler(
             IOptionsMonitor<LocalAuthSchemeOptions> options,
             ILoggerFactory logger,
-            UrlEncoder encoder,
-            ISystemClock clock)
-            : base(options, logger, encoder, clock)
+            UrlEncoder encoder)
+            : base(options, logger, encoder)
         {
         }
 

@@ -1,6 +1,7 @@
 using MessageSilo;
 using MessageSilo.Auth;
 using MessageSilo.HealthChecks;
+using MessageSilo.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -51,6 +52,8 @@ builder.Host.UseOrleans(siloBuilder =>
         .AddMemoryGrainStorageAsDefault();
     }
 
+    siloBuilder.Services.AddInfrastructureServices(configuration);
+
     siloBuilder.Configure<ClusterOptions>(options =>
     {
         options.ClusterId = "MessageSiloCluster001";
@@ -60,6 +63,8 @@ builder.Host.UseOrleans(siloBuilder =>
 });
 
 builder.Host.UseSerilog(Log.Logger);
+
+builder.Services.AddInfrastructureServices(configuration);
 
 builder.Services.AddControllers();
 

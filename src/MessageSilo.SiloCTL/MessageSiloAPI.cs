@@ -15,8 +15,9 @@ namespace MessageSilo.SiloCTL
 
         public IEnumerable<Entity> List()
         {
-            var result = httpClient.GetJson<IEnumerable<Entity>>("Entities");
-            return result;
+            var request = new RestRequest("Entities", Method.Get);
+            var result = httpClient.ExecuteGet<IEnumerable<Entity>>(request);
+            return result.Data;
         }
 
         public void Clear()

@@ -1,11 +1,10 @@
 ﻿using Amazon.SQS;
 using Amazon.SQS.Model;
+using MessageSilo.Application.DTOs;
 using MessageSilo.Domain.Enums;
-using MessageSilo.Features.Connection;
-using MessageSilo.Shared.Models;
-using Entities = MessageSilo.Domain.Entities;
+using MessageSilo.Infrastructure.Interfaces;
 
-namespace MessageSilo.Features.AWS
+namespace MessageSilo.Infrastructure.Services
 {
     public class AWSSQSConnectionGrain : MessagePlatformConnectionGrain, IAWSSQSConnectionGrain
     {
@@ -41,7 +40,7 @@ namespace MessageSilo.Features.AWS
             await Task.CompletedTask;
         }
 
-        public override async Task Enqueue(Entities.Message message)
+        public override async Task Enqueue(Domain.Entities.Message message)
         {
             await client.SendMessageAsync(queueUrl, message.Body);
         }
@@ -71,7 +70,7 @@ namespace MessageSilo.Features.AWS
 
                 var connection = grainFactory.GetGrain<IConnectionGrain>(this.GetPrimaryKeyString());
 
-                var isDelivered = await connection.TransformAndSend(new Entities.Message(msg.MessageId, msg.Body));
+                var isDelivered = await connection.TransformAndSend(new Domain.Entities.Message(msg.MessageId, msg.Body));
 
                 if (isDelivered && settings.ReceiveMode == ReceiveMode.ReceiveAndDelete)
                     await client.DeleteMessageAsync(queueUrl, msg.ReceiptHandle);

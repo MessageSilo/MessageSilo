@@ -1,7 +1,5 @@
 ﻿using MessageSilo.Domain.Enums;
-using MessageSilo.Features.Connection;
-using MessageSilo.Features.EntityManager;
-using MessageSilo.Features.UserManager;
+using MessageSilo.Infrastructure.Interfaces;
 
 namespace MessageSilo
 {

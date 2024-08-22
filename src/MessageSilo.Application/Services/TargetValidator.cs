@@ -1,11 +1,12 @@
 ﻿using FluentValidation;
 using MessageSilo.Application.DTOs;
+using MessageSilo.Application.Interfaces;
 using MessageSilo.Domain.Entities;
 using MessageSilo.Domain.Enums;
 
 namespace MessageSilo.Application.Services
 {
-    public class TargetValidator : AbstractValidator<TargetDTO>
+    public class TargetValidator : ValidatorBase<TargetDTO>, ITargetValidator
     {
         public TargetValidator(IEnumerable<Entity> entities)
         {

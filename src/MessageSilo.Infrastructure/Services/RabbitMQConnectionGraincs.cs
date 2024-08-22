@@ -1,13 +1,13 @@
-﻿using MessageSilo.Domain.Entities;
+﻿using MessageSilo.Application.DTOs;
+using MessageSilo.Domain.Entities;
 using MessageSilo.Domain.Enums;
-using MessageSilo.Features.Connection;
-using MessageSilo.Shared.Models;
+using MessageSilo.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 
-namespace MessageSilo.Features.RabbitMQ
+namespace MessageSilo.Infrastructure.Services
 {
     public class RabbitMQConnectionGrain : MessagePlatformConnectionGrain, IRabbitMQConnectionGrain
     {

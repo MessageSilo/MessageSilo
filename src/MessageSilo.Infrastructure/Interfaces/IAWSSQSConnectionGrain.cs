@@ -1,6 +1,4 @@
-﻿using MessageSilo.Shared.Models;
-
-namespace MessageSilo.Features.AWS
+﻿namespace MessageSilo.Infrastructure.Interfaces
 {
     public interface IAWSSQSConnectionGrain : IMessagePlatformConnectionGrain
     {

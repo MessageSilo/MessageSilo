@@ -1,6 +1,4 @@
-﻿using MessageSilo.Shared.Models;
-
-namespace MessageSilo.Features.Azure
+﻿namespace MessageSilo.Infrastructure.Interfaces
 {
     public interface IAzureServiceBusConnectionGrain : IMessagePlatformConnectionGrain
     {

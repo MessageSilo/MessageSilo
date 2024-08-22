@@ -1,6 +1,8 @@
-﻿using MessageSilo.Domain.Entities;
+﻿using MessageSilo.Application.DTOs;
+using MessageSilo.Domain.Entities;
+using MessageSilo.Infrastructure.Interfaces;
 
-namespace MessageSilo.Shared.Models
+namespace MessageSilo.Infrastructure.Services
 {
     public abstract class MessagePlatformConnectionGrain : Grain, IMessagePlatformConnectionGrain
     {

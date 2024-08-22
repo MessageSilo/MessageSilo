@@ -6,7 +6,7 @@ using MessageSilo.Domain.Enums;
 
 namespace MessageSilo.Application.Services
 {
-    public class EnricherValidator : AbstractValidator<EnricherDTO>, IEnricherValidator
+    public class EnricherValidator : ValidatorBase<EnricherDTO>, IEnricherValidator
     {
         public EnricherValidator(IEnumerable<Entity> entities) : base()
         {

@@ -1,6 +1,4 @@
-﻿using MessageSilo.Shared.Models;
-
-namespace MessageSilo.Features.RabbitMQ
+﻿namespace MessageSilo.Infrastructure.Interfaces
 {
     public interface IRabbitMQConnectionGrain : IMessagePlatformConnectionGrain
     {

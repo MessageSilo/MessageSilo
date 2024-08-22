@@ -6,7 +6,7 @@ using MessageSilo.Domain.Enums;
 
 namespace MessageSilo.Application.Services
 {
-    public class ConnectionValidator : AbstractValidator<ConnectionSettingsDTO>, IConnectionValidator
+    public class ConnectionValidator : ValidatorBase<ConnectionSettingsDTO>, IConnectionValidator
     {
         public ConnectionValidator(IEnumerable<Entity> entities) : base()
         {

@@ -1,7 +1,9 @@
-﻿using MessageSilo.Infrastructure.Interfaces;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Infrastructure.Interfaces;
 using MessageSilo.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Orleans.Serialization;
 
 namespace MessageSilo.Infrastructure.DependencyInjection
 {
@@ -11,12 +13,11 @@ namespace MessageSilo.Infrastructure.DependencyInjection
         {
             services.AddSingleton<IYamlConverterService, YamlConverterService>();
 
-            // Register other infrastructure services
-            //services.AddTransient<IEmailService, EmailService>();
-            //services.AddTransient<ILoggingService, LoggingService>();
-
-            // Optional: Register Orleans-related services if using Orleans
-            //services.AddOrleansSilo(configuration);
+            services.AddSerializer(serializerBuilder =>
+            {
+                serializerBuilder.AddNewtonsoftJsonSerializer(
+                    isSupported: type => typeof(Entity).Namespace.StartsWith("MessageSilo"));
+            });
 
             return services;
         }

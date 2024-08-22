@@ -1,7 +1,8 @@
-﻿using MessageSilo.Domain.Entities;
+﻿using MessageSilo.Application.DTOs;
+using MessageSilo.Domain.Entities;
 using Orleans.Concurrency;
 
-namespace MessageSilo.Shared.Models
+namespace MessageSilo.Infrastructure.Interfaces
 {
     public interface IMessagePlatformConnectionGrain : IAsyncDisposable, IGrainWithStringKey
     {

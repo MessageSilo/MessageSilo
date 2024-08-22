@@ -1,5 +1,5 @@
-﻿using MessageSilo.Domain.Entities;
-using MessageSilo.Shared.Models;
+﻿using MessageSilo.Application.DTOs;
+using MessageSilo.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MessageSilo.Controllers

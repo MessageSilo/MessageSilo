@@ -1,8 +1,17 @@
 ﻿namespace MessageSilo.Domain.Entities
 {
-    public readonly record struct RetrySettings(int MaxRetryAttempts);
+    public record RetrySettings(int MaxRetryAttempts = 1);
 
-    public readonly record struct ValidationFailure(string ErrorMessage);
+    [Serializable]
+    public class ValidationFailure
+    {
+        public string ErrorMessage { get; set; }
 
-    public readonly record struct EntityValidationErrors(string EntityName, IEnumerable<ValidationFailure> ValidationFailures);
+        public ValidationFailure(string errorMessage)
+        {
+            ErrorMessage = errorMessage;
+        }
+    }
+
+    public record EntityValidationErrors(string EntityName, IEnumerable<ValidationFailure> ValidationFailures);
 }
