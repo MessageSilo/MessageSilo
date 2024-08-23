@@ -13,7 +13,7 @@ namespace MessageSilo.Application.Services
 
             RuleFor(p => p.Name)
                 .NotEmpty()
-                .MaximumLength(20)
+                .MaximumLength(100)
                 .Matches("^[a-zA-Z0-9$_-]+$")
                 .WithName("Name");
 

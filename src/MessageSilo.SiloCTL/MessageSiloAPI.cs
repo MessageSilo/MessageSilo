@@ -1,5 +1,6 @@
 ﻿using MessageSilo.Application.DTOs;
 using MessageSilo.Domain.Entities;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace MessageSilo.SiloCTL
@@ -29,6 +30,9 @@ namespace MessageSilo.SiloCTL
         {
             var response = httpClient.PostAsJsonAsync("Entities", dto).GetAwaiter().GetResult();
             response.EnsureSuccessStatusCode();
+
+            if (response.StatusCode == HttpStatusCode.NoContent)
+                return null;
 
             var result = response.Content.ReadFromJsonAsync<IEnumerable<EntityValidationErrors>?>().GetAwaiter().GetResult();
 
