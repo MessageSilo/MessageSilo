@@ -5,7 +5,6 @@ using System.Security.Claims;
 
 namespace MessageSilo.Controllers
 {
-    [Authorize]
     public abstract class MessageSiloControllerBase : ControllerBase
     {
         protected readonly ILogger<MessageSiloControllerBase> logger;
@@ -27,8 +26,7 @@ namespace MessageSilo.Controllers
             this.client = client;
             this.httpContextAccessor = httpContextAccessor;
 
-            var user = httpContextAccessor?.HttpContext?.User;
-            loggedInUserId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+            loggedInUserId = "local_user";
             this.entityManagerGrain = client.GetGrain<IEntityManagerGrain>(loggedInUserId);
         }
     }

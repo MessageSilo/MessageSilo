@@ -1,14 +1,13 @@
 ﻿using FluentValidation;
 using MessageSilo.Application.DTOs;
 using MessageSilo.Application.Interfaces;
-using MessageSilo.Domain.Entities;
 using MessageSilo.Domain.Enums;
 
 namespace MessageSilo.Application.Services
 {
     public class EnricherValidator : ValidatorBase<EnricherDTO>, IEnricherValidator
     {
-        public EnricherValidator(IEnumerable<Entity> entities) : base()
+        public EnricherValidator() : base()
         {
             RuleFor(p => p.UserId).NotEmpty().WithName("UserId");
 
@@ -16,7 +15,6 @@ namespace MessageSilo.Application.Services
                 .NotEmpty()
                 .MaximumLength(20)
                 .Matches("^[a-zA-Z0-9$_-]+$")
-                .Must((e, x) => isUnique(entities, e)).WithMessage(p => $"Entity with name '{p.Name}' already exist")
                 .WithName("Name");
 
             RuleFor(p => p.Type).NotEmpty();
@@ -30,8 +28,6 @@ namespace MessageSilo.Application.Services
             RuleFor(p => p.Command).NotEmpty()
                 .When(p => p.Type == EnricherType.AI);
         }
-
-        private bool isUnique(IEnumerable<Entity> entities, EnricherDTO entity) => entities.Count(p => p.Id == entity.Id) == 1;
     }
 
 }

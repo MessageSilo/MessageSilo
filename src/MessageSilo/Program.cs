@@ -1,10 +1,6 @@
 using MessageSilo;
-using MessageSilo.Auth;
 using MessageSilo.HealthChecks;
 using MessageSilo.Infrastructure.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Orleans.Configuration;
 using Orleans.Providers;
@@ -64,30 +60,7 @@ builder.Host.UseOrleans(siloBuilder =>
 
 builder.Host.UseSerilog(Log.Logger);
 
-builder.Services.AddInfrastructureServices(configuration);
-
 builder.Services.AddControllers();
-
-builder.Services.AddAuthentication()
-        .AddScheme<LocalAuthSchemeOptions, LocalAuthHandler>("LocalAuthScheme", options => { })
-        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
-        {
-            c.Authority = $"{configuration["Auth0:Domain"]}";
-            c.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidAudience = configuration["Auth0:Audience"],
-                ValidIssuer = $"{configuration["Auth0:Domain"]}"
-            };
-        });
-
-builder.Services.AddAuthorization(options =>
-{
-    var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
-        JwtBearerDefaults.AuthenticationScheme,
-        "LocalAuthScheme");
-    defaultAuthorizationPolicyBuilder = defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
-    options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
-});
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
@@ -104,8 +77,6 @@ app.UseSerilogRequestLogging();
 app.UseCors(builder => builder.SetIsOriginAllowed(isOriginAllowed: _ => true).WithExposedHeaders(HeaderNames.ContentDisposition).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
 

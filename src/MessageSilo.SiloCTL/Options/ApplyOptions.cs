@@ -7,7 +7,7 @@ using MessageSilo.Infrastructure.Services;
 namespace MessageSilo.SiloCTL.Options
 {
     [Verb("apply", HelpText = "Apply a configuration to an entity by file name or stdin.\r\n\r\nYAML formats are accepted.")]
-    public class ApplyOptions : AuthorizedOptions
+    public class ApplyOptions : Options
     {
         private readonly IYamlConverterService yamlConverterService = new YamlConverterService();
 
@@ -21,7 +21,7 @@ namespace MessageSilo.SiloCTL.Options
         [Option('s', "scale", Required = false, HelpText = "How many instances of entities to run in parallel. The default value is 1.")]
         public int Scale { get; set; } = 1;
 
-        public void Apply()
+        public void Apply(MessageSiloAPI api)
         {
             var configReader = new ConfigReader(FileName);
             ApplyDTO dto = new()

@@ -1,8 +1,10 @@
 ﻿using MessageSilo.Application.DTOs;
+using MessageSilo.Application.Interfaces;
 using MessageSilo.Application.Services;
 using MessageSilo.Domain.Entities;
 using MessageSilo.Domain.Enums;
 using MessageSilo.Infrastructure.Interfaces;
+using Microsoft.Azure.Amqp.Framing;
 using Microsoft.Extensions.Logging;
 
 namespace MessageSilo.Infrastructure.Services
@@ -17,15 +19,28 @@ namespace MessageSilo.Infrastructure.Services
 
         private readonly IYamlConverterService yamlConverterService;
 
+        private readonly IConnectionValidator connectionValidator;
+
+        private readonly IEnricherValidator enricherValidator;
+
+        private readonly ITargetValidator targetValidator;
+
         public EntityManagerGrain(
             [PersistentState("EntityManagerState")] IPersistentState<EntityManagerState> state, ILogger<EntityManagerGrain> logger,
-            IGrainFactory grainFactory, IYamlConverterService yamlConverterService
+            IGrainFactory grainFactory, IYamlConverterService yamlConverterService,
+            IConnectionValidator connectionValidator,
+            IEnricherValidator enricherValidator,
+            ITargetValidator targetValidator
             )
         {
             persistence = state;
             this.logger = logger;
             this.grainFactory = grainFactory;
             this.yamlConverterService = yamlConverterService;
+            this.connectionValidator = connectionValidator;
+            this.enricherValidator = enricherValidator;
+            this.targetValidator = targetValidator;
+
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -47,9 +62,10 @@ namespace MessageSilo.Infrastructure.Services
 
             var entities = new List<Entity>().Concat(dto.Targets).Concat(dto.Enrichers).Concat(dto.Connections);
 
-            var targetValidator = new TargetValidator(entities);
-            var enricherValidator = new EnricherValidator(entities);
-            var connectionValidator = new ConnectionValidator(entities);
+            var entitiesValidationErrors = await new EntitiesValidator(entities).ValidateAsync(entities);
+
+            if (entitiesValidationErrors is not null && entitiesValidationErrors.Count() > 0)
+                result.Add(new EntityValidationErrors("Global", entitiesValidationErrors));
 
             foreach (var target in dto.Targets)
             {
@@ -142,50 +158,6 @@ namespace MessageSilo.Infrastructure.Services
                     await grain.Init(true);
                 }
             }
-        }
-
-        public async Task<List<ValidationFailure>?> Upsert(Entity entity)
-        {
-            var validationErrors = new List<ValidationFailure>();
-
-            switch (entity.Kind)
-            {
-                case EntityKind.Connection:
-                    {
-                        var res = await new ConnectionValidator(persistence.State.Entities).ValidateAsync(entity as ConnectionSettingsDTO);
-                        validationErrors = res.ToList();
-                    }
-                    break;
-                case EntityKind.Target:
-                    {
-                        var res = await new TargetValidator(persistence.State.Entities).ValidateAsync(entity as TargetDTO);
-                        validationErrors = res.ToList();
-                    }
-                    break;
-                case EntityKind.Enricher:
-                    {
-                        var res = await new EnricherValidator(persistence.State.Entities).ValidateAsync(entity as EnricherDTO);
-                        validationErrors = res.ToList();
-                    }
-                    break;
-            }
-
-            if (validationErrors.Any())
-                return validationErrors;
-
-            if (!persistence.State.Entities.Any(p => p.Id == entity.Id))
-            {
-                persistence.State.Entities.Add(new Entity()
-                {
-                    UserId = entity.UserId,
-                    Name = entity.Name,
-                    Kind = entity.Kind,
-                    YamlDefinition = yamlConverterService.Serialize(entity)
-                });
-                await persistence.WriteStateAsync();
-            }
-
-            return null;
         }
 
         public async Task<ConnectionSettingsDTO> GetConnectionSettings(string name)

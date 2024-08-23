@@ -1,34 +1,37 @@
 ﻿using MessageSilo.Application.DTOs;
 using MessageSilo.Domain.Entities;
-using RestSharp;
+using System.Net.Http.Json;
 
 namespace MessageSilo.SiloCTL
 {
     public class MessageSiloAPI
     {
-        private readonly RestClient httpClient;
+        private readonly HttpClient httpClient;
 
-        public MessageSiloAPI(RestClient httpClient)
+        public MessageSiloAPI(HttpClient httpClient)
         {
             this.httpClient = httpClient;
         }
 
         public IEnumerable<Entity> List()
         {
-            var request = new RestRequest("Entities", Method.Get);
-            var result = httpClient.ExecuteGet<IEnumerable<Entity>>(request);
-            return result.Data;
+            var response = httpClient.GetFromJsonAsync<IEnumerable<Entity>>("Entities").GetAwaiter().GetResult();
+            return response;
         }
 
         public void Clear()
         {
-            var request = new RestRequest($"Entities", Method.Delete);
-            httpClient.Delete(request);
+            var response = httpClient.DeleteAsync("Entities").GetAwaiter().GetResult();
+            response.EnsureSuccessStatusCode();
         }
 
         public IEnumerable<EntityValidationErrors>? Apply(ApplyDTO dto)
         {
-            var result = httpClient.PostJson<ApplyDTO, IEnumerable<EntityValidationErrors>?>("Entities", dto);
+            var response = httpClient.PostAsJsonAsync("Entities", dto).GetAwaiter().GetResult();
+            response.EnsureSuccessStatusCode();
+
+            var result = response.Content.ReadFromJsonAsync<IEnumerable<EntityValidationErrors>?>().GetAwaiter().GetResult();
+
             return result;
         }
     }

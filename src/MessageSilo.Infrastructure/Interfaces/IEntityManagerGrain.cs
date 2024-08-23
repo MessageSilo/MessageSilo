@@ -7,8 +7,6 @@ namespace MessageSilo.Infrastructure.Interfaces
     {
         Task<IEnumerable<Entity>> List();
 
-        Task<List<ValidationFailure>?> Upsert(Entity entity);
-
         Task<ConnectionSettingsDTO> GetConnectionSettings(string name);
 
         Task<TargetDTO> GetTargetSettings(string name);
