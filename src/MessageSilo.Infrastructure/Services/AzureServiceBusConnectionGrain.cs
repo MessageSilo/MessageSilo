@@ -26,15 +26,6 @@ namespace MessageSilo.Infrastructure.Services
             this.grainFactory = grainFactory;
         }
 
-        public override Task OnDeactivateAsync(DeactivationReason reason, CancellationToken token)
-        {
-            var grain = grainFactory.GetGrain<IAzureServiceBusConnectionGrain>(this.GetPrimaryKeyString());
-
-            grain.GetPrimaryKeyString();
-
-            return Task.CompletedTask;
-        }
-
         public override async Task Init(ConnectionSettingsDTO settings)
         {
             this.settings = settings;

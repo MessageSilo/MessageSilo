@@ -4,19 +4,19 @@ namespace MessageSilo.Domain.Entities
 {
     public class AIEnricher : IEnricher
     {
-        private readonly string apiKey;
+        private readonly IAIService aIService;
 
         private readonly string command;
 
-        public AIEnricher(string apiKey, string command)
+        public AIEnricher(IAIService aIService, string command)
         {
-            this.apiKey = apiKey;
+            this.aIService = aIService;
             this.command = command;
         }
 
         public async Task<string> TransformMessage(string message)
         {
-            return message;
+            return await aIService.Chat(command, message);
         }
     }
 }

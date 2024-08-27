@@ -19,16 +19,6 @@ namespace MessageSilo.Infrastructure.Services
             this.grainFactory = grainFactory;
         }
 
-        public override Task OnDeactivateAsync(DeactivationReason reason, CancellationToken token)
-        {
-            var grain = grainFactory.GetGrain<IAWSSQSConnectionGrain>(this.GetPrimaryKeyString());
-
-            grain.GetPrimaryKeyString();
-
-            return Task.CompletedTask;
-        }
-
-
         public override async ValueTask DisposeAsync()
         {
             if (client is not null)

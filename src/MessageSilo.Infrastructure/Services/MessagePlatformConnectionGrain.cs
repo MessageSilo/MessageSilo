@@ -4,6 +4,7 @@ using MessageSilo.Infrastructure.Interfaces;
 
 namespace MessageSilo.Infrastructure.Services
 {
+    [KeepAlive]
     public abstract class MessagePlatformConnectionGrain : Grain, IMessagePlatformConnectionGrain
     {
         protected ConnectionSettingsDTO settings;
