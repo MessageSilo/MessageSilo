@@ -1,33 +1,41 @@
-﻿using MessageSilo.Shared.Models;
-using Microsoft.Azure.Amqp.Transaction;
-using RestSharp;
+﻿using MessageSilo.Application.DTOs;
+using MessageSilo.Domain.Entities;
+using System.Net;
+using System.Net.Http.Json;
 
 namespace MessageSilo.SiloCTL
 {
     public class MessageSiloAPI
     {
-        private readonly RestClient httpClient;
+        private readonly HttpClient httpClient;
 
-        public MessageSiloAPI(RestClient httpClient)
+        public MessageSiloAPI(HttpClient httpClient)
         {
             this.httpClient = httpClient;
         }
 
         public IEnumerable<Entity> List()
         {
-            var result = httpClient.GetJson<IEnumerable<Entity>>("Entities");
-            return result;
+            var response = httpClient.GetFromJsonAsync<IEnumerable<Entity>>("Entities").GetAwaiter().GetResult();
+            return response;
         }
 
         public void Clear()
         {
-            var request = new RestRequest($"Entities", Method.Delete);
-            httpClient.Delete(request);
+            var response = httpClient.DeleteAsync("Entities").GetAwaiter().GetResult();
+            response.EnsureSuccessStatusCode();
         }
 
         public IEnumerable<EntityValidationErrors>? Apply(ApplyDTO dto)
         {
-            var result = httpClient.PostJson<ApplyDTO, IEnumerable<EntityValidationErrors>?>("Entities", dto);
+            var response = httpClient.PostAsJsonAsync("Entities", dto).GetAwaiter().GetResult();
+            response.EnsureSuccessStatusCode();
+
+            if (response.StatusCode == HttpStatusCode.NoContent)
+                return null;
+
+            var result = response.Content.ReadFromJsonAsync<IEnumerable<EntityValidationErrors>?>().GetAwaiter().GetResult();
+
             return result;
         }
     }

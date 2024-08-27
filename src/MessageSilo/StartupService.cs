@@ -1,11 +1,5 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using MessageSilo.Features.Connection;
-using MessageSilo.Features.EntityManager;
-using MessageSilo.Features.UserManager;
-using MessageSilo.Shared.Enums;
-using Microsoft.Extensions.DependencyInjection;
-using Orleans.Configuration;
-using System.Net;
+﻿using MessageSilo.Domain.Enums;
+using MessageSilo.Infrastructure.Interfaces;
 
 namespace MessageSilo
 {

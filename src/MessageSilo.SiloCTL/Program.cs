@@ -20,14 +20,21 @@ namespace MessageSilo.SiloCTL
                 if (interactiveMode)
                     args = Console.ReadLine()!.Split();
 
-                Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions, ClearOptions, LogoutOptions>(args)
+                var client = new HttpClient
+                {
+                    BaseAddress = new Uri(config.ApiUrl),
+                };
+
+                var api = new MessageSiloAPI(client);
+
+                Parser.Default.ParseArguments<ShowOptions, ApplyOptions, ConfigOptions, ClearOptions>(args)
                            .WithParsed<ShowOptions>(o =>
                            {
-                               o.Show();
+                               o.Show(api);
                            })
                            .WithParsed<ApplyOptions>(o =>
                            {
-                               o.Apply();
+                               o.Apply(api);
                            })
                            .WithParsed<ConfigOptions>(o =>
                            {
@@ -35,11 +42,7 @@ namespace MessageSilo.SiloCTL
                            })
                            .WithParsed<ClearOptions>(o =>
                            {
-                               o.Clear();
-                           })
-                           .WithParsed<LogoutOptions>(o =>
-                           {
-                               o.Logout();
+                               o.Clear(api);
                            });
             } while (interactiveMode);
         }

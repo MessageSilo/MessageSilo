@@ -1,28 +1,26 @@
 ﻿using CommandLine;
 using ConsoleTables;
-using MessageSilo.Shared.Enums;
-using MessageSilo.Shared.Models;
 
 namespace MessageSilo.SiloCTL.Options
 {
     [Verb("show", HelpText = "Display one or many entities.\r\n\r\nPrints a table of the most important information about the specified entities.")]
-    public class ShowOptions : AuthorizedOptions
+    public class ShowOptions : Options
     {
-        private readonly ConsoleTable showEntitesTable = new ConsoleTable(new ConsoleTableOptions()
+        private readonly ConsoleTable showEntitesTable = new(new ConsoleTableOptions()
         {
-            Columns = new[] { "KIND", "NAME" },
+            Columns = ["KIND", "NAME"],
             EnableCount = true,
             NumberAlignment = Alignment.Right
         });
+
+        [Option('n', "name", Required = false, HelpText = "Display detailed information about a specific entity.")]
+        public string Name { get; set; }
 
         public ShowOptions() : base()
         {
         }
 
-        [Option('n', "name", Required = false, HelpText = "Display detailed information about a specific entity.")]
-        public string Name { get; set; }
-
-        public void Show()
+        public void Show(MessageSiloAPI api)
         {
             var entities = api.List();
 
