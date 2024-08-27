@@ -7,8 +7,9 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["src/MessageSilo/MessageSilo.csproj", "src/MessageSilo/"]
-COPY ["src/MessageSilo.Features/MessageSilo.Features.csproj", "src/MessageSilo.Features/"]
-COPY ["src/MessageSilo.Shared/MessageSilo.Shared.csproj", "src/MessageSilo.Shared/"]
+COPY ["src/MessageSilo.Application/MessageSilo.Application.csproj", "src/MessageSilo.Application/"]
+COPY ["src/MessageSilo.Infrastructure/MessageSilo.Infrastructure.csproj", "src/MessageSilo.Infrastructure/"]
+COPY ["src/MessageSilo.Domain/MessageSilo.Domain.csproj", "src/MessageSilo.Domain/"]
 RUN dotnet restore "src/MessageSilo/MessageSilo.csproj"
 COPY . .
 WORKDIR "/src/src/MessageSilo"
