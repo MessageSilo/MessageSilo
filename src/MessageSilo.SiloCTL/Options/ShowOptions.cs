@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using ConsoleTables;
+using MessageSilo.Infrastructure.Interfaces;
 
 namespace MessageSilo.SiloCTL.Options
 {
@@ -20,9 +21,9 @@ namespace MessageSilo.SiloCTL.Options
         {
         }
 
-        public void Show(MessageSiloAPI api)
+        public void Show(IMessageSiloAPI api)
         {
-            var entities = api.List();
+            var entities = api.List().GetAwaiter().GetResult();
 
             if (!string.IsNullOrEmpty(Name))
             {

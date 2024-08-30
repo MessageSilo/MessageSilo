@@ -1,0 +1,102 @@
+﻿@page "/"
+
+@using MessageSilo.Application.DTOs
+@using MessageSilo.Domain.Entities
+@using MessageSilo.Domain.Enums
+@using MessageSilo.Infrastructure.Interfaces
+
+@inject IMessageSiloAPI api
+@inject IYamlConverterService yamlConverterService
+
+<PageTitle>Manager - Message Silo</PageTitle>
+
+<h1>Manager</h1>
+
+<Row>
+    <Column>
+        <FileEdit />
+        <MemoEdit Rows="20" Class="mt-5" @bind-Text="@fileContent"/>
+        <Button Color="Color.Primary" Class="mt-5" Clicked="@OnApply">Apply</Button>
+    </Column>
+    <Column>
+        <Table Striped>
+            <TableHeader>
+                <TableRow>
+                    <TableHeaderCell>KIND</TableHeaderCell>
+                    <TableHeaderCell>NAME</TableHeaderCell>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach (var entity in entities)
+                {
+                    <TableRow>
+                        <TableRowCell>@entity.Kind</TableRowCell>
+                        <TableRowCell>@entity.Name</TableRowCell>
+                    </TableRow>
+                }
+
+            </TableBody>
+        </Table>
+    </Column>
+</Row>
+
+@code {
+    private IEnumerable<Entity> entities = [];
+
+    private string fileContent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadEntities();
+    }
+
+    private async Task OnApply()
+    {
+        ApplyDTO dto = new ApplyDTO();
+
+        var content = fileContent.Split("---", StringSplitOptions.RemoveEmptyEntries & StringSplitOptions.TrimEntries);
+
+        foreach (var config in content.Where(p => p.Contains($"kind: {EntityKind.Target}")))
+        {
+            var parsed = yamlConverterService.Deserialize<TargetDTO>(config);
+            dto.Targets.Add(parsed);
+        }
+
+        foreach (var config in content.Where(p => p.Contains($"kind: {EntityKind.Enricher}")))
+        {
+            var parsed = yamlConverterService.Deserialize<EnricherDTO>(config);
+            dto.Enrichers.Add(parsed);
+        }
+
+        foreach (var config in content.Where(p => p.Contains($"kind: {EntityKind.Connection}")))
+        {
+            var parsed = yamlConverterService.Deserialize<ConnectionSettingsDTO>(config);
+            parsed.TargetKind = dto.Targets.Any(p => p.Id == parsed.TargetId) ? EntityKind.Target : EntityKind.Connection;
+            dto.Connections.Add(parsed);
+        }
+
+        var errors = await api.Apply(dto);
+
+        if (errors is not null)
+            foreach (var error in errors)
+            {
+                Console.WriteLine($"Cannot apply changes on '{error.EntityName}' because the following errors:");
+
+                foreach (var failure in error.ValidationFailures)
+                {
+                    Console.WriteLine($"\t- {failure.ErrorMessage}");
+                }
+
+                return;
+            }
+
+        Console.WriteLine($"Changes applied successfully!");
+        
+        await ReloadEntities();
+    }
+
+    private async Task ReloadEntities()
+    {
+        entities = await api.List();
+    }
+}

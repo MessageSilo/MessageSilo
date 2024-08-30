@@ -21,7 +21,7 @@ namespace MessageSilo.SiloCTL.Options
         [Option('s', "scale", Required = false, HelpText = "How many instances of entities to run in parallel. The default value is 1.")]
         public int Scale { get; set; } = 1;
 
-        public void Apply(MessageSiloAPI api)
+        public void Apply(IMessageSiloAPI api)
         {
             var configReader = new ConfigReader(FileName);
             ApplyDTO dto = new()
@@ -48,7 +48,7 @@ namespace MessageSilo.SiloCTL.Options
                 dto.Connections.Add(parsed);
             }
 
-            var errors = api.Apply(dto);
+            var errors = api.Apply(dto).GetAwaiter().GetResult();
 
             if (errors is not null)
                 foreach (var error in errors)
