@@ -1,5 +1,9 @@
 ﻿@page "/"
 
+@using Blazor.Diagrams
+@using Blazor.Diagrams.Components
+@using Blazor.Diagrams.Core.Geometry
+@using Blazor.Diagrams.Core.Models
 @using MessageSilo.Application.DTOs
 @using MessageSilo.Domain.Entities
 @using MessageSilo.Domain.Enums
@@ -15,11 +19,11 @@
 <Row>
     <Column>
         <FileEdit />
-        <MemoEdit Rows="20" Class="mt-5" @bind-Text="@fileContent"/>
+        <MemoEdit Rows="20" Class="mt-5" @bind-Text="@fileContent" />
         <Button Color="Color.Primary" Class="mt-5" Clicked="@OnApply">Apply</Button>
     </Column>
     <Column>
-        <Table Striped>
+        <Table Striped FixedHeader FixedHeaderTableHeight="200px">
             <TableHeader>
                 <TableRow>
                     <TableHeaderCell>KIND</TableHeaderCell>
@@ -34,19 +38,27 @@
                         <TableRowCell>@entity.Name</TableRowCell>
                     </TableRow>
                 }
-
             </TableBody>
         </Table>
+        <Div Class="diagram-container mt-5" Height="Height.Is75">
+            <CascadingValue Value="diagram" IsFixed="true">
+                <DiagramCanvas></DiagramCanvas>
+            </CascadingValue>
+        </Div>
     </Column>
 </Row>
 
 @code {
     private IEnumerable<Entity> entities = [];
 
-    private string fileContent;
+    private string fileContent = null!;
+
+    private BlazorDiagram diagram = null!;
 
     protected override async Task OnInitializedAsync()
     {
+        diagram = new BlazorDiagram();
+
         await ReloadEntities();
     }
 
@@ -91,12 +103,49 @@
             }
 
         Console.WriteLine($"Changes applied successfully!");
-        
+
         await ReloadEntities();
     }
 
     private async Task ReloadEntities()
     {
         entities = await api.List();
+
+        foreach (var entity in entities)
+        {
+            diagram.Nodes.Add(new NodeModel(entity.Name)
+                {
+                    Title = entity.Name
+                });
+        }
+
+        foreach (var entity in entities)
+        {
+            if (entity.Kind == EntityKind.Connection)
+            {
+                var conn = yamlConverterService.Deserialize<ConnectionSettingsDTO>(entity.YamlDefinition);
+
+                var connNode = diagram.Nodes.First(p => p.Id == conn.Name);
+
+                NodeModel? previousEnricherNode = null;
+
+                for (var i = 0; i < conn.Enrichers.Count(); i++)
+                {
+                    var enricher = conn.Enrichers.ElementAt(i);
+                    var enricherNode = diagram.Nodes.First(p => p.Id == conn.Name);
+
+                    if (i == 0)
+                        diagram.Links.Add(new LinkModel(connNode, enricherNode));
+
+                    if (previousEnricherNode is not null)
+                    {
+                        diagram.Links.Add(new LinkModel(previousEnricherNode, enricherNode));
+                    }
+
+                    previousEnricherNode = enricherNode;
+                }
+
+            }
+        }
     }
 }
