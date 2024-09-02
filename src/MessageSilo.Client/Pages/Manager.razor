@@ -23,24 +23,7 @@
         <Button Color="Color.Primary" Class="mt-5" Clicked="@OnApply">Apply</Button>
     </Column>
     <Column>
-        <Table Striped FixedHeader FixedHeaderTableHeight="200px">
-            <TableHeader>
-                <TableRow>
-                    <TableHeaderCell>KIND</TableHeaderCell>
-                    <TableHeaderCell>NAME</TableHeaderCell>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                @foreach (var entity in entities)
-                {
-                    <TableRow>
-                        <TableRowCell>@entity.Kind</TableRowCell>
-                        <TableRowCell>@entity.Name</TableRowCell>
-                    </TableRow>
-                }
-            </TableBody>
-        </Table>
-        <Div Class="diagram-container mt-5" Height="Height.Is75">
+        <Div Class="diagram-container" Height="Height.Is100">
             <CascadingValue Value="diagram" IsFixed="true">
                 <DiagramCanvas></DiagramCanvas>
             </CascadingValue>
@@ -126,23 +109,38 @@
                 var conn = yamlConverterService.Deserialize<ConnectionSettingsDTO>(entity.YamlDefinition);
 
                 var connNode = diagram.Nodes.First(p => p.Id == conn.Name);
+                connNode.SetPosition(10, 10);
 
-                NodeModel? previousEnricherNode = null;
+                NodeModel? lastEnricherNode = null;
 
                 for (var i = 0; i < conn.Enrichers.Count(); i++)
                 {
                     var enricher = conn.Enrichers.ElementAt(i);
-                    var enricherNode = diagram.Nodes.First(p => p.Id == conn.Name);
+                    var enricherNode = diagram.Nodes.First(p => p.Id == enricher);
+                    enricherNode.SetPosition(10, 10 + (i + 1) * 100);
 
                     if (i == 0)
-                        diagram.Links.Add(new LinkModel(connNode, enricherNode));
-
-                    if (previousEnricherNode is not null)
                     {
-                        diagram.Links.Add(new LinkModel(previousEnricherNode, enricherNode));
+                        diagram.Links.Add(new LinkModel(connNode, enricherNode));
                     }
 
-                    previousEnricherNode = enricherNode;
+                    if (lastEnricherNode is not null)
+                    {
+                        diagram.Links.Add(new LinkModel(lastEnricherNode, enricherNode));
+                    }
+
+                    lastEnricherNode = enricherNode;
+                }
+
+                if (!string.IsNullOrWhiteSpace(conn.Target))
+                {
+                    var targetNode = diagram.Nodes.First(p => p.Id == conn.Target);
+                    targetNode.SetPosition(10, 10 + (conn.Enrichers.Count() + 1) * 100);
+
+                    if (lastEnricherNode is not null)
+                        diagram.Links.Add(new LinkModel(lastEnricherNode, targetNode));
+                    else
+                        diagram.Links.Add(new LinkModel(connNode, targetNode));
                 }
 
             }
