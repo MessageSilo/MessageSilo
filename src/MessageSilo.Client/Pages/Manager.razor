@@ -4,7 +4,10 @@
 @using Blazor.Diagrams.Components
 @using Blazor.Diagrams.Core.Geometry
 @using Blazor.Diagrams.Core.Models
+@using Blazor.Diagrams.Models
 @using MessageSilo.Application.DTOs
+@using MessageSilo.Client.Components
+@using MessageSilo.Client.Models
 @using MessageSilo.Domain.Entities
 @using MessageSilo.Domain.Enums
 @using MessageSilo.Infrastructure.Interfaces
@@ -12,13 +15,11 @@
 @inject IMessageSiloAPI api
 @inject IYamlConverterService yamlConverterService
 
-<PageTitle>Manager - Message Silo</PageTitle>
-
-<h1>Manager</h1>
+<PageTitle>Message Silo</PageTitle>
 
 <Row>
     <Column>
-        <FileEdit />
+        <FileEdit Changed="@OnFileEditChanged" />
         <MemoEdit Rows="20" Class="mt-5" @bind-Text="@fileContent" />
         <Button Color="Color.Primary" Class="mt-5" Clicked="@OnApply">Apply</Button>
     </Column>
@@ -41,6 +42,9 @@
     protected override async Task OnInitializedAsync()
     {
         diagram = new BlazorDiagram();
+        diagram.RegisterComponent<ConnectionNode, ConnectionWidget>();
+        diagram.RegisterComponent<EnricherNode, EnricherWidget>();
+        diagram.RegisterComponent<TargetNode, TargetWidget>();
 
         await ReloadEntities();
     }
@@ -94,56 +98,134 @@
     {
         entities = await api.List();
 
-        foreach (var entity in entities)
+        foreach (var entity in entities.Where(p => p.Kind == EntityKind.Target))
         {
-            diagram.Nodes.Add(new NodeModel(entity.Name)
+            var dto = yamlConverterService.Deserialize<TargetDTO>(entity.YamlDefinition);
+
+            diagram.Nodes.Add(new TargetNode(dto, entity.Name)
                 {
                     Title = entity.Name
                 });
         }
 
-        foreach (var entity in entities)
+        foreach (var entity in entities.Where(p => p.Kind == EntityKind.Enricher))
         {
-            if (entity.Kind == EntityKind.Connection)
+            var dto = yamlConverterService.Deserialize<EnricherDTO>(entity.YamlDefinition);
+
+            diagram.Nodes.Add(new EnricherNode(dto, entity.Name)
+                {
+                    Title = entity.Name
+                });
+        }
+
+        foreach (var entity in entities.Where(p => p.Kind == EntityKind.Connection))
+        {
+            var dto = yamlConverterService.Deserialize<ConnectionSettingsDTO>(entity.YamlDefinition);
+
+            diagram.Nodes.Add(new ConnectionNode(dto, entity.Name)
+                {
+                    Title = entity.Name
+                });
+        }
+
+        foreach (ConnectionNode connNode in diagram.Nodes.Where(p => p is ConnectionNode))
+        {
+            var linkedEntities = connNode.DTO.Enrichers.ToArray();
+
+            if (!string.IsNullOrWhiteSpace(connNode.DTO.Target))
+                linkedEntities = [connNode.Id, ..linkedEntities, connNode.DTO.Target];
+
+            for (int i = 0; i <= linkedEntities.Length; i++)
             {
-                var conn = yamlConverterService.Deserialize<ConnectionSettingsDTO>(entity.YamlDefinition);
-
-                var connNode = diagram.Nodes.First(p => p.Id == conn.Name);
-                connNode.SetPosition(10, 10);
-
-                NodeModel? lastEnricherNode = null;
-
-                for (var i = 0; i < conn.Enrichers.Count(); i++)
+                if (i == 0)
                 {
-                    var enricher = conn.Enrichers.ElementAt(i);
-                    var enricherNode = diagram.Nodes.First(p => p.Id == enricher);
-                    enricherNode.SetPosition(10, 10 + (i + 1) * 100);
-
-                    if (i == 0)
-                    {
-                        diagram.Links.Add(new LinkModel(connNode, enricherNode));
-                    }
-
-                    if (lastEnricherNode is not null)
-                    {
-                        diagram.Links.Add(new LinkModel(lastEnricherNode, enricherNode));
-                    }
-
-                    lastEnricherNode = enricherNode;
+                    diagram.Links.Add(new LinkModel(connNode, node));
                 }
+            }
 
-                if (!string.IsNullOrWhiteSpace(conn.Target))
-                {
-                    var targetNode = diagram.Nodes.First(p => p.Id == conn.Target);
-                    targetNode.SetPosition(10, 10 + (conn.Enrichers.Count() + 1) * 100);
+            foreach (var nodeId in linkedEntities)
+            {
+                var node = FindNode(nodeId);
 
-                    if (lastEnricherNode is not null)
-                        diagram.Links.Add(new LinkModel(lastEnricherNode, targetNode));
-                    else
-                        diagram.Links.Add(new LinkModel(connNode, targetNode));
-                }
-
+                diagram.Links.Add(new LinkModel(connNode, node));
             }
         }
+
+        // foreach (var entity in entities)
+        // {
+        //     if (entity.Kind == EntityKind.Connection)
+        //     {
+        //         var conn = yamlConverterService.Deserialize<ConnectionSettingsDTO>(entity.YamlDefinition);
+
+        //         var connNode = diagram.Nodes.First(p => p.Id == conn.Name);
+        //         connNode.SetPosition(10, 10);
+
+        //         NodeModel? lastEnricherNode = null;
+
+        //         for (var i = 0; i < conn.Enrichers.Count(); i++)
+        //         {
+        //             var enricher = conn.Enrichers.ElementAt(i);
+        //             var enricherNode = diagram.Nodes.First(p => p.Id == enricher);
+        //             enricherNode.SetPosition(10, 10 + (i + 1) * 100);
+
+        //             if (i == 0)
+        //             {
+        //                 diagram.Links.Add(new LinkModel(connNode, enricherNode));
+        //             }
+
+        //             if (lastEnricherNode is not null)
+        //             {
+        //                 diagram.Links.Add(new LinkModel(lastEnricherNode, enricherNode));
+        //             }
+
+        //             lastEnricherNode = enricherNode;
+        //         }
+
+        //         if (!string.IsNullOrWhiteSpace(conn.Target))
+        //         {
+        //             var targetNode = diagram.Nodes.First(p => p.Id == conn.Target);
+        //             targetNode.SetPosition(10, 10 + (conn.Enrichers.Count() + 1) * 100);
+
+        //             if (lastEnricherNode is not null)
+        //                 diagram.Links.Add(new LinkModel(lastEnricherNode, targetNode));
+        //             else
+        //                 diagram.Links.Add(new LinkModel(connNode, targetNode));
+        //         }
+
+        //     }
+        // }
+    }
+
+    private async Task OnFileEditChanged(FileChangedEventArgs e)
+    {
+        try
+        {
+            foreach (var file in e.Files)
+            {
+                var stream = new MemoryStream();
+
+                await file.WriteToStreamAsync(stream);
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+
+                var reader = new StreamReader(stream);
+
+                fileContent = await reader.ReadToEndAsync();
+            }
+        }
+        catch (Exception exc)
+        {
+            Console.WriteLine(exc.Message);
+        }
+        finally
+        {
+            this.StateHasChanged();
+        }
+    }
+
+    private NodeModel FindNode(string nodeId)
+    {
+        return diagram.Nodes.First(p => p.Id == nodeId);
     }
 }

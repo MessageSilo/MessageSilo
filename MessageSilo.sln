@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.Infrastructure"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.Application", "src\MessageSilo.Application\MessageSilo.Application.csproj", "{12410FC4-0C89-44B3-9B85-34DB0E94F9CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageSilo.Client", "src\MessageSilo.Client\MessageSilo.Client.csproj", "{F8F34E41-72EA-4BD4-A347-FA88E2AA2AF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageSilo.Client", "src\MessageSilo.Client\MessageSilo.Client.csproj", "{F8F34E41-72EA-4BD4-A347-FA88E2AA2AF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

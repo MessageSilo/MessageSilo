@@ -106,3 +106,30 @@ code {
     width: 100%;
     border: 1px solid black;
 }
+
+.widget-container {
+    width: 200px;
+    max-height: 41px;
+    border-radius: 10px;
+    outline: 1px solid black;
+    padding: 0px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    overflow: hidden;
+}
+
+.icon-container {
+    height: 100%;
+    background-color: lightgray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.text-container {
+    flex: 1;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+}
