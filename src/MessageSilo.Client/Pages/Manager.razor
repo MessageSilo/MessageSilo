@@ -2,6 +2,7 @@
 
 @using Blazor.Diagrams
 @using Blazor.Diagrams.Components
+@using Blazor.Diagrams.Components.Widgets
 @using Blazor.Diagrams.Core.Geometry
 @using Blazor.Diagrams.Core.Models
 @using Blazor.Diagrams.Models
@@ -26,7 +27,12 @@
     <Column>
         <Div Class="diagram-container" Height="Height.Is100">
             <CascadingValue Value="diagram" IsFixed="true">
-                <DiagramCanvas></DiagramCanvas>
+                <DiagramCanvas>
+                    <Widgets>
+                        <GridWidget Size="20" Mode="GridMode.Point" BackgroundColor="white" />
+                        <SelectionBoxWidget />
+                    </Widgets>
+                </DiagramCanvas>
             </CascadingValue>
         </Div>
     </Column>
@@ -133,67 +139,25 @@
             var linkedEntities = connNode.DTO.Enrichers.ToArray();
 
             if (!string.IsNullOrWhiteSpace(connNode.DTO.Target))
-                linkedEntities = [connNode.Id, ..linkedEntities, connNode.DTO.Target];
+                linkedEntities = [connNode.Id, .. linkedEntities, connNode.DTO.Target];
 
-            for (int i = 0; i <= linkedEntities.Length; i++)
+            for (int i = linkedEntities.Length - 1; i >= 0; i--)
             {
-                if (i == 0)
+                string currentItem = linkedEntities[i];
+                string prevItem = (i - 1 >= 0) ? linkedEntities[i - 1] : null!;
+
+                if (prevItem is not null)
                 {
-                    diagram.Links.Add(new LinkModel(connNode, node));
+                    var currentNode = FindNode(currentItem);
+                    var prevNode = FindNode(prevItem);
+
+                    diagram.Links.Add(new LinkModel(prevNode, currentNode)
+                    {
+                        TargetMarker = LinkMarker.Arrow
+                    });
                 }
             }
-
-            foreach (var nodeId in linkedEntities)
-            {
-                var node = FindNode(nodeId);
-
-                diagram.Links.Add(new LinkModel(connNode, node));
-            }
         }
-
-        // foreach (var entity in entities)
-        // {
-        //     if (entity.Kind == EntityKind.Connection)
-        //     {
-        //         var conn = yamlConverterService.Deserialize<ConnectionSettingsDTO>(entity.YamlDefinition);
-
-        //         var connNode = diagram.Nodes.First(p => p.Id == conn.Name);
-        //         connNode.SetPosition(10, 10);
-
-        //         NodeModel? lastEnricherNode = null;
-
-        //         for (var i = 0; i < conn.Enrichers.Count(); i++)
-        //         {
-        //             var enricher = conn.Enrichers.ElementAt(i);
-        //             var enricherNode = diagram.Nodes.First(p => p.Id == enricher);
-        //             enricherNode.SetPosition(10, 10 + (i + 1) * 100);
-
-        //             if (i == 0)
-        //             {
-        //                 diagram.Links.Add(new LinkModel(connNode, enricherNode));
-        //             }
-
-        //             if (lastEnricherNode is not null)
-        //             {
-        //                 diagram.Links.Add(new LinkModel(lastEnricherNode, enricherNode));
-        //             }
-
-        //             lastEnricherNode = enricherNode;
-        //         }
-
-        //         if (!string.IsNullOrWhiteSpace(conn.Target))
-        //         {
-        //             var targetNode = diagram.Nodes.First(p => p.Id == conn.Target);
-        //             targetNode.SetPosition(10, 10 + (conn.Enrichers.Count() + 1) * 100);
-
-        //             if (lastEnricherNode is not null)
-        //                 diagram.Links.Add(new LinkModel(lastEnricherNode, targetNode));
-        //             else
-        //                 diagram.Links.Add(new LinkModel(connNode, targetNode));
-        //         }
-
-        //     }
-        // }
     }
 
     private async Task OnFileEditChanged(FileChangedEventArgs e)

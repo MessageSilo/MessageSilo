@@ -117,6 +117,7 @@ code {
     align-items: center;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     overflow: hidden;
+    background: white;
 }
 
 .icon-container {
@@ -132,4 +133,15 @@ code {
     padding-left: 10px;
     display: flex;
     align-items: center;
+}
+
+g.diagram-link path:not(.selection-helper) {
+    stroke-dasharray: 5;
+    animation: dash .5s linear infinite;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: -10;
+    }
 }
