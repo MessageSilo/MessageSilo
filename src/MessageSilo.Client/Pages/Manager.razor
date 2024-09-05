@@ -12,11 +12,38 @@
 @using MessageSilo.Domain.Entities
 @using MessageSilo.Domain.Enums
 @using MessageSilo.Infrastructure.Interfaces
+@using System.Text
 
 @inject IMessageSiloAPI api
 @inject IYamlConverterService yamlConverterService
 
 <PageTitle>Message Silo</PageTitle>
+
+<Row>
+    <Alert Color="@(errors is null ? Color.Success : Color.Danger)" @bind-Visible="@alertVisible">
+        <AlertMessage>@(errors is null ? "Well done!" : "Oh no!")</AlertMessage>
+        <br />
+        <AlertDescription>
+            @if (errors is not null)
+            {
+                foreach (var error in errors)
+                {
+                    <Span>@($"Cannot apply changes on '{error.EntityName}' because the following errors:")</Span>
+                    <ul>
+                        @foreach (var failure in error.ValidationFailures)
+                        {
+                            <li>@failure.ErrorMessage</li>
+                        }
+                    </ul>
+                }
+            }
+            else
+            {
+                <Span>Changes applied successfully!</Span>
+            }
+        </AlertDescription>
+    </Alert>
+</Row>
 
 <Row>
     <Column>
@@ -39,7 +66,11 @@
 </Row>
 
 @code {
+    private bool alertVisible = false;
+
     private IEnumerable<Entity> entities = [];
+
+    private IEnumerable<EntityValidationErrors>? errors;
 
     private string fileContent = null!;
 
@@ -80,24 +111,14 @@
             dto.Connections.Add(parsed);
         }
 
-        var errors = await api.Apply(dto);
+        errors = await api.Apply(dto);
 
-        if (errors is not null)
-            foreach (var error in errors)
-            {
-                Console.WriteLine($"Cannot apply changes on '{error.EntityName}' because the following errors:");
+        if (errors is null)
+        {
+            await ReloadEntities();
+        }
 
-                foreach (var failure in error.ValidationFailures)
-                {
-                    Console.WriteLine($"\t- {failure.ErrorMessage}");
-                }
-
-                return;
-            }
-
-        Console.WriteLine($"Changes applied successfully!");
-
-        await ReloadEntities();
+        alertVisible = true;
     }
 
     private async Task ReloadEntities()
@@ -152,9 +173,9 @@
                     var prevNode = FindNode(prevItem);
 
                     diagram.Links.Add(new LinkModel(prevNode, currentNode)
-                    {
-                        TargetMarker = LinkMarker.Arrow
-                    });
+                        {
+                            TargetMarker = LinkMarker.Arrow
+                        });
                 }
             }
         }
