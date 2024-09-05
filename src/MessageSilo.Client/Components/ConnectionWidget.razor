@@ -1,25 +1,48 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
 @using MessageSilo.Client.Models
 
-<div Class="widget-container">
-    <div class="icon-container">
-        <Image Source="@imageUrl" Width="Width.Px(25)" Height="Height.Px(25)" Margin="Margin.Is2"></Image>
+<Tooltip Text="@tooltipContent">
+    <div Class="widget-container">
+        <div class="icon-container">
+            <Image Source="@imageUrl" Width="Width.Px(25)" Height="Height.Px(25)" Margin="Margin.Is2"></Image>
+        </div>
+
+        <div class="text-container">
+            @Node.DTO.Name
+        </div>
+
+        @foreach (var port in Node.Ports)
+        {
+            <PortRenderer @key="port" Port="port" />
+        }
+
     </div>
-
-    <div class="text-container">
-        @Node.DTO.Name
-    </div>
-
-    @foreach (var port in Node.Ports)
-    {
-        <PortRenderer @key="port" Port="port" />
-    }
-
-</div>
+</Tooltip>
 
 @code {
     // This gets filled by the library
     [Parameter] public ConnectionNode Node { get; set; } = null!;
 
     private string imageUrl => $"/img/platform-types/{Node?.DTO.Type.ToString()}.svg";
+
+    private string tooltipContent =>
+    $"<table>" +
+    HtmlHelpers.RenderEntityDetailRow("Name", Node?.DTO.Name) +
+    HtmlHelpers.RenderEntityDetailRow("Kind", Node?.DTO.Kind.ToString()) +
+    HtmlHelpers.RenderEntityDetailRow("Type", Node?.DTO.Type.ToString()) +
+
+    HtmlHelpers.RenderEntityDetailRow("Connection String", Node?.DTO.ConnectionString, true) +
+    HtmlHelpers.RenderEntityDetailRow("Queue Name", Node?.DTO.QueueName) +
+    HtmlHelpers.RenderEntityDetailRow("Receive Mode", Node?.DTO.ReceiveMode.ToString()) +
+
+    HtmlHelpers.RenderEntityDetailRow("Topic Name", Node?.DTO.TopicName) +
+    HtmlHelpers.RenderEntityDetailRow("Subscription Name", Node?.DTO.SubscriptionName) +
+    HtmlHelpers.RenderEntityDetailRow("Sub Queue", Node?.DTO.SubQueue) +
+
+    HtmlHelpers.RenderEntityDetailRow("Exchange Name", Node?.DTO.ExchangeName) +
+
+    HtmlHelpers.RenderEntityDetailRow("Region", Node?.DTO.Region) +
+    HtmlHelpers.RenderEntityDetailRow("Access Key", Node?.DTO.AccessKey, true) +
+    HtmlHelpers.RenderEntityDetailRow("SecretAccess Key", Node?.DTO.SecretAccessKey, true) +
+    "</table>";
 }

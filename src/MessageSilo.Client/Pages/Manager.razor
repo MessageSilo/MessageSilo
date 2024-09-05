@@ -179,6 +179,8 @@
                 }
             }
         }
+
+        GenerateCoordinates(200, 50);
     }
 
     private async Task OnFileEditChanged(FileChangedEventArgs e)
@@ -212,5 +214,27 @@
     private NodeModel FindNode(string nodeId)
     {
         return diagram.Nodes.First(p => p.Id == nodeId);
+    }
+
+    private void GenerateCoordinates(int elementWidth, int elementHeight)
+    {
+        List<(int X, int Y)> coordinates = new List<(int X, int Y)>();
+
+        // Calculate how many elements can fit in one column
+        int elementsPerColumn = (int)diagram.Container.Height / 50;
+
+        // Generate X, Y coordinates for each element
+        for (int i = 0; i < diagram.Nodes.Count; i++)
+        {
+            // Calculate column and row based on column-first approach
+            int column = i / elementsPerColumn;
+            int row = i % elementsPerColumn;
+
+            // Calculate X and Y positions
+            int x = column * elementWidth;
+            int y = row * elementHeight;
+
+            diagram.Nodes[i].SetPosition(x, y);
+        }
     }
 }

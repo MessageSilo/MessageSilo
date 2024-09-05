@@ -1,25 +1,43 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
 @using MessageSilo.Client.Models
 
-<div Class="widget-container">
-    <div class="icon-container">
-        <Image Source="@imageUrl" Width="Width.Px(25)" Height="Height.Px(25)" Margin="Margin.Is2"></Image>
+<Tooltip Text="@tooltipContent">
+    <div Class="widget-container">
+        <div class="icon-container">
+            <Image Source="@imageUrl" Width="Width.Px(25)" Height="Height.Px(25)" Margin="Margin.Is2"></Image>
+        </div>
+
+        <div class="text-container">
+            @Node.DTO.Name
+        </div>
+
+        @foreach (var port in Node.Ports)
+        {
+            <PortRenderer @key="port" Port="port" />
+        }
+
     </div>
-
-    <div class="text-container">
-        @Node.DTO.Name
-    </div>
-
-    @foreach (var port in Node.Ports)
-    {
-        <PortRenderer @key="port" Port="port" />
-    }
-
-</div>
+</Tooltip>
 
 @code {
     // This gets filled by the library
     [Parameter] public EnricherNode Node { get; set; } = null!;
 
     private string imageUrl => $"/img/enricher.svg";
+
+    private string tooltipContent =>
+    $"<table>" +
+    HtmlHelpers.RenderEntityDetailRow("Name", Node?.DTO.Name) +
+    HtmlHelpers.RenderEntityDetailRow("Kind", Node?.DTO.Kind.ToString()) +
+    HtmlHelpers.RenderEntityDetailRow("Type", Node?.DTO.Type.ToString()) +
+
+    HtmlHelpers.RenderEntityDetailRow("Function", Node?.DTO.Function) +
+
+    HtmlHelpers.RenderEntityDetailRow("Url", Node?.DTO.Url) +
+    HtmlHelpers.RenderEntityDetailRow("Method", Node?.DTO.Method.ToString()) +
+    HtmlHelpers.RenderEntityDetailRow("Max Retry Attempts", Node?.DTO.Retry?.MaxRetryAttempts.ToString()) +
+
+    HtmlHelpers.RenderEntityDetailRow("ApiKey", Node?.DTO.ApiKey, true) +
+    HtmlHelpers.RenderEntityDetailRow("Command", Node?.DTO.Command) +
+    "</table>";
 }
