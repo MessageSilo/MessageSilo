@@ -1,23 +1,25 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
 @using MessageSilo.Client.Models
 
-<Tooltip Text="@tooltipContent">
-    <div Class="widget-container">
-        <div class="icon-container">
-            <Image Source="@imageUrl" Width="Width.Px(25)" Height="Height.Px(25)" Margin="Margin.Is2"></Image>
+<Div Class="widget-container">
+    <Tooltip Text="@tooltipContent">
+        <div class="widget-content">
+            <div class="icon-container">
+                <Image Source="@imageUrl" Width="Width.Px(25)" Height="Height.Px(25)" Margin="Margin.Is2"></Image>
+            </div>
+
+            <div class="text-container">
+                @Node.DTO.Name
+            </div>
+
+            @foreach (var port in Node.Ports)
+            {
+                <PortRenderer @key="port" Port="port" />
+            }
+
         </div>
-
-        <div class="text-container">
-            @Node.DTO.Name
-        </div>
-
-        @foreach (var port in Node.Ports)
-        {
-            <PortRenderer @key="port" Port="port" />
-        }
-
-    </div>
-</Tooltip>
+    </Tooltip>
+</Div>
 
 @code {
     // This gets filled by the library
