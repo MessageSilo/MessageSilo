@@ -48,7 +48,7 @@
 <Row>
     <Column>
         <FileEdit Changed="@OnFileEditChanged" />
-        <MemoEdit Rows="20" Class="mt-5" @bind-Text="@fileContent" />
+        <MemoEdit Rows="20" Class="mt-5" @bind-Text="@fileContent" Placeholder="Define your Entities here..." />
         <Button Color="Color.Primary" Class="mt-5" Clicked="@OnApply">Apply</Button>
     </Column>
     <Column>
@@ -125,6 +125,8 @@
     {
         entities = await api.List();
 
+        diagram.Nodes.Clear();
+
         foreach (var entity in entities.Where(p => p.Kind == EntityKind.Target))
         {
             var dto = yamlConverterService.Deserialize<TargetDTO>(entity.YamlDefinition);
@@ -155,32 +157,9 @@
                 });
         }
 
-        foreach (ConnectionNode connNode in diagram.Nodes.Where(p => p is ConnectionNode))
-        {
-            var linkedEntities = connNode.DTO.Enrichers.ToArray();
+        PlaceNodes();
 
-            if (!string.IsNullOrWhiteSpace(connNode.DTO.Target))
-                linkedEntities = [connNode.Id, .. linkedEntities, connNode.DTO.Target];
-
-            for (int i = linkedEntities.Length - 1; i >= 0; i--)
-            {
-                string currentItem = linkedEntities[i];
-                string prevItem = (i - 1 >= 0) ? linkedEntities[i - 1] : null!;
-
-                if (prevItem is not null)
-                {
-                    var currentNode = FindNode(currentItem);
-                    var prevNode = FindNode(prevItem);
-
-                    diagram.Links.Add(new LinkModel(prevNode, currentNode)
-                        {
-                            TargetMarker = LinkMarker.Arrow
-                        });
-                }
-            }
-        }
-
-        GenerateCoordinates(200, 50);
+        ConnectNodes();
     }
 
     private async Task OnFileEditChanged(FileChangedEventArgs e)
@@ -211,30 +190,60 @@
         }
     }
 
-    private NodeModel FindNode(string nodeId)
+    private void PlaceNodes()
     {
-        return diagram.Nodes.First(p => p.Id == nodeId);
-    }
+        if (diagram.Nodes.Count == 0)
+            return;
 
-    private void GenerateCoordinates(int elementWidth, int elementHeight)
-    {
+        var centerX = ((int)diagram.Container.Width / 2) - 100;
+        var centerY = ((int)diagram.Container.Height / 2) - 50;
+
         List<(int X, int Y)> coordinates = new List<(int X, int Y)>();
 
-        // Calculate how many elements can fit in one column
-        int elementsPerColumn = (int)diagram.Container.Height / 50;
+        // Calculate angle step
+        double angleStep = 360.0 / diagram.Nodes.Count;
+        var radius = diagram.Nodes.Count * 50;
 
         // Generate X, Y coordinates for each element
         for (int i = 0; i < diagram.Nodes.Count; i++)
         {
-            // Calculate column and row based on column-first approach
-            int column = i / elementsPerColumn;
-            int row = i % elementsPerColumn;
+            // Calculate the angle in radians
+            double angleInRadians = (Math.PI / 180) * (angleStep * i);
 
             // Calculate X and Y positions
-            int x = column * elementWidth;
-            int y = row * elementHeight;
+            int x = centerX + (int)(radius * Math.Cos(angleInRadians));
+            int y = centerY + (int)(radius * Math.Sin(angleInRadians));
 
+            // Add the coordinates to the node
             diagram.Nodes[i].SetPosition(x, y);
+        }
+    }
+
+    public void ConnectNodes()
+    {
+        foreach (ConnectionNode connNode in diagram.Nodes.Where(p => p is ConnectionNode))
+        {
+            var linkedEntities = connNode.DTO.Enrichers.ToArray();
+
+            if (!string.IsNullOrWhiteSpace(connNode.DTO.Target))
+                linkedEntities = [connNode.Id, .. linkedEntities, connNode.DTO.Target];
+
+            for (int i = linkedEntities.Length - 1; i >= 0; i--)
+            {
+                string currentItem = linkedEntities[i];
+                string prevItem = (i - 1 >= 0) ? linkedEntities[i - 1] : null!;
+
+                if (prevItem is not null)
+                {
+                    var currentNode = diagram.Nodes.First(p => p.Id == currentItem);
+                    var prevNode = diagram.Nodes.First(p => p.Id == prevItem);
+
+                    diagram.Links.Add(new LinkModel(prevNode, currentNode)
+                        {
+                            TargetMarker = LinkMarker.Arrow
+                        });
+                }
+            }
         }
     }
 }
