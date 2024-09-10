@@ -15,10 +15,11 @@ namespace MessageSilo.Controllers
         {
         }
 
-        [HttpPost("{id}")]
-        public async Task Send(string id, [FromBody] MessageDTO dto)
+        [HttpPost("{name}")]
+        public async Task Send(string name, [FromBody] MessageDTO dto)
         {
-            var grain = client.GetGrain<IConnectionGrain>(id);
+            var conn = await entityManagerGrain.GetConnectionSettings(name);
+            var grain = client.GetGrain<IConnectionGrain>($"{conn.Id}#{1}");
 
             await grain.Send(new Message(dto.Id, dto.Body));
         }

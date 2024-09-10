@@ -40,5 +40,11 @@ namespace MessageSilo.Infrastructure.ApiClients
 
             return result;
         }
+
+        public async Task Send(string connectionId, MessageDTO dto)
+        {
+            var response = await httpClient.PostAsJsonAsync($"Connections/{connectionId}", dto);
+            response.EnsureSuccessStatusCode();
+        }
     }
 }

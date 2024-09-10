@@ -10,5 +10,7 @@ namespace MessageSilo.Infrastructure.Interfaces
         Task Clear();
 
         Task<IEnumerable<EntityValidationErrors>?> Apply(ApplyDTO dto);
+
+        Task Send(string connectionId, MessageDTO dto);
     }
 }

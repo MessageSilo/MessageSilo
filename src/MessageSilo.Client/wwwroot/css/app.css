@@ -166,6 +166,7 @@ code {
 g.diagram-link path:not(.selection-helper) {
     stroke-dasharray: 5;
     animation: dash .5s linear infinite;
+    stroke: #00d9d0;
 }
 
 @keyframes dash {

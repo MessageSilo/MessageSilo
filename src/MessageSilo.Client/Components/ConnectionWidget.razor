@@ -19,7 +19,7 @@
         </div>
     </Tooltip>
     <div class="send-container">
-        <Icon Name="IconName.Send" class="fa-fw" Width="Width.Px(25)" Height="Height.Px(25)" Margin="Margin.Is2" />
+        <Icon Name="IconName.Send" title="Send a message" class="fa-fw" Width="Width.Px(25)" Height="Height.Px(25)" Margin="Margin.Is2" Clicked="async () => await Node.OnSendClick(Node.DTO)" />
     </div>
 </Div>
 
