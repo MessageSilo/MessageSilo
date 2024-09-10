@@ -8,7 +8,7 @@ namespace MessageSilo.Controllers
     public class EntitiesController : MessageSiloControllerBase
     {
         public EntitiesController(
-            ILogger<MessageSiloControllerBase> logger,
+            ILogger<EntitiesController> logger,
             IHttpContextAccessor httpContextAccessor,
             IClusterClient client) : base(logger, httpContextAccessor, client)
         {

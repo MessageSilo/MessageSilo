@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using MessageSilo.Infrastructure.Interfaces;
 
 namespace MessageSilo.SiloCTL.Options
 {
@@ -9,7 +10,7 @@ namespace MessageSilo.SiloCTL.Options
         {
         }
 
-        public void Clear(MessageSiloAPI api)
+        public void Clear(IMessageSiloAPI api)
         {
             api.Clear();
 

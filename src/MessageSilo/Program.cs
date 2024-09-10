@@ -60,10 +60,9 @@ builder.Host.UseOrleans(siloBuilder =>
 
 builder.Host.UseSerilog(Log.Logger);
 
-builder.Services.AddControllers();
-
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 builder.Services.AddHealthChecks()
     .AddCheck<ShallowHealthCheck>("shallow")
     .AddCheck<DeepHealthCheck>("deep");
@@ -72,12 +71,27 @@ builder.Services.AddHostedService<StartupService>();
 
 var app = builder.Build();
 
-app.UseStaticFiles();
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseWebAssemblyDebugging();
+}
+else
+{
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
 app.UseSerilogRequestLogging();
 app.UseCors(builder => builder.SetIsOriginAllowed(isOriginAllowed: _ => true).WithExposedHeaders(HeaderNames.ContentDisposition).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 app.UseHttpsRedirection();
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
 app.UseRouting();
+
+app.MapRazorPages();
 app.MapControllers();
 app.MapHealthChecks("/health");
+app.MapFallbackToFile("/", "index.html");
 
 app.Run();

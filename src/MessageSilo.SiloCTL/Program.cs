@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using MessageSilo.Infrastructure.ApiClients;
 using MessageSilo.SiloCTL.Options;
 
 namespace MessageSilo.SiloCTL

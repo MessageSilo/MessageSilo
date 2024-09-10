@@ -10,7 +10,7 @@
     <PackageReference Include="Jint" Version="4.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Polly.Core" Version="8.4.1" />
-    <PackageReference Include="RestSharp" Version="111.4.1" />
+    <PackageReference Include="RestSharp" Version="112.0.0" />
   </ItemGroup>
 
 </Project>
