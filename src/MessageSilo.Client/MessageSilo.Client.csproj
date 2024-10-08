@@ -18,4 +18,8 @@
     <ProjectReference Include="..\MessageSilo.Infrastructure\MessageSilo.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\js\bootstrap\" />
+  </ItemGroup>
+
 </Project>

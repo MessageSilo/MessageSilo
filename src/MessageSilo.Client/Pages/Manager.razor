@@ -20,7 +20,7 @@
 <PageTitle>Message Silo</PageTitle>
 
 <Row>
-    <Alert Color="@(errors is null ? Color.Success : Color.Danger)" @bind-Visible="@alertVisible">
+    <Alert Color="@(errors is null ? Color.Success : Color.Danger)" @bind-Visible="@alertVisible" Class="alert-dismissible fade show">
         <AlertMessage>@(errors is null ? "Well done!" : "Oh no!")</AlertMessage>
         <br />
         <AlertDescription>
@@ -42,6 +42,7 @@
                 <Span>Changes applied successfully!</Span>
             }
         </AlertDescription>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </Alert>
 </Row>
 

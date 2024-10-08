@@ -1,27 +1,32 @@
-html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
 }
 
-h1:focus {
-    outline: none;
+.navbar {
+    background-color: #1f1f1f;
 }
 
-a, .btn-link {
-    color: #0071c1;
+.navbar-brand, .nav-link {
+    color: #b0bec5 !important;
 }
 
 .btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #3498db;
+    border-color: #3498db;
+    color: #ffffff;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+    }
 
-.content {
-    padding-top: 1.1rem;
+footer {
+    background-color: #1f1f1f;
+    color: #b0bec5;
+    padding: 20px 0;
 }
 
 .valid.modified:not([type=checkbox]) {
@@ -123,6 +128,7 @@ code {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     overflow: hidden;
     background: white;
+    color: black;
 }
 
 .send-container {
@@ -137,6 +143,7 @@ code {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     overflow: hidden;
     background: white;
+    color: black;
     cursor: pointer;
 }
 
@@ -166,7 +173,7 @@ code {
 g.diagram-link path:not(.selection-helper) {
     stroke-dasharray: 5;
     animation: dash .5s linear infinite;
-    stroke: #00d9d0;
+    stroke: #3498db;
 }
 
 @keyframes dash {
