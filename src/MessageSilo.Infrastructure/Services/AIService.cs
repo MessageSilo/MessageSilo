@@ -7,9 +7,9 @@ namespace MessageSilo.Infrastructure.Services
     {
         private readonly ChatClient client;
 
-        public AIService(string apiKey)
+        public AIService(string apiKey, string model)
         {
-            client = new(model: "gpt-4o", apiKey);
+            client = new(model: model ?? "gpt-4o", apiKey);
         }
 
         public async Task<string> Chat(string command, string message)
