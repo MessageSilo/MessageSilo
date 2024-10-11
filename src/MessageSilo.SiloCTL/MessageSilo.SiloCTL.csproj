@@ -22,7 +22,7 @@
     <PackageReference Include="ConsoleTables" Version="2.6.1" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="8.0.8" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup>
