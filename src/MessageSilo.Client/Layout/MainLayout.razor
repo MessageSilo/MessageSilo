@@ -1,16 +1,18 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
+
+<!-- Navbar -->
+<NavMenu></NavMenu>
+
+<!-- Text Area and Image Section -->
+<section class="py-5">
+    <div class="container">
+        @Body
     </div>
+</section>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://github.com/MessageSilo/MessageSilo" target="_blank">GitHub</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<!-- Footer -->
+<footer class="text-center">
+    <div class="container">
+        <p>&copy; @(DateTime.Now.Year) Message Silo. All rights reserved.</p>
+    </div>
+</footer>

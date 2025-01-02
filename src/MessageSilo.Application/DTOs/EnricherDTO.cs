@@ -22,6 +22,8 @@ namespace MessageSilo.Application.DTOs
         //AI
         public string ApiKey { get; set; }
 
+        public string Model { get; set; }
+
         public string Command { get; set; }
 
         public EnricherDTO()

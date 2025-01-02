@@ -80,7 +80,12 @@ namespace MessageSilo.Infrastructure.Services
             {
                 EnricherType.Inline => new InlineEnricher(dto.Function),
                 EnricherType.API => new APIEnricher(dto.Url, dto.Method ?? Method.Post, dto.Retry ?? new()),
-                EnricherType.AI => new AIEnricher(new AIService(dto.ApiKey ?? configuration["AI_API_KEY"]), dto.Command),
+                EnricherType.AI => new AIEnricher(
+                    new AIService(
+                        dto.ApiKey ?? configuration["AI_API_KEY"],
+                        dto.Model ?? configuration["AI_MODEL"]
+                        ),
+                    dto.Command),
                 _ => throw new NotSupportedException(),
             };
         }
