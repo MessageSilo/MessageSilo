@@ -18,6 +18,13 @@ namespace MessageSilo.Application.DTOs
 
         public string AccessKey { get; set; }
 
+        //AI_Router
+        public List<AIRouterRule> Rules { get; set; } = [];
+
+        public string ApiKey { get; set; }
+
+        public string Model { get; set; }
+
         public TargetDTO()
         {
             Kind = EntityKind.Target;

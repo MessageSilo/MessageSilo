@@ -14,4 +14,6 @@
     }
 
     public record EntityValidationErrors(string EntityName, IEnumerable<ValidationFailure> ValidationFailures);
+
+    public record AIRouterRule(string TargetName, string Condition);
 }

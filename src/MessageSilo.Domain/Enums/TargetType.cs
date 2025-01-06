@@ -3,6 +3,7 @@
     public enum TargetType
     {
         API,
-        Azure_EventGrid
+        Azure_EventGrid,
+        AI_Router
     }
 }

@@ -10,9 +10,9 @@ namespace MessageSilo.Infrastructure.Services
 {
     public class TargetGrain : Grain, ITargetGrain
     {
-        private readonly ILogger<TargetGrain> logger;
+        protected readonly ILogger<TargetGrain> logger;
 
-        private readonly IGrainFactory grainFactory;
+        protected readonly IGrainFactory grainFactory;
 
         private ITarget target;
 
@@ -29,7 +29,7 @@ namespace MessageSilo.Infrastructure.Services
             await base.OnActivateAsync(cancellationToken);
         }
 
-        public async Task Send(Message message)
+        public virtual async Task Send(Message message)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace MessageSilo.Infrastructure.Services
             }
         }
 
-        public async Task Init(TargetDTO? dto = null)
+        public virtual async Task Init(TargetDTO? dto = null)
         {
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
 

@@ -4,19 +4,30 @@ namespace MessageSilo.Domain.Entities
 {
     public class AIEnricher : IEnricher
     {
-        private readonly IAIService aIService;
+        private const string PROMPT_TEMPLATE = @"
+        ## Task
+        {0}
 
-        private readonly string command;
+        ### Input
+        You will receive a JSON object or invalid JSON.
 
-        public AIEnricher(IAIService aIService, string command)
+        ### Output
+        Ensure the output is strictly formatted as valid JSON with no additional text or comments.
+        ";
+
+        private readonly IAIService aiService;
+
+        private readonly string prompt;
+
+        public AIEnricher(IAIService aiService, string command)
         {
-            this.aIService = aIService;
-            this.command = command;
+            this.aiService = aiService;
+            this.prompt = string.Format(PROMPT_TEMPLATE, command);
         }
 
         public async Task<string> TransformMessage(string message)
         {
-            return await aIService.Chat(command, message);
+            return await aiService.Chat(prompt, message);
         }
     }
 }
