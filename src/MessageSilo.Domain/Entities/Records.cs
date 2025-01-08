@@ -15,5 +15,11 @@
 
     public record EntityValidationErrors(string EntityName, IEnumerable<ValidationFailure> ValidationFailures);
 
-    public record AIRouterRule(string TargetName, string Condition);
+    public class AIRouterRule
+    {
+        public AIRouterRule() { }
+
+        public required string TargetName { get; set; }
+        public required string Condition { get; set; }
+    }
 }

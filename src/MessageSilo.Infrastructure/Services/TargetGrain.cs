@@ -4,22 +4,26 @@ using MessageSilo.Domain.Enums;
 using MessageSilo.Domain.Helpers;
 using MessageSilo.Domain.Interfaces;
 using MessageSilo.Infrastructure.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace MessageSilo.Infrastructure.Services
 {
     public class TargetGrain : Grain, ITargetGrain
     {
-        protected readonly ILogger<TargetGrain> logger;
+        private readonly ILogger<TargetGrain> logger;
 
-        protected readonly IGrainFactory grainFactory;
+        private readonly IGrainFactory grainFactory;
+
+        private readonly IConfiguration configuration;
 
         private ITarget target;
 
-        public TargetGrain(ILogger<TargetGrain> logger, IGrainFactory grainFactory)
+        public TargetGrain(ILogger<TargetGrain> logger, IGrainFactory grainFactory, IConfiguration configuration)
         {
             this.logger = logger;
             this.grainFactory = grainFactory;
+            this.configuration = configuration;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -29,7 +33,7 @@ namespace MessageSilo.Infrastructure.Services
             await base.OnActivateAsync(cancellationToken);
         }
 
-        public virtual async Task Send(Message message)
+        public async Task Send(Message message)
         {
             try
             {
@@ -43,7 +47,7 @@ namespace MessageSilo.Infrastructure.Services
             }
         }
 
-        public virtual async Task Init(TargetDTO? dto = null)
+        public async Task Init(TargetDTO? dto = null)
         {
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
 
@@ -74,6 +78,10 @@ namespace MessageSilo.Infrastructure.Services
             {
                 TargetType.API => new APITarget(dto.Url, dto.Retry ?? new()),
                 TargetType.Azure_EventGrid => new AzureEventGridTarget(dto.Endpoint, dto.AccessKey),
+                TargetType.AI_Router => new AIRouter(dto.UserId, new AIService(
+                        dto.ApiKey ?? configuration["AI_API_KEY"],
+                        dto.Model ?? configuration["AI_MODEL"]
+                        ), dto.Rules, grainFactory),
                 _ => throw new NotSupportedException(),
             };
         }

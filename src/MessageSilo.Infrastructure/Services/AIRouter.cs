@@ -1,9 +1,11 @@
-﻿using MessageSilo.Domain.Interfaces;
+﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Interfaces;
+using MessageSilo.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 
-namespace MessageSilo.Domain.Entities
+namespace MessageSilo.Infrastructure.Services
 {
-    public class AIRouter : IAIRouter
+    public class AIRouter : ITarget
     {
         private const string PROMPT_TEMPLATE = @"
         ## Task
@@ -23,23 +25,43 @@ namespace MessageSilo.Domain.Entities
         - Multiple rules can match simultaneously, so include all applicable targets.
         ";
 
+        private readonly IEntityManagerGrain entityManager;
+
+        private readonly IGrainFactory grainFactory;
+        
         private readonly IAIService aiService;
 
         private readonly string prompt;
 
-        public AIRouter(IAIService aiService, IEnumerable<AIRouterRule> rules)
+        public AIRouter(string userId, IAIService aiService, IEnumerable<AIRouterRule> rules, IGrainFactory grainFactory)
         {
             this.aiService = aiService;
+            this.grainFactory = grainFactory;
 
             var rulesPropmpt = string.Join(Environment.NewLine, rules.Select((rule, index) =>
             $"- **{rule.TargetName}**: {rule.Condition}"));
 
             this.prompt = string.Format(PROMPT_TEMPLATE, rulesPropmpt);
+
+            this.entityManager = this.grainFactory.GetGrain<IEntityManagerGrain>(userId);
         }
 
-        public async Task<IEnumerable<string>> GetTargetNames(string message)
+        public async Task Send(Message message)
         {
-            var aiResponse =  await aiService.Chat(prompt, message);
+            var targetNames = await getTargetNames(message.Body);
+
+            var entities = await entityManager.List();
+
+            var targets = entities.Where(p => targetNames.Contains(p.Name));
+
+            foreach (var target in targets)
+            {
+            }
+        }
+
+        private async Task<IEnumerable<string>> getTargetNames(string message)
+        {
+            var aiResponse = await aiService.Chat(prompt, message);
 
             var targetNames = JsonConvert.DeserializeObject<IEnumerable<string>>(aiResponse);
 
