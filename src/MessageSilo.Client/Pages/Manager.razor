@@ -290,5 +290,17 @@
                 }
             }
         }
+
+        foreach (TargetNode targetNode in diagram.Nodes.Where(p => p is TargetNode))
+        {
+            foreach (var rule in targetNode.DTO.Rules)
+            {
+                var nodeByRule = diagram.Nodes.First(p => p.Id == rule.TargetName);
+                diagram.Links.Add(new LinkModel(targetNode, nodeByRule)
+                    {
+                        TargetMarker = LinkMarker.Arrow
+                    });
+            }
+        }
     }
 }
