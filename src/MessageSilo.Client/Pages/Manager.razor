@@ -154,7 +154,6 @@
         foreach (var config in content.Where(p => p.Contains($"kind: {EntityKind.Connection}")))
         {
             var parsed = yamlConverterService.Deserialize<ConnectionSettingsDTO>(config);
-            parsed.TargetEntity = dto.Targets.FirstOrDefault(p => p.Id == parsed.TargetId);
             dto.Connections.Add(parsed);
         }
 

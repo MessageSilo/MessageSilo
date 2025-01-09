@@ -44,7 +44,6 @@ namespace MessageSilo.SiloCTL.Options
             foreach (var config in configReader.FileContents.Where(p => p.Contains($"kind: {EntityKind.Connection}")))
             {
                 var parsed = yamlConverterService.Deserialize<ConnectionSettingsDTO>(config);
-                parsed.TargetEntity = dto.Targets.FirstOrDefault(p => p.Id == parsed.TargetId);
                 dto.Connections.Add(parsed);
             }
 

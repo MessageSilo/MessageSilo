@@ -22,4 +22,6 @@
         public required string TargetName { get; set; }
         public required string Condition { get; set; }
     }
+
+    public record AIRouterResponse(IEnumerable<string> Targets);
 }

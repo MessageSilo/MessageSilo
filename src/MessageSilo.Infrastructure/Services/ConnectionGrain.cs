@@ -13,7 +13,7 @@ namespace MessageSilo.Infrastructure.Services
 
         private readonly IGrainFactory grainFactory;
 
-        private TargetDTO? targetEntity { get; set; }
+        private Entity? targetEntity { get; set; }
 
         private MessagePlatformType? messagePlatformType { get; set; }
 
@@ -39,6 +39,8 @@ namespace MessageSilo.Infrastructure.Services
 
                 if (settings == null)
                     return;
+
+                targetEntity = (await em.List()).FirstOrDefault(p => p.Name == settings.Target);
 
                 messagePlatformType = settings.Type.Value;
                 enrichers = settings.Enrichers.ToList();
@@ -96,7 +98,7 @@ namespace MessageSilo.Infrastructure.Services
                     return false;
 
                 if (targetEntity is not null)
-                    await getTarget().Send(message);
+                    await getTarget(scaleSet).Send(message);
 
                 return true;
             }
@@ -111,12 +113,12 @@ namespace MessageSilo.Infrastructure.Services
 
         }
 
-        private IMessageSenderGrain getTarget()
+        private IMessageSenderGrain getTarget(string scaleSet)
         {
             return targetEntity.Kind switch
             {
-                EntityKind.Connection => grainFactory.GetGrain<IConnectionGrain>(targetEntity.Id),
-                EntityKind.Target => grainFactory.GetGrain<ITargetGrain>(targetEntity.Id),
+                EntityKind.Connection => grainFactory.GetGrain<IConnectionGrain>($"{targetEntity.Id}#{scaleSet}"),
+                EntityKind.Target => grainFactory.GetGrain<ITargetGrain>($"{targetEntity.Id}#{scaleSet}"),
                 _ => throw new NotSupportedException(),
             };
         }

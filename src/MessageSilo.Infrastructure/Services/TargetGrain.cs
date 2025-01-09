@@ -47,19 +47,14 @@ namespace MessageSilo.Infrastructure.Services
             }
         }
 
-        public async Task Init(TargetDTO? dto = null)
+        public async Task Init()
         {
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
 
             try
             {
-                TargetDTO? settings = dto;
-
-                if (settings == null)
-                {
-                    var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
-                    settings = await em.GetTargetSettings(name);
-                }
+                var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
+                var settings = await em.GetTargetSettings(name);
 
                 if (settings == null)
                     return;

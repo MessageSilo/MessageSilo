@@ -1,4 +1,5 @@
 ﻿using MessageSilo.Domain.Entities;
+using MessageSilo.Domain.Enums;
 using MessageSilo.Domain.Interfaces;
 using MessageSilo.Infrastructure.Interfaces;
 using Newtonsoft.Json;
@@ -18,7 +19,7 @@ namespace MessageSilo.Infrastructure.Services
         You will receive a JSON object or invalid JSON.
 
         ### Output
-        Return a JSON array of target names that match the rules. If no rules match, return an empty array `[]`.
+        Return a JSON array of target names that match the rules, for example: '{{ ""targets"": [""target1""] }}'. If no rules match, return an empty array '{{ ""targets"": [] }}'.
 
         ### Notes
         - The output must always be a valid JSON array.
@@ -28,7 +29,7 @@ namespace MessageSilo.Infrastructure.Services
         private readonly IEntityManagerGrain entityManager;
 
         private readonly IGrainFactory grainFactory;
-        
+
         private readonly IAIService aiService;
 
         private readonly string prompt;
@@ -39,7 +40,7 @@ namespace MessageSilo.Infrastructure.Services
             this.grainFactory = grainFactory;
 
             var rulesPropmpt = string.Join(Environment.NewLine, rules.Select((rule, index) =>
-            $"- **{rule.TargetName}**: {rule.Condition}"));
+            $"- {rule.TargetName}: {rule.Condition}"));
 
             this.prompt = string.Format(PROMPT_TEMPLATE, rulesPropmpt);
 
@@ -56,6 +57,8 @@ namespace MessageSilo.Infrastructure.Services
 
             foreach (var target in targets)
             {
+                IMessageSenderGrain sender = getTarget(target);
+                await sender.Send(message);
             }
         }
 
@@ -63,9 +66,21 @@ namespace MessageSilo.Infrastructure.Services
         {
             var aiResponse = await aiService.Chat(prompt, message);
 
-            var targetNames = JsonConvert.DeserializeObject<IEnumerable<string>>(aiResponse);
+            var aiRouterResponse = JsonConvert.DeserializeObject<AIRouterResponse>(aiResponse);
 
-            return targetNames;
+            return aiRouterResponse.Targets;
+        }
+
+        private IMessageSenderGrain getTarget(Entity targetEntity)
+        {
+            var targetId = $"{targetEntity.Id}#{1}";
+
+            return targetEntity.Kind switch
+            {
+                EntityKind.Connection => grainFactory.GetGrain<IConnectionGrain>(targetId),
+                EntityKind.Target => grainFactory.GetGrain<ITargetGrain>(targetId),
+                _ => throw new NotSupportedException(),
+            };
         }
     }
 }
