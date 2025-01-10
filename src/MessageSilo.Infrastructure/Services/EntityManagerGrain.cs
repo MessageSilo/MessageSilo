@@ -132,12 +132,21 @@ namespace MessageSilo.Infrastructure.Services
             persistence.State.Scale = dto.Scale;
             await persistence.WriteStateAsync();
 
+            foreach (var target in dto.Targets)
+            {
+                for (int scaleSet = 1; scaleSet <= persistence.State.Scale; scaleSet++)
+                {
+                    var grain = grainFactory.GetGrain<ITargetGrain>($"{target.Id}#{scaleSet}");
+                    await grain.Init();
+                }
+            }
+
             foreach (var enricher in dto.Enrichers)
             {
                 for (int scaleSet = 1; scaleSet <= persistence.State.Scale; scaleSet++)
                 {
                     var grain = grainFactory.GetGrain<IEnricherGrain>($"{enricher.Id}#{scaleSet}");
-                    await grain.Init(enricher);
+                    await grain.Init();
                 }
             }
 
