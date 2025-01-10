@@ -12,12 +12,11 @@ namespace MessageSilo.Infrastructure.Services
             client = new(model: model ?? "gpt-4o", apiKey);
         }
 
-        public async Task<string> Chat(string command, string message)
+        public async Task<string> Chat(string prompt, string message)
         {
             IEnumerable<ChatMessage> chatMessages =
             [
-                ChatMessage.CreateSystemMessage(command),
-                ChatMessage.CreateSystemMessage("Ensure the output is strictly formatted as valid JSON with no additional text or comments."),
+                ChatMessage.CreateSystemMessage(prompt),
                 ChatMessage.CreateUserMessage(message)
             ];
 

@@ -16,10 +16,6 @@ namespace MessageSilo.Application.DTOs
 
         public string Target { get; set; }
 
-        public string TargetId => string.IsNullOrEmpty(Target) ? null! : $"{UserId}|{Target}";
-
-        public EntityKind TargetKind { get; set; }
-
         public ReceiveMode? ReceiveMode { get; set; }
 
         //Azure

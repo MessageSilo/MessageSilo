@@ -9,6 +9,6 @@ namespace MessageSilo.Infrastructure.Interfaces
         Task<Message?> Enrich(Message message);
 
         [OneWay]
-        Task Init(EnricherDTO? dto = null);
+        Task Init();
     }
 }

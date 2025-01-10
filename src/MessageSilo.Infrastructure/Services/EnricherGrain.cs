@@ -49,19 +49,14 @@ namespace MessageSilo.Infrastructure.Services
             }
         }
 
-        public async Task Init(EnricherDTO? dto = null)
+        public async Task Init()
         {
             var (userId, name, scaleSet) = this.GetPrimaryKeyString().Explode();
 
             try
             {
-                EnricherDTO? settings = dto;
-
-                if (settings == null)
-                {
-                    var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
-                    settings = await em.GetEnricherSettings(name);
-                }
+                var em = grainFactory.GetGrain<IEntityManagerGrain>(userId);
+                var settings = await em.GetEnricherSettings(name);
 
                 if (settings == null)
                     return;

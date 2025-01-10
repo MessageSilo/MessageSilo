@@ -137,7 +137,7 @@ namespace MessageSilo.Infrastructure.Services
                 for (int scaleSet = 1; scaleSet <= persistence.State.Scale; scaleSet++)
                 {
                     var grain = grainFactory.GetGrain<ITargetGrain>($"{target.Id}#{scaleSet}");
-                    await grain.Init(target);
+                    await grain.Init();
                 }
             }
 
@@ -146,7 +146,7 @@ namespace MessageSilo.Infrastructure.Services
                 for (int scaleSet = 1; scaleSet <= persistence.State.Scale; scaleSet++)
                 {
                     var grain = grainFactory.GetGrain<IEnricherGrain>($"{enricher.Id}#{scaleSet}");
-                    await grain.Init(enricher);
+                    await grain.Init();
                 }
             }
 

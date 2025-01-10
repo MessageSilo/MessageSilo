@@ -154,7 +154,6 @@
         foreach (var config in content.Where(p => p.Contains($"kind: {EntityKind.Connection}")))
         {
             var parsed = yamlConverterService.Deserialize<ConnectionSettingsDTO>(config);
-            parsed.TargetKind = dto.Targets.Any(p => p.Id == parsed.TargetId) ? EntityKind.Target : EntityKind.Connection;
             dto.Connections.Add(parsed);
         }
 
@@ -289,6 +288,18 @@
                             TargetMarker = LinkMarker.Arrow
                         });
                 }
+            }
+        }
+
+        foreach (TargetNode targetNode in diagram.Nodes.Where(p => p is TargetNode))
+        {
+            foreach (var rule in targetNode.DTO.Rules)
+            {
+                var nodeByRule = diagram.Nodes.First(p => p.Id == rule.TargetName);
+                diagram.Links.Add(new LinkModel(targetNode, nodeByRule)
+                    {
+                        TargetMarker = LinkMarker.Arrow
+                    });
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using MessageSilo.Domain.Entities;
+﻿using MessageSilo.Application.DTOs;
+using MessageSilo.Domain.Entities;
 using MessageSilo.Domain.Enums;
 using MessageSilo.Domain.Helpers;
 using MessageSilo.Infrastructure.Interfaces;
@@ -12,9 +13,7 @@ namespace MessageSilo.Infrastructure.Services
 
         private readonly IGrainFactory grainFactory;
 
-        private string? targetId { get; set; }
-
-        private EntityKind? targetKind { get; set; }
+        private Entity? targetEntity { get; set; }
 
         private MessagePlatformType? messagePlatformType { get; set; }
 
@@ -41,11 +40,7 @@ namespace MessageSilo.Infrastructure.Services
                 if (settings == null)
                     return;
 
-                if (settings.TargetId is not null)
-                {
-                    targetId = $"{settings.TargetId}#{scaleSet}";
-                    targetKind = settings.TargetKind;
-                }
+                targetEntity = (await em.List()).FirstOrDefault(p => p.Name == settings.Target);
 
                 messagePlatformType = settings.Type.Value;
                 enrichers = settings.Enrichers.ToList();
@@ -102,8 +97,8 @@ namespace MessageSilo.Infrastructure.Services
                 if (message is null)
                     return false;
 
-                if (targetId is not null)
-                    await getTarget().Send(message);
+                if (targetEntity is not null)
+                    await getTarget(scaleSet).Send(message);
 
                 return true;
             }
@@ -118,12 +113,12 @@ namespace MessageSilo.Infrastructure.Services
 
         }
 
-        private IMessageSenderGrain getTarget()
+        private IMessageSenderGrain getTarget(string scaleSet)
         {
-            return targetKind switch
+            return targetEntity.Kind switch
             {
-                EntityKind.Connection => grainFactory.GetGrain<IConnectionGrain>(targetId),
-                EntityKind.Target => grainFactory.GetGrain<ITargetGrain>(targetId),
+                EntityKind.Connection => grainFactory.GetGrain<IConnectionGrain>($"{targetEntity.Id}#{scaleSet}"),
+                EntityKind.Target => grainFactory.GetGrain<ITargetGrain>($"{targetEntity.Id}#{scaleSet}"),
                 _ => throw new NotSupportedException(),
             };
         }

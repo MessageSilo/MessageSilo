@@ -1,5 +1,6 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
 @using MessageSilo.Client.Models
+@using MessageSilo.Domain.Enums
 
 <Div Class="widget-container">
     <Tooltip Text="@tooltipContent">
@@ -25,7 +26,11 @@
     // This gets filled by the library
     [Parameter] public TargetNode Node { get; set; } = null!;
 
-    private string imageUrl => $"/img/target.png";
+    private string imageUrl => Node.DTO.Type switch
+    {
+        TargetType.AI_Router => $"/img/ai_router.webp",
+        _ => $"/img/target.png"
+    };
 
     private string tooltipContent =>
     $"<table>" +
